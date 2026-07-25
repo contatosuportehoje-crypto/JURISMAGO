@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Direito Penal - Jurisprudência STJ/STF (Bloco 2)</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --card2:#273549; --text:#e2e8f0; --muted:#94a3b8;
+    --green:#22c55e; --red:#ef4444; --blue:#3b82f6; --yellow:#eab308; --purple:#a855f7;
+    --border:#334155;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:var(--bg); color:var(--text);
+    min-height:100vh; padding:16px;
+  }
+  .wrap{max-width:900px; margin:0 auto;}
+  h1{font-size:1.4rem; margin:0 0 4px 0; color:#fff;}
+  .subtitle{color:var(--muted); font-size:.85rem; margin-bottom:16px;}
+  .statsbar{
+    display:flex; flex-wrap:wrap; gap:10px; background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:12px; margin-bottom:14px;
+  }
+  .stat{flex:1; min-width:90px; text-align:center;}
+  .stat .num{font-size:1.3rem; font-weight:700;}
+  .stat .lbl{font-size:.72rem; color:var(--muted);}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; align-items:center;
+  }
+  select, input[type=text], input[type=number]{
+    background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:8px;
+    padding:8px 10px; font-size:.85rem;
+  }
+  button{
+    cursor:pointer; border:none; border-radius:8px; padding:8px 12px; font-size:.85rem; font-weight:600;
+    transition:opacity .15s;
+  }
+  button:hover{opacity:.85;}
+  .btn-blue{background:var(--blue); color:#fff;}
+  .btn-gray{background:var(--card2); color:var(--text); border:1px solid var(--border);}
+  .btn-green{background:var(--green); color:#052e12;}
+  .btn-red{background:var(--red); color:#fff;}
+  .btn-yellow{background:var(--yellow); color:#3f2d00;}
+  .btn-purple{background:var(--purple); color:#fff;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px;
+  }
+  .tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .tag{
+    font-size:.68rem; padding:3px 9px; border-radius:20px; background:var(--card2); color:var(--muted);
+    border:1px solid var(--border);
+  }
+  .tag.source{background:#312e81; color:#c7d2fe; border-color:#4338ca;}
+  .statement{font-size:1.02rem; line-height:1.5; margin-bottom:16px;}
+  .caso-box{
+    background:#1b2436; border:1px solid #3b4a6b; border-left:4px solid var(--yellow); border-radius:8px;
+    padding:12px 14px; font-size:.86rem; line-height:1.55; margin-bottom:14px; color:#cbd5e1;
+  }
+  .caso-box b{color:var(--yellow);}
+  .vf-buttons{display:flex; gap:10px; margin-bottom:14px;}
+  .vf-buttons button{flex:1; padding:12px; font-size:.95rem;}
+  .result-banner{
+    padding:10px 14px; border-radius:10px; margin-bottom:12px; font-weight:700; font-size:.9rem;
+  }
+  .result-banner.correct{background:#052e12; color:var(--green); border:1px solid var(--green);}
+  .result-banner.wrong{background:#450a0a; color:var(--red); border:1px solid var(--red);}
+  .justification{
+    background:var(--card2); border-left:4px solid var(--blue); border-radius:8px; padding:12px 14px;
+    font-size:.88rem; line-height:1.5; margin-bottom:14px;
+  }
+  .justification b.correct-ans{color:var(--red);}
+  .guess-row{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
+  .guess-row button{flex:1; min-width:140px;}
+  .nav-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:6px;}
+  .nav-left, .nav-right{display:flex; gap:8px; flex-wrap:wrap;}
+  .qcounter{font-size:.8rem; color:var(--muted); text-align:center; margin-bottom:8px;}
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center;
+    z-index:100; padding:16px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; max-width:600px;
+    width:100%; max-height:80vh; overflow-y:auto;
+  }
+  .modal h2{margin-top:0; font-size:1.1rem;}
+  textarea{
+    width:100%; min-height:120px; background:var(--card2); color:var(--text); border:1px solid var(--border);
+    border-radius:8px; padding:10px; font-size:.8rem;
+  }
+  .list-item{
+    background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:8px;
+    font-size:.83rem; display:flex; justify-content:space-between; gap:10px; align-items:center;
+  }
+  .list-item .txt{flex:1;}
+  .close-x{float:right; background:none; color:var(--muted); font-size:1.2rem; padding:0 6px;}
+  .empty-msg{color:var(--muted); text-align:center; padding:20px; font-size:.9rem;}
+  .cat-chip{
+    font-size:.75rem; padding:6px 12px; border-radius:20px; background:var(--card2); color:var(--text);
+    border:1px solid var(--border); cursor:pointer;
+  }
+  .cat-chip.active{background:var(--blue); border-color:var(--blue); color:#fff;}
+  .catwrap{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .hint{font-size:.72rem; color:var(--muted); margin-top:6px;}
+  .footer-note{text-align:center; color:var(--muted); font-size:.7rem; margin-top:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚖️ Quiz V/F — Jurisprudência Penal (STJ/STF) — Bloco 2</h1>
+  <div class="subtitle">Questões elaboradas exclusivamente com base no material de informativos fornecido (Info 10 a Info 860, incluindo julgados sem número de informativo).</div>
+
+  <div class="statsbar" id="statsbar"></div>
+
+  <div class="controls">
+    <select id="categorySelect"></select>
+    <input type="text" id="searchInput" placeholder="🔎 Buscar por palavra-chave...">
+    <input type="number" id="goToInput" placeholder="Nº questão" style="width:110px;">
+    <button class="btn-blue" id="goToBtn">Ir</button>
+    <button class="btn-gray" id="bankBtn">📦 Banco de Fáceis</button>
+    <button class="btn-gray" id="statsModalBtn">📊 Ver erros/chutes</button>
+    <button class="btn-gray" id="exportBtn">Exportar progresso</button>
+    <button class="btn-gray" id="importBtn">Importar progresso</button>
+  </div>
+  <div class="controls">
+    <button class="btn-yellow" id="restartBtn">🔄 Recomeçar (mantém fáceis)</button>
+    <button class="btn-red" id="resetAllBtn">🗑️ Zerar tudo</button>
+  </div>
+
+  <div class="qcounter" id="qcounter"></div>
+  <div class="card" id="quizCard"></div>
+
+  <div class="footer-note">Progresso salvo automaticamente. Feche e volte quando quiser — o quiz continua de onde parou.</div>
+</div>
+
+<!-- Modal Banco de Fáceis -->
+<div class="modal-bg" id="bankModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('bankModal')">✕</button>
+    <h2>📦 Banco de Questões Fáceis</h2>
+    <div id="bankList"></div>
+  </div>
+</div>
+
+<!-- Modal Estatísticas -->
+<div class="modal-bg" id="statsModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('statsModal')">✕</button>
+    <h2>📊 Revisão: Erros e Acertos no Chute</h2>
+    <h3 style="color:var(--red);">❌ Questões erradas</h3>
+    <div id="wrongList"></div>
+    <h3 style="color:var(--yellow);">🎲 Acertos no chute (revisar!)</h3>
+    <div id="guessList"></div>
+  </div>
+</div>
+
+<!-- Modal Import/Export -->
+<div class="modal-bg" id="dataModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('dataModal')">✕</button>
+    <h2 id="dataModalTitle">Progresso</h2>
+    <textarea id="dataTextarea"></textarea>
+    <div class="hint" id="dataHint"></div>
+    <br>
+    <button class="btn-blue" id="dataConfirmBtn">Confirmar</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   BANCO DE QUESTÕES — 100% baseado no material fornecido
+   (Bloco 2: informativos mais antigos, Info 10 a Info 860)
+   ========================================================= */
+const QUESTIONS = [
+{id:1, tema:"Homicídio (art. 121)", fonte:"STJ Info 860", statement:"A qualificadora do homicídio praticado mediante paga ou promessa de recompensa (art. 121, §2º, I, do CP) se comunica automaticamente ao mandante do crime, por se tratar de circunstância objetiva que se estende a todos os coautores.", answer:false, just:"ERRADO. O STJ decidiu que a qualificadora da paga ou promessa de recompensa NÃO se comunica automaticamente ao mandante do crime (EAREsp 1.322.867-SP)."},
+{id:2, tema:"Concurso de Crimes", fonte:"STJ Info 860", caso:"Carlos, ao dirigir embriagado em alta velocidade, colidiu com outro veículo e causou a morte de dois ocupantes desse outro carro. Foi denunciado e pronunciado por dois homicídios dolosos, na modalidade de dolo eventual. Os jurados o condenaram, reconhecendo que ele assumiu o risco de produzir o resultado morte em relação a ambas as vítimas.", statement:"O reconhecimento de dolo eventual em relação às duas vítimas é incompatível com o reconhecimento de desígnios autônomos, devendo ser aplicado o concurso formal próprio (mais benéfico ao réu).", answer:false, just:"ERRADO. O STJ decidiu que o dolo eventual é compatível com o reconhecimento de desígnios autônomos (o agente assumiu conscientemente o risco de matar quantas pessoas encontrasse), justificando a aplicação do concurso formal impróprio, com soma das penas."},
+{id:3, tema:"Crimes Sexuais", fonte:"STJ Info 859", caso:"Letícia, de 20 anos, dormia na casa de João, amigo de sua mãe. Durante a madrugada, João passou a mão em sua genitália. Assustada, ela despertou e correu para o banheiro. O Tribunal de origem havia desclassificado a conduta para importunação sexual.", statement:"A prática de ato libidinoso com pessoa em estado de sono configura o crime de importunação sexual (art. 215-A do CP), e não estupro de vulnerável, por não haver emprego de violência ou grave ameaça física.", answer:false, just:"ERRADO. O STJ entendeu configurado o crime de estupro de vulnerável (art. 217-A, §1º, do CP), pois o estado de sono da vítima prejudica sua capacidade de resistência, não sendo cabível a desclassificação."},
+{id:4, tema:"Lei de Drogas", fonte:"STJ Info 858 (Tema 1262)", statement:"É possível o aumento da pena-base com fundamento na natureza da droga apreendida (art. 42 da Lei 11.343/2006), ainda que a quantidade apreendida seja ínfima, já que a natureza e a quantidade são vetoriais autônomas e independentes entre si.", answer:false, just:"ERRADO. Em recurso repetitivo (Tema 1262), o STJ fixou que é desproporcional a majoração da pena-base quando a droga apreendida for de ínfima quantidade, independentemente de sua natureza."},
+{id:5, tema:"Lei Maria da Penha", fonte:"STJ Info 858 (Tema 1333)", statement:"Após a Lei 14.994/2024, que incluiu o §2º ao art. 21 da Lei das Contravenções Penais, ainda é possível aplicar cumulativamente a agravante do art. 61, II, 'f', do CP às vias de fato praticadas em contexto de violência doméstica contra a mulher.", answer:false, just:"ERRADO. Após a Lei 14.994/2024, por força dos princípios da especialidade e da vedação ao bis in idem, não é mais possível aplicar essa agravante genérica à contravenção de vias de fato quando incide o §2º do art. 21 da LCP (Tema 1333)."},
+{id:6, tema:"Parte Geral (Execução Penal)", fonte:"STJ Info 858", statement:"A pena de multa perdeu seu caráter de sanção penal após a alteração do art. 51 do Código Penal pela Lei 13.964/2019 (Pacote Anticrime), de modo que sua execução deve ser sempre promovida diretamente pela Fazenda Pública, como dívida ativa.", answer:false, just:"ERRADO. O STJ afirmou que a multa não perde sua natureza penal mesmo após a Lei 13.964/2019; deve ser executada prioritariamente pelo Ministério Público perante o Juízo da Execução Penal, cabendo à Fazenda Pública atuação apenas subsidiária, caso o MP não atue em 90 dias."},
+{id:7, tema:"Lei de Drogas", fonte:"STJ Info 857", caso:"Regina vendia drogas com o auxílio de sua filha Janaína, adolescente de 16 anos. O MP imputou a Regina as majorantes do art. 40, II (prevalecimento do poder familiar) e VI (envolvimento de adolescente) da Lei de Drogas, ambas referentes ao mesmo fato de utilização da filha.", statement:"A aplicação simultânea das majorantes do art. 40, II e VI, da Lei de Drogas, quando referentes ao mesmo fato de envolvimento da filha menor, configura bis in idem, sendo cabível apenas uma delas.", answer:false, just:"ERRADO. O STJ entendeu que as majorantes possuem naturezas jurídicas distintas — uma trata do abuso do poder familiar, outra do envolvimento direto do menor no crime — podendo ser aplicadas simultaneamente sem configurar bis in idem."},
+{id:8, tema:"Lei Maria da Penha", fonte:"STJ Info 856", statement:"A vítima de violência doméstica não possui legitimidade recursal própria para impugnar decisão que indefere ou revoga medidas protetivas de urgência, cabendo essa atribuição exclusivamente ao Ministério Público, por força do art. 271 do CPP.", answer:false, just:"ERRADO. O STJ reconheceu a legitimidade da vítima para recorrer de decisão que indefere ou revoga medidas protetivas, não podendo essa legitimidade ser limitada pela previsão do art. 271 do CPP."},
+{id:9, tema:"Dosimetria da Pena", fonte:"STJ Info 856", statement:"Segundo o STJ, se já se passaram mais de 10 anos entre a extinção da pena de uma condenação anterior e a prática de novo delito, essa condenação pretérita não pode mais ser considerada maus antecedentes na dosimetria da nova pena.", answer:true, just:"CORRETO. O STJ flexibilizou o sistema de perpetuidade dos maus antecedentes: embora o prazo depurador de 5 anos do art. 64, I, do CP não se aplique aos maus antecedentes, ultrapassados 10 anos da extinção da pena, a condenação anterior não pode mais ser usada como maus antecedentes."},
+{id:10, tema:"Lei de Drogas", fonte:"STJ Info 27 (Ed. Extraordinária)", caso:"João foi abordado com uma bolsa contendo frascos de um líquido transparente. A perícia identificou tratar-se de um solvente formado por efedrina (precursora), ácido clorídrico (insumo químico) e tricloroetileno (substância psicotrópica e insumo), individualmente controlados, embora o produto final não constasse nominalmente da lista da Anvisa.", statement:"Não configura tráfico de drogas o transporte de um solvente formado pela combinação de substâncias individualmente controladas, quando a mistura resultante não constar, ela própria, da lista de substâncias proibidas da Anvisa.", answer:false, just:"ERRADO. O STJ decidiu que configura tráfico de drogas o transporte de substâncias que, individualmente, constituem ou são precursoras de entorpecentes, mesmo que a combinação delas não conste da lista de substâncias proibidas da Anvisa."},
+{id:11, tema:"Lei de Drogas", fonte:"STJ Info 27 (Ed. Extraordinária)", statement:"A determinação, por parte do mandante, para que terceiro adquira e entregue droga, com definição de dia, horário e local, configura mero ato preparatório atípico, não sendo possível responsabilizar o mandante pelo verbo 'trazer consigo' do tipo penal de tráfico.", answer:false, just:"ERRADO. O STJ entendeu que essa conduta, acompanhada de atos de coordenação e execução, configura autoria intelectual do tráfico, justificando a aplicação do art. 29, caput, do Código Penal ao mandante."},
+{id:12, tema:"Lei de Tortura", fonte:"STJ Info 27 (Ed. Extraordinária)", caso:"Carlos, líder informal na hierarquia entre os detentos ('comando') de uma cela, amarrou e agrediu física e psicologicamente Pedro por três dias, após este se recusar a cumprir uma ordem de limpeza. Foi denunciado por tortura-castigo (art. 1º, II, da Lei 9.455/1997).", statement:"O crime de tortura-castigo (art. 1º, II, da Lei 9.455/97) pode ser praticado por qualquer pessoa que exerça ascendência informal sobre a vítima, como a liderança de um preso sobre outro, ainda que inexista relação jurídica preexistente de guarda, poder ou autoridade.", answer:false, just:"ERRADO. O STJ decidiu que a tortura-castigo é crime próprio, exigindo que o autor ocupe posição de garante decorrente de lei ou de outra relação jurídica preexistente; a mera liderança informal entre presos não configura esse vínculo."},
+{id:13, tema:"Descaminho", fonte:"STJ Info 27 (Ed. Extraordinária)", caso:"João, fiscal de tributos estaduais, identificou sonegação de ICMS na entrada de um caminhão de batatas vindo de outro Estado, mas permitiu a circulação da mercadoria sem exigir o recolhimento do imposto, violando seus deveres funcionais.", statement:"A circulação de produto nacional dentro do território brasileiro, com ilusão do pagamento de tributo estadual (ICMS), caracteriza o crime de descaminho (art. 334 do CP), de competência da Justiça Federal.", answer:false, just:"ERRADO. O STJ decidiu que essa conduta não caracteriza descaminho, pois este pressupõe tributo federal incidente sobre operação de comércio exterior; a competência é da Justiça Estadual, podendo a conduta do servidor configurar outros crimes, como prevaricação."},
+{id:14, tema:"Parte Geral (Execução Penal)", fonte:"STJ Info 27 (Ed. Extraordinária)", statement:"Admite-se a detração penal do período de prisão preventiva cumprida em processo distinto quando, nesse segundo processo, o réu foi condenado com trânsito em julgado, mas teve a punibilidade extinta por indulto.", answer:false, just:"ERRADO. O STJ entendeu que não é possível a detração nesse caso: o indulto pressupõe reconhecimento da culpabilidade do réu, não se podendo afirmar que a segregação foi indevidamente cumprida."},
+{id:15, tema:"Dosimetria da Pena", fonte:"STJ Info 853 (Tema 1318)", statement:"A premeditação autoriza automaticamente a valoração negativa da circunstância judicial da culpabilidade (art. 59 do CP), dispensando fundamentação específica sobre a maior reprovabilidade da conduta no caso concreto.", answer:false, just:"ERRADO. Segundo o Tema 1318, a exasperação da pena-base pela premeditação não é automática, exigindo fundamentação específica sobre a maior reprovabilidade, além de a premeditação não poder ser elementar do tipo nem pressuposto de agravante/qualificadora já considerada."},
+{id:16, tema:"Racismo (Lei 7.716/89)", fonte:"STJ Info 851", statement:"A embriaguez voluntária e o ânimo exaltado do réu são, por si sós, suficientes para afastar o dolo específico necessário à configuração do crime de injúria racial.", answer:false, just:"ERRADO. O STJ decidiu que a embriaguez voluntária e os ânimos exaltados são insuficientes para afastar o dolo específico da injúria racial, bastando a intenção de ofender a honra subjetiva da vítima por elementos ligados à sua cor de pele."},
+{id:17, tema:"Crimes Contra a Fé Pública", fonte:"STJ Info 850 (Tema 1255)", statement:"O crime de falsa identidade é crime material, exigindo para sua consumação a ocorrência de resultado naturalístico efetivo decorrente da informação falsa fornecida.", answer:false, just:"ERRADO. O STJ fixou (Tema 1255) que se trata de crime formal, que se consuma com o simples fornecimento consciente e voluntário de dados inexatos sobre a identidade, independentemente de resultado naturalístico."},
+{id:18, tema:"Crimes Contra o Patrimônio", fonte:"STJ Info 847", statement:"A prática de roubo no período noturno, por si só, justifica a exasperação da pena-base, por revelar maior gravidade do modus operandi, dada a menor visibilidade e circulação de pessoas em via pública.", answer:false, just:"ERRADO. O STJ decidiu que essa circunstância, isoladamente, não justifica o aumento da pena-base, pois não é reveladora, por si só, da maior gravidade do modus operandi."},
+{id:19, tema:"Lei de Drogas", fonte:"STJ Info 846", caso:"João foi investigado por divulgar venda de drogas em perfil anônimo do Instagram e interagir com compradores por mensagens. Após seis meses, a polícia apreendeu celulares, cadernos e um áudio, mas nenhuma droga foi encontrada com ele.", statement:"É válida a condenação por tráfico de drogas fundamentada essencialmente em prints de publicações de venda de entorpecentes em redes sociais e mensagens eletrônicas, ainda que não tenha havido apreensão de substância entorpecente.", answer:false, just:"ERRADO. O STJ considerou flagrantemente ilegal a condenação nesses moldes, sendo imprescindível a apreensão de entorpecentes ou outros elementos concretos que comprovem a materialidade do tráfico."},
+{id:20, tema:"Lei Maria da Penha", fonte:"STJ Info 846", statement:"Nos casos de violência doméstica, o crime de violação de domicílio é absorvido pelo crime de lesão corporal praticado na sequência, em razão do princípio da consunção, já que ambos, em essência, protegem a integridade da vítima.", answer:false, just:"ERRADO. O STJ decidiu que esses crimes devem ser tratados como autônomos, sem aplicação da consunção, mesmo que um ocorra antes ou depois do outro, pois tutelam bens jurídicos diversos: privacidade/sossego (invasão de domicílio) e integridade física (lesão corporal)."},
+{id:21, tema:"Lei Maria da Penha", fonte:"STJ Info 824", statement:"A ausência de relação duradoura de afeto entre autor e vítima afasta a incidência do sistema protetivo da Lei Maria da Penha, que pressuporia vínculo familiar ou afetivo consolidado.", answer:false, just:"ERRADO. O STJ decidiu que, ainda que o envolvimento entre vítima e ofensor tenha sido efêmero, não é possível afastar a ocorrência de violência doméstica praticada contra a mulher, já que a vulnerabilidade feminina é presumida pela lei."},
+{id:22, tema:"Crimes Sexuais", fonte:"STJ Info 822", caso:"Lucas e Carla iniciaram relação sexual consensual. Lucas sugeriu sexo anal, recusado por Carla, mas forçou a penetração mesmo com os pedidos reiterados dela para que parasse. Meses depois, Carla trocou mensagens amigáveis com Lucas, e só cerca de um ano e meio depois registrou ocorrência policial.", statement:"A ausência de reação física enérgica da vítima durante o ato, somada a trocas posteriores de mensagens amigáveis com o agressor, é suficiente para afastar a configuração do crime de estupro.", answer:false, just:"ERRADO. O STJ afirmou que a passividade da vítima, após perceber que a resistência ativa seria inútil, não afasta o crime quando há dissenso claro e reiterado; tampouco atitudes posteriores da ofendida (como trocar mensagens) podem descaracterizar a violência já configurada."},
+{id:23, tema:"Crimes Contra a Pessoa (Aborto)", fonte:"STJ Info 820", statement:"É possível, por analogia ao entendimento do STF na ADPF 54 (anencefalia), conceder salvo-conduto para interrupção da gravidez de feto com Síndrome de Edwards, sempre que essa condição genética apresentar prognóstico grave e alta probabilidade de letalidade.", answer:false, just:"ERRADO. O STJ negou a extensão por analogia nesse caso, pois a documentação médica não confirmava a impossibilidade de vida fora do útero para o feto com Síndrome de Edwards — diferentemente da anencefalia, tratada na ADPF 54."},
+{id:24, tema:"Lei Geral do Esporte", fonte:"STJ Info 21 / atualização STF 2025", caso:"Igor, jogador de futebol, teria aceitado vantagem patrimonial para receber propositalmente cartão amarelo em uma partida do Campeonato Brasileiro, beneficiando apostadores. A defesa alegou que 'resultado de competição esportiva' equivaleria apenas ao placar final, e que cartão amarelo não o altera diretamente.", statement:"Para o STJ, a promessa de vantagem indevida para receber cartão amarelo configura, em tese, o crime do art. 198 da Lei Geral do Esporte, ainda que não haja alteração direta do placar — mas, posteriormente, a 2ª Turma do STF decidiu de forma diversa em caso concreto, entendendo atípica a conduta e trancando a ação penal.", answer:true, just:"CORRETO. O STJ (HC 861.121-GO) entendeu configurado o tipo penal, já que o cartão amarelo pode influenciar critérios de desempate do campeonato e o desempenho do próprio jogador. Contudo, em atualização de 2025, a 2ª Turma do STF (AgRg no RHC 238757-GO, j. 02/12/2025) decidiu de forma diferente, considerando a conduta atípica e determinando o trancamento da ação penal."},
+{id:25, tema:"Crimes no ECA", fonte:"STJ Info 817 (Súmula 669)", statement:"Segundo a Súmula 669 do STJ, o fornecimento de bebida alcoólica a criança ou adolescente somente configura o crime do art. 243 do ECA após o advento da Lei 13.106/2015.", answer:true, just:"CORRETO. É exatamente o teor da Súmula 669-STJ: 'o fornecimento de bebida alcoólica a criança ou adolescente, após o advento da Lei 13.106/2015, configura o crime previsto no art. 243 do ECA'."},
+{id:26, tema:"Crimes Sexuais", fonte:"STJ Info 817 (Súmula 670)", statement:"Segundo a Súmula 670 do STJ, nos crimes sexuais cometidos contra vítima em situação de vulnerabilidade temporária que recupera plenamente o discernimento, a ação penal é sempre pública incondicionada, independentemente da data em que o fato foi praticado.", answer:false, just:"ERRADO. A Súmula 670-STJ prevê ação penal pública CONDICIONADA à representação nesses casos, mas apenas se o fato tiver sido praticado na vigência da redação do art. 225 do CP dada pela Lei 12.015/2009."},
+{id:27, tema:"Lei de Drogas", fonte:"STJ Info 816", caso:"João foi preso em flagrante praticando tráfico de drogas enquanto usava tornozeleira eletrônica, imposta em outro processo. O juiz reconheceu o privilégio do §4º do art. 33 da Lei de Drogas, mas fixou a redução no menor percentual (1/6).", statement:"O fato de o réu praticar tráfico de drogas estando sob monitoramento eletrônico, por conta de outro processo, não pode ser usado para reduzir o percentual da minorante do §4º do art. 33 da Lei de Drogas ao patamar mínimo, por configurar bis in idem com a reincidência.", answer:false, just:"ERRADO. O STJ considerou legítima essa fundamentação: praticar o crime sob monitoramento eletrônico denota descaso com a Justiça e é idôneo para modular a fração de redução do benefício legal para o patamar mínimo (1/6)."},
+{id:28, tema:"Crimes Contra a Administração Pública", fonte:"STJ Info 815", caso:"um particular ofereceu vantagem indevida para que um funcionário da OAB fornecesse o gabarito de uma prova. Esse funcionário foi denunciado por corrupção passiva (art. 317 do CP), sob o argumento de que o empregado da OAB é equiparado a funcionário público para fins penais.", statement:"Os empregados da OAB não são equiparados a funcionários públicos para fins penais, uma vez que o STF (ADI 3.026/DF) decidiu que a OAB não integra nem se sujeita à Administração Pública.", answer:false, just:"ERRADO. O STJ decidiu que são equiparados a funcionário público (art. 327, §1º, do CP), pois a decisão do STF na ADI 3.026/DF não retirou a natureza pública do serviço prestado pela OAB, vinculado à administração da Justiça."},
+{id:29, tema:"Crimes Contra o Patrimônio", fonte:"STJ Info 811", caso:"Pedro, assistido por Regina (advogada ciente dos fatos), ajuizou execução com base em título executivo falso, obtendo a penhora e o levantamento de R$ 100 mil da conta de João.", statement:"O denominado 'estelionato judicial' — uso de ação judicial fundada em título falso para obter vantagem indevida — configura o crime de estelionato (art. 171 do CP), pois o juiz é induzido em erro pelo autor da ação.", answer:false, just:"ERRADO. O STJ entende que o estelionato judicial é conduta atípica na esfera penal, pela absoluta impropriedade do meio: o processo é dialético, permitindo contraditório e recursos, o que afasta a 'indução em erro' do magistrado."},
+{id:30, tema:"Estatuto do Desarmamento", fonte:"STJ Info 808 (Súmula 668)", statement:"Segundo a Súmula 668 do STJ, é hediondo o delito de porte ou posse de arma de fogo de uso permitido cuja numeração, marca ou sinal de identificação tenha sido raspado, suprimido ou adulterado.", answer:false, just:"ERRADO. A Súmula 668-STJ estabelece exatamente o oposto: NÃO é hediondo esse delito, mesmo com a arma tendo sinal de identificação adulterado."},
+{id:31, tema:"Lei Maria da Penha", fonte:"STJ Info 803", statement:"Para a aplicação da Lei Maria da Penha, é necessário demonstrar concretamente a hipossuficiência ou vulnerabilidade da mulher agredida no caso específico, não bastando a mera existência de relação doméstica ou familiar.", answer:false, just:"ERRADO. O STJ entende que a vulnerabilidade e a hipossuficiência da mulher são presumidas, sendo desnecessária a demonstração específica da motivação de gênero para incidir o sistema protetivo da Lei Maria da Penha."},
+{id:32, tema:"Crimes Sexuais", fonte:"STJ Info 803", caso:"Carolina, com 13 anos, iniciou 'namoro' às escondidas com Rogério, 20 anos. A família acionou o Conselho Tutelar, mas eles continuaram se encontrando, e Carolina engravidou ainda com 13 anos.", statement:"A constituição de família decorrente do relacionamento — incluindo o nascimento de um filho — exclui, por si só, a punibilidade do crime de estupro de vulnerável, ainda que não tenha havido consentimento dos pais da adolescente.", answer:false, just:"ERRADO. O STJ manteve a condenação: o nascimento de filha, nesse caso, é circunstância que torna ainda mais grave a conduta (e até atrai causa de aumento do art. 234-A, III, do CP), distinguindo-se do precedente excepcional do REsp 1.977.165/MS, que não se aplicou por não haver concordância dos pais nem relacionamento subsistente."},
+{id:33, tema:"Parte Geral (Execução Penal)", fonte:"STJ Info 803 (Tema 931)", statement:"Mesmo cumprida integralmente a pena privativa de liberdade, o inadimplemento da pena de multa sempre impede a extinção da punibilidade, ainda que o condenado alegue e comprove hipossuficiência financeira.", answer:false, just:"ERRADO. Segundo o Tema 931, se o condenado alegar hipossuficiência, a punibilidade será extinta, salvo se o juízo, em decisão fundamentada, demonstrar sua capacidade financeira de pagamento da multa."},
+{id:34, tema:"Princípio da Insignificância", fonte:"STJ Info 802 (Tema 1218)", statement:"A reiteração da conduta delitiva obsta, em regra, a aplicação do princípio da insignificância ao crime de descaminho, independentemente do valor do tributo não recolhido, ressalvada a possibilidade de, no caso concreto, se concluir que a medida é socialmente recomendável.", answer:true, just:"CORRETO. É exatamente a tese fixada pelo STJ no Tema 1218 dos recursos repetitivos, considerando-se a contumácia inclusive a partir de procedimentos penais e fiscais ainda pendentes de definitividade."},
+{id:35, tema:"Lei de Drogas", fonte:"STJ Info 801", caso:"A polícia investigava João, Pedro e Tiago por tráfico de drogas com base em interceptações telefônicas e depoimentos de compradores. A busca e apreensão nas residências não encontrou drogas.", statement:"A apreensão e perícia da substância entorpecente são imprescindíveis para a comprovação da materialidade do crime de tráfico de drogas, não bastando depoimentos de compradores e conversas interceptadas, ainda que indiquem negociações.", answer:true, just:"CORRETO. O STJ decidiu que, na ausência de apreensão de drogas, os demais elementos de prova, mesmo em conjunto, não se prestam à comprovação da materialidade delitiva do tráfico."},
+{id:36, tema:"Lei de Tortura", fonte:"STJ Info 799", statement:"A incidência da agravante do art. 61, II, 'e', do CP (crime contra ascendente, descendente, irmão ou cônjuge) no crime de tortura-castigo praticado pelo pai contra filha adolescente configura bis in idem, já que a relação de parentesco integraria o próprio tipo penal da tortura.", answer:false, just:"ERRADO. O STJ decidiu que não há bis in idem, pois o tipo de tortura-castigo (art. 1º, II, da Lei 9.455/97) não exige relação de parentesco como elementar, sendo cabível a aplicação cumulativa da agravante."},
+{id:37, tema:"Crimes Contra o Patrimônio", fonte:"STJ Info 799 (Tema 1171)", statement:"A utilização de simulacro de arma de fogo para subtrair bens não configura grave ameaça, de modo que é cabível a substituição da pena privativa de liberdade por restritiva de direitos nesses casos de roubo.", answer:false, just:"ERRADO. O STJ fixou (Tema 1171) que o simulacro de arma já configura a elementar grave ameaça do roubo, atraindo a vedação de substituição de pena prevista no art. 44, I, do CP."},
+{id:38, tema:"Lei de Drogas", fonte:"STJ Info 796 (Tema 1206)", statement:"A falta de assinatura do perito no laudo toxicológico definitivo, por si só, sempre anula a prova pericial da materialidade do tráfico de drogas, independentemente de outros elementos que comprovem sua autenticidade.", answer:false, just:"ERRADO. Segundo o Tema 1206, a falta de assinatura constitui mera irregularidade, não anulando a prova pericial quando existirem outros elementos que comprovem sua autenticidade e o perito estiver devidamente identificado."},
+{id:39, tema:"Dosimetria da Pena", fonte:"STJ Info 793 (Tema 1172)", statement:"A reincidência específica, isoladamente considerada como fundamento, pode justificar o agravamento da pena em fração superior a 1/6, sem necessidade de fundamentação adicional baseada em dados concretos do caso.", answer:false, just:"ERRADO. Segundo o Tema 1172, a fração superior a 1/6 exige fundamentação detalhada baseada em dados concretos do caso, não bastando a reincidência específica isoladamente considerada."},
+{id:40, tema:"Princípio da Insignificância", fonte:"STJ Info 793 (Tema 1205)", caso:"Rodrigo subtraiu peças de picanha e desodorantes de um supermercado, mas foi detido pelos seguranças, e os bens foram imediata e integralmente restituídos.", statement:"A restituição imediata e integral do bem furtado constitui, por si só, motivo suficiente para a incidência do princípio da insignificância, independentemente de outras circunstâncias do caso concreto.", answer:false, just:"ERRADO. Segundo o Tema 1205, essa restituição não é, isoladamente, suficiente para a insignificância, podendo ser afastada diante de outras circunstâncias, como a habitualidade delitiva do agente."},
+{id:41, tema:"Prescrição", fonte:"STF Info 1101 (Tema 788)", statement:"Segundo o STF, o prazo de prescrição da pretensão executória da pena começa a correr do trânsito em julgado da sentença condenatória apenas para a acusação, dispensando o trânsito em julgado também para a defesa.", answer:false, just:"ERRADO. O STF declarou não recepcionada a expressão 'para a acusação' do art. 112, I, do CP, fixando (Tema 788) que o prazo prescricional da execução só começa a correr do trânsito em julgado para AMBAS as partes, com modulação de efeitos."},
+{id:42, tema:"Lei Maria da Penha", fonte:"STJ Info 779 (Tema 1189)", statement:"Nos casos de violência doméstica e familiar contra a mulher, é possível a aplicação isolada da pena de multa, mesmo no crime de ameaça, que prevê essa pena de forma autônoma no preceito secundário do tipo.", answer:false, just:"ERRADO. O art. 17 da Lei Maria da Penha veda a aplicação isolada de multa nesses casos, ainda que prevista de forma autônoma no preceito secundário do tipo penal (Tema 1189)."},
+{id:43, tema:"Crimes Contra o Patrimônio", fonte:"STJ Info 777", caso:"Quatro indivíduos invadiram a casa de João, idoso de 84 anos, para roubá-lo. Agrediram-no, amarraram-no e o amordaçaram. Ele foi encontrado morto horas depois; o laudo apontou infarto, agravado pelo estresse da situação.", statement:"A existência de doença cardíaca preexistente na vítima de roubo, que contribuiu para sua morte por infarto durante o crime, afasta a imputação de latrocínio, por se tratar de concausa superveniente absolutamente independente.", answer:false, just:"ERRADO. O STJ entendeu tratar-se de concausa PREEXISTENTE relativamente independente, não sendo possível afastar o resultado morte nem a imputação de latrocínio, já que os agressores criaram risco juridicamente proibido que se concretizou no resultado típico."},
+{id:44, tema:"Dosimetria da Pena", fonte:"STJ (sem informativo específico)", statement:"O STJ possui entendimento pacífico e uniforme no sentido de que a teoria da coculpabilidade — responsabilização do Estado pela deficiência no atendimento das necessidades fundamentais do indivíduo — jamais pode ser aplicada no ordenamento penal brasileiro.", answer:false, just:"ERRADO. Há divergência no STJ: uma corrente rejeita a coculpabilidade; outra a admite como fundamento da atenuante genérica do art. 66 do CP, desde que comprovada, no caso concreto, a omissão estatal quanto à assistência devida ao acusado."},
+{id:45, tema:"Prescrição", fonte:"STJ Info 773", statement:"É cabível a redução do prazo prescricional pela metade (art. 115 do CP) se o réu completa idade superior a 70 anos entre a sentença condenatória e o julgamento dos embargos de declaração, pois a decisão dos embargos integra a própria sentença condenatória.", answer:true, just:"CORRETO. É exatamente a tese fixada pelo STJ, considerando que a decisão que julga os embargos de declaração integra a sentença condenatória para fins de contagem da idade do réu."},
+{id:46, tema:"Crimes Sexuais", fonte:"STJ Info 772", statement:"O crime de registro não autorizado da intimidade sexual (art. 216-B do CP) é de ação penal privada, uma vez que a Lei 13.772/2018, ao criar o Capítulo I-A do Título VI do CP, não incluiu esse capítulo expressamente no rol do art. 225 do CP.", answer:false, just:"ERRADO. O STJ entendeu que, no silêncio da lei quanto à espécie de ação penal (omissão legislativa ao criar o novo capítulo), aplica-se a regra geral do art. 100 do CP: ação penal pública incondicionada."},
+{id:47, tema:"Sistema Financeiro Nacional", fonte:"STJ Info 771", caso:"foram apresentados documentos falsos para a obtenção de financiamento imobiliário junto à Caixa Econômica Federal. O contrato de financiamento chegou a ser assinado, e somente depois disso a fraude foi descoberta, antes da liberação do crédito.", statement:"O crime de obter, mediante fraude, financiamento em instituição financeira (art. 19 da Lei 7.492/86) somente se consuma com a efetiva liberação do crédito ao agente, sendo mera tentativa se a fraude for descoberta antes disso.", answer:false, just:"ERRADO. O STJ decidiu que o crime se consuma no momento em que é assinado o contrato de obtenção de financiamento mediante fraude, ainda que o dinheiro não chegue a ser liberado."},
+{id:48, tema:"Crimes Contra a Liberdade Individual", fonte:"STJ Info 771", caso:"Larissa contratou Nair, que realiza rituais de magia com intenções maléficas, para provocar a morte de um Delegado, um Promotor, um Presidente de Câmara e um jornalista. Nair, porém, procurou o jornalista e relatou o ocorrido.", statement:"A contratação de serviços espirituais/de magia para provocar a morte de autoridades configura o crime de ameaça (art. 147 do CP), pois o mal prometido é grave e injusto, ainda que o meio utilizado seja de natureza metafísica.", answer:false, just:"ERRADO. O STJ considerou o fato atípico: não ficou demonstrada a vontade livre e consciente da contratante de intimidar as vítimas, nem a ameaça teve potencialidade de concretização sob a perspectiva da ciência e do homem médio."},
+{id:49, tema:"Lei de Drogas", fonte:"STJ Info 770", caso:"Tiago, preso, pediu que Natália, sua namorada, levasse maconha para ele na próxima visita. Durante a revista, os agentes penitenciários encontraram o entorpecente antes da entrega.", statement:"A mera solicitação, feita pelo preso à namorada, para que leve droga ao estabelecimento prisional, já configura tráfico de drogas na modalidade 'adquirir', ainda que a droga seja interceptada antes de chegar ao destinatário.", answer:false, just:"ERRADO. O STJ entendeu que essa solicitação configura, no máximo, ato preparatório impunível, sendo atípica a conduta do preso quando a interceptação da droga ocorre antes de sua entrega efetiva."},
+{id:50, tema:"Lei Maria da Penha", fonte:"STJ Info 770 (Tema 1249)", statement:"A extinção da punibilidade do autor do fato acarreta, automaticamente, a extinção das medidas protetivas de urgência em vigor, sem necessidade de oitiva da vítima.", answer:false, just:"ERRADO. O STJ (inclusive no Tema 1249) fixou que a extinção de punibilidade, o arquivamento do inquérito ou a absolvição não geram, necessariamente, a extinção da medida protetiva, sendo indispensável a prévia oitiva da vítima para avaliar a persistência do risco."},
+{id:51, tema:"Crimes Sexuais", fonte:"STJ Info 769 (Súmula 593)", statement:"O consentimento da vítima menor de 14 anos e o namoro com o acusado nunca afastam a configuração de estupro de vulnerável, sendo absolutamente vedado ao STJ qualquer distinguishing em relação à Súmula 593.", answer:false, just:"ERRADO. Em regra, o consentimento não afasta o crime (Súmula 593), mas o STJ já admitiu, excepcionalmente, distinguishing em situações muito peculiares (como namoro consentido pelos pais e convivência familiar estável); isso não se aplicou, porém, a caso de grande diferença de idade e ausência de consentimento familiar."},
+{id:52, tema:"Crimes Contra a Saúde Pública", fonte:"STF Info 1088 (Tema 1246)", statement:"O art. 268 do CP, por veicular norma penal em branco, somente pode ser complementado por atos normativos infralegais editados pela União, sob pena de violação à competência privativa para legislar sobre direito penal (art. 22, I, CF/88).", answer:false, just:"ERRADO. O STF fixou (Tema 1246) que a complementação dessa norma penal em branco também pode se dar por atos normativos de Estados, Distrito Federal e Municípios, respeitadas suas esferas de atuação, sem ofensa à competência privativa da União."},
+{id:53, tema:"Crimes Contra o Patrimônio", fonte:"STJ Info 768", statement:"Antes da Lei 13.531/2017, já era possível enquadrar como dano qualificado a lesão a bens de autarquias, fundações públicas e empresas públicas, por analogia ao rol do art. 163, parágrafo único, III, do CP.", answer:false, just:"ERRADO. O STJ entendeu que, antes da alteração legislativa promovida pela Lei 13.531/2017, não era possível esse enquadramento, em razão da vedação à analogia in malam partem no sistema penal brasileiro."},
+{id:54, tema:"Lei Maria da Penha", fonte:"STJ Info 766 (Tema 1167)", statement:"A audiência prevista no art. 16 da Lei Maria da Penha deve ser designada de ofício pelo juiz sempre que a denúncia for recebida, independentemente de qualquer manifestação prévia da vítima quanto à retratação.", answer:false, just:"ERRADO. Segundo o Tema 1167, essa audiência não pode ser designada de ofício, sendo necessária apenas se houver manifestação da vítima, antes do recebimento da denúncia, do desejo de se retratar."},
+{id:55, tema:"Descaminho", fonte:"STJ Info 765", statement:"A majorante do §3º do art. 334 do CP (descaminho praticado em transporte aéreo) somente incide quando o voo utilizado for clandestino, não se aplicando a voos comerciais regulares.", answer:false, just:"ERRADO. O STJ decidiu que essa majorante incide independentemente de o voo ser regular ou clandestino."},
+{id:56, tema:"Lei Maria da Penha", fonte:"STJ Info 764", caso:"Um casal morava em Indaiatuba (SP) e foi passear em Belo Horizonte, onde o homem agrediu a mulher.", statement:"O juízo do domicílio da mulher vítima de violência doméstica é competente para deferir medidas protetivas de urgência, mesmo que a agressão tenha ocorrido em outra comarca, muito embora a competência para julgar o crime seja a do local dos fatos.", answer:true, just:"CORRETO. Aplica-se o princípio do juízo imediato às medidas protetivas de urgência, sem que isso altere a competência do juízo natural para julgar a ação penal pelo crime, que segue as regras gerais do CPP."},
+{id:57, tema:"Crimes Tributários", fonte:"STJ Info 764", statement:"O fato de a dívida tributária estar garantida por contrato de seguro no bojo de execução fiscal descaracteriza a materialidade dos crimes fiscais e a lesividade da conduta, extinguindo a punibilidade do agente.", answer:false, just:"ERRADO. O STJ decidiu que a garantia do crédito tributário não possui natureza de pagamento voluntário, não descaracterizando a materialidade nem a lesividade dos crimes fiscais."},
+{id:58, tema:"Lei de Drogas", fonte:"STJ Info 10 (Especial)", caso:"uma mulher tentou ingressar em um presídio com droga escondida em sua região pélvica, para entregá-la a um detento. O juiz aumentou a pena-base sob o argumento de que essa circunstância revelaria culpabilidade intensa.", statement:"A ocultação de drogas na região pélvica pela mulher que tenta ingressar em presídio constitui, por si só, fundamento idôneo para negativar a culpabilidade na dosimetria da pena-base.", answer:false, just:"ERRADO. O STJ entendeu que esse modus operandi é uma das formas mais comuns de ingresso de drogas em estabelecimentos prisionais, não demonstrando maior grau de reprovabilidade que justifique o aumento da pena-base pela culpabilidade."},
+{id:59, tema:"CTB", fonte:"STJ Info 10 (Especial)", statement:"Se o agente dirige embriagado e sem habilitação, praticando ações autônomas e distintas, incide o concurso material (e não o formal) entre os crimes dos arts. 306 e 309 do Código de Trânsito Brasileiro.", answer:true, just:"CORRETO. O STJ decidiu que, resultando os delitos de ações distintas e autônomas, não incide o concurso formal entre os tipos penais dos arts. 306 (embriaguez ao volante) e 309 (dirigir sem habilitação) do CTB."},
+{id:60, tema:"Dosimetria da Pena", fonte:"STJ Info 761/745 — mudança em 10/09/2025 (Tema 1194)", caso:"João, por não aceitar o fim do relacionamento, matou Regina, sua ex-companheira, com vários tiros. Foi denunciado por feminicídio praticado por motivo fútil (duas qualificadoras). Em interrogatório, confessou a autoria, mas alegou ter 'perdido a cabeça' após ser provocado pela vítima (confissão qualificada). O júri reconheceu as duas qualificadoras; o juiz usou o feminicídio para qualificar o crime e deslocou o motivo fútil para a 2ª fase como agravante, compensando-o integralmente com a atenuante da confissão espontânea.", statement:"Segundo o entendimento ATUAL do STJ (Tema 1194), a confissão qualificada sempre prepondera integralmente sobre agravantes no concurso de circunstâncias, da mesma forma que a confissão simples e espontânea preponderaria.", answer:false, just:"ERRADO. Superando entendimento anterior (que admitia compensação integral), o STJ fixou no Tema 1194 que a confissão de crime menos grave e a confissão qualificada NÃO preponderam no concurso com agravantes, devendo a atenuação ser aplicada em menor proporção quando o fato confessado corresponder a crime de menor pena ou a circunstância excludente de tipicidade, ilicitude ou culpabilidade."},
+{id:61, tema:"Prescrição", fonte:"STJ Info 744 (Tema 1100)", statement:"O acórdão que confirma sentença condenatória somente interrompe a prescrição se aumentar a pena anteriormente fixada, não produzindo esse efeito quando apenas mantiver ou reduzir a pena imposta.", answer:false, just:"ERRADO. Segundo o Tema 1100, o acórdão condenatório confirmatório interrompe a prescrição em qualquer hipótese — seja mantendo, reduzindo ou aumentando a pena anteriormente fixada."},
+{id:62, tema:"Lei Maria da Penha", fonte:"STJ Info 743", statement:"A audiência prevista no art. 16 da Lei Maria da Penha é necessária mesmo quando a vítima manifesta interesse de desistir da representação somente após o recebimento da denúncia.", answer:false, just:"ERRADO. O STJ decidiu que a audiência do art. 16 somente é necessária se a vítima houver manifestado o desejo de desistir da representação em momento ANTERIOR ao recebimento da denúncia."},
+{id:63, tema:"Crimes Contra o Patrimônio", fonte:"STJ Info 742 (Tema 1144)", statement:"Para incidir a majorante do §1º do art. 155 do CP (repouso noturno no furto), é indispensável que a vítima estivesse efetivamente dormindo no momento do crime e que o fato ocorra em residência habitada.", answer:false, just:"ERRADO. Segundo o Tema 1144, são irrelevantes o fato de a vítima estar ou não dormindo no momento do crime e o local de sua ocorrência (residência, via pública, veículo etc.); basta que o furto ocorra à noite e em situação de repouso/sossego."},
+{id:64, tema:"Crimes Contra o Patrimônio", fonte:"STJ (sem informativo específico)", statement:"O chamado furto de uso, embora atípico no Direito Penal comum pela ausência de ânimo de assenhoramento, também é considerado atípico no Código Penal Militar, em razão da aplicação subsidiária da legislação penal comum.", answer:false, just:"ERRADO. O STJ decidiu que essa atipicidade não se aplica ao Código Penal Militar, por ser incompatível com os rigores da hierarquia e disciplina próprios da vida castrense."},
+{id:65, tema:"Estatuto do Desarmamento", fonte:"STJ (sem informativo específico)", statement:"A apreensão de pequena quantidade de munição, desacompanhada de arma apta a deflagrá-la, sempre autoriza a aplicação do princípio da insignificância, independentemente do contexto em que ocorreu a apreensão.", answer:false, just:"ERRADO. O STJ afastou a insignificância em caso concreto de apreensão de munições no contexto de violência doméstica, somado à reincidência do agente, exigindo sempre a análise conglobante das circunstâncias do caso."},
+{id:66, tema:"Lei de Tortura", fonte:"STJ (sem informativo específico)", statement:"A tortura imprópria (art. 1º, §2º, da Lei 9.455/97), praticada por omissão de quem deveria evitar o ato, dispensa qualquer vínculo hierárquico entre o executor imediato da tortura e a autoridade que se manteve omissa.", answer:false, just:"ERRADO. O STJ decidiu que essa modalidade pressupõe a existência de vínculo hierárquico entre o executor imediato da tortura e a autoridade omissa, que tinha o dever legal de impedir ou apurar o ato."},
+{id:67, tema:"Dosimetria da Pena", fonte:"STJ (sem informativo específico)", statement:"A agravante do art. 61, II, 'h', do CP (crime praticado contra criança presente) não se aplica se o patrimônio subtraído no roubo pertencia à mãe da criança presente, e não à própria criança.", answer:false, just:"ERRADO. O STJ decidiu que é indiferente que o patrimônio subtraído pertença à criança ou a terceiro (como a mãe), bastando que a criança tenha sofrido os efeitos da violência ou grave ameaça no crime complexo de roubo."},
+{id:68, tema:"Crimes Contra o Patrimônio", fonte:"STJ (sem informativo específico)", statement:"A interrupção da conduta de furto motivada pela presença de transeuntes na calçada configura desistência voluntária, por se tratar de decisão livre do próprio agente de não prosseguir na empreitada criminosa.", answer:false, just:"ERRADO. O STJ entendeu que, nesse caso, o abandono da conduta decorre de coação externa (circunstância impeditiva alheia à vontade do agente), e não de voluntariedade, afastando a desistência voluntária."},
+{id:69, tema:"Crimes no ECA", fonte:"STJ (sem informativo específico)", statement:"É cabível a aplicação do princípio da adequação social para afastar a tipicidade do crime do art. 243 do ECA (fornecimento de bebida alcoólica a adolescentes), por se tratar de conduta socialmente tolerada.", answer:false, just:"ERRADO. O STJ considerou inviável a aplicação do princípio da adequação social, pois, com o advento da Lei 13.106/2015, o fornecimento de bebida alcoólica a menor de idade configura crime expressamente tipificado no ECA."},
+{id:70, tema:"Crimes Sexuais", fonte:"STJ (sem informativo específico)", statement:"A indução da vítima ao consumo excessivo de álcool pode, em tese, configurar meio para torná-la vulnerável nos termos do art. 217-A, §1º, do CP; contudo, antes da Lei 13.106/2015, o simples fornecimento de bebida alcoólica a menor de 18 anos não configurava o crime do art. 243 do ECA.", answer:true, just:"CORRETO. Ambas as teses foram fixadas pelo STJ no mesmo julgado (REsp 1.775.136/AC): a indução ao consumo excessivo de álcool pode, em tese, servir de meio para a vulnerabilidade do art. 217-A, §1º (embora, no caso concreto, não tenha sido reconhecida a incapacidade de resistência da vítima de 16 anos); e o fornecimento de bebida alcoólica antes da Lei 13.106/2015 não configurava o crime do art. 243 do ECA."},
+{id:71, tema:"Lei de Drogas", fonte:"STJ (sem informativo específico)", statement:"O tricloroetileno e o cloreto de etila, substâncias utilizadas na preparação do 'lança-perfume', não constituem objeto material típico do crime de tráfico de drogas, por se tratar de substâncias de uso industrial predominantemente lícito.", answer:false, just:"ERRADO. O STJ pacificou o entendimento de que essas substâncias constituem, sim, objeto material típico do delito de tráfico de drogas."},
+{id:72, tema:"Homicídio (art. 121)", fonte:"STJ (sem informativo específico)", statement:"Segundo o STJ, motivo fútil se confunde com ausência de motivos, de modo que um homicídio praticado sem nenhuma razão aparente já autoriza, por si só, a qualificadora do motivo fútil.", answer:false, just:"ERRADO. O STJ decidiu que motivo fútil NÃO se confunde com ausência de motivos: se o crime for praticado sem nenhuma razão, o agente somente pode ser denunciado por homicídio simples."},
+{id:73, tema:"Concurso de Crimes", fonte:"STJ (sem informativo específico)", statement:"Nos crimes de estupro contra vulneráveis, mesmo diante de imprecisão sobre o número exato de infrações cometidas, o STJ admite a aplicação da fração máxima de aumento (2/3) da continuidade delitiva quando o contexto probatório evidenciar reiteração constante dos abusos ao longo de anos.", answer:true, just:"CORRETO. O STJ afirmou que a imprecisão sobre o número exato de crimes cometidos não deve levar o aumento da pena ao patamar mínimo quando o contexto dos autos evidencia que os abusos foram praticados de forma reiterada e constante por longo período."},
+{id:74, tema:"Crimes Sexuais", fonte:"STJ (sem informativo específico)", statement:"Circunstâncias como o uso de constantes ameaças, o aproveitamento da ausência de terceiros na residência e o isolamento da vítima de pessoas estranhas ao grupo familiar não podem ser usadas para aumentar a pena-base no crime de estupro de vulnerável, por serem inerentes ao próprio tipo penal.", answer:false, just:"ERRADO. O STJ considerou válido o aumento da pena-base nesse caso, por revelar gravidade concreta do modus operandi superior à ínsita ao tipo penal de estupro de vulnerável."},
+{id:75, tema:"Crimes Sexuais", fonte:"STJ (sem informativo específico)", statement:"A prática de ato libidinoso diverso da conjunção carnal contra vítima vulnerável deve ser desclassificada para o crime de importunação sexual (art. 215-A do CP), por se tratar de conduta de menor gravidade.", answer:false, just:"ERRADO. O STJ decidiu que essa conduta já consuma o próprio crime de estupro de vulnerável (art. 217-A do CP), não havendo espaço para desclassificação, dada a presunção de violência e a irrelevância do consentimento da vítima."},
+{id:76, tema:"Crimes Sexuais", fonte:"STJ (sem informativo específico)", statement:"É obrigatório que os Tribunais de Justiça atribuam às Varas da Infância e da Juventude a competência para processar e julgar crimes sexuais praticados contra crianças e adolescentes, sob pena de nulidade absoluta.", answer:false, just:"ERRADO. O STJ entende que essa atribuição é FACULTATIVA aos Tribunais de Justiça (art. 96, I, 'a' e 'd', e II, 'd', CF/88), não havendo nulidade se a competência permanecer com as Varas Criminais comuns."},
+{id:77, tema:"Crimes Contra a Fé Pública", fonte:"STJ (sem informativo específico)", statement:"Configura o crime de falsidade ideológica o simples fato de o proprietário informar o endereço de sua genitora, e não o seu, para documentar o veículo perante o órgão de trânsito, independentemente de qualquer intenção de prejudicar direito ou criar obrigação.", answer:false, just:"ERRADO. O STJ entendeu que essa conduta não possui relevância jurídico-penal suficiente para configurar o crime, sobretudo por não haver elemento que demonstre o interesse do agente em prejudicar direito ou criar obrigações, elemento exigido pelo tipo."},
+];
+
+const TOTAL = QUESTIONS.length;
+
+/* =========================================================
+   ESTADO / STORAGE
+   ========================================================= */
+let state = {
+  answers: {},      // {id: {status:'correct'|'wrong', guess:true|false|null}}
+  easyIds: [],       // ids marcados como fáceis (excluídos permanentemente)
+  currentIndex: 0,
+  category: "TODAS",
+  search: ""
+};
+let filteredQuestions = [];
+let answeredCurrent = false;
+let currentSelected = null; // 'V' ou 'F'
+let pendingSelection = null; // seleção feita mas ainda não confirmada
+
+const LS_PREFIX = 'quizdp_bloco2_v1_';
+
+// Wrapper com fallback duplo: tenta window.storage (preview da Claude) e
+// SEMPRE espelha em localStorage (funciona também se o arquivo for aberto
+// direto no navegador, fora do preview). Garante que o progresso sobrevive
+// a fechar/reabrir o navegador em qualquer um dos dois cenários.
+async function storageGet(key){
+  try{
+    if(window.storage && typeof window.storage.get === 'function'){
+      const r = await window.storage.get(key, false);
+      if(r && typeof r.value !== 'undefined' && r.value !== null) return r.value;
+    }
+  }catch(e){}
+  try{
+    const v = localStorage.getItem(LS_PREFIX + key);
+    if(v !== null) return v;
+  }catch(e){}
+  return null;
+}
+async function storageSet(key, value){
+  try{
+    if(window.storage && typeof window.storage.set === 'function'){
+      await window.storage.set(key, value, false);
+    }
+  }catch(e){}
+  try{
+    localStorage.setItem(LS_PREFIX + key, value);
+  }catch(e){}
+}
+
+async function loadState(){
+  try{
+    const v = await storageGet('quiz-answers');
+    if(v) state.answers = JSON.parse(v);
+  }catch(e){}
+  try{
+    const v = await storageGet('quiz-easy');
+    if(v) state.easyIds = JSON.parse(v);
+  }catch(e){}
+  try{
+    const v = await storageGet('quiz-meta');
+    if(v){
+      const m = JSON.parse(v);
+      state.currentIndex = m.currentIndex || 0;
+      state.category = m.category || "TODAS";
+      state.search = m.search || "";
+    }
+  }catch(e){}
+}
+
+async function saveAnswers(){
+  try{ await storageSet('quiz-answers', JSON.stringify(state.answers)); }catch(e){}
+}
+async function saveEasy(){
+  try{ await storageSet('quiz-easy', JSON.stringify(state.easyIds)); }catch(e){}
+}
+async function saveMeta(){
+  try{ await storageSet('quiz-meta', JSON.stringify({currentIndex: state.currentIndex, category: state.category, search: state.search})); }catch(e){}
+}
+
+/* =========================================================
+   INICIALIZAÇÃO
+   ========================================================= */
+function getCategories(){
+  const set = new Set(QUESTIONS.map(q=>q.tema));
+  return ["TODAS", ...Array.from(set).sort()];
+}
+
+function buildFiltered(){
+  const cat = state.category;
+  const search = state.search.trim().toLowerCase();
+  filteredQuestions = QUESTIONS.filter(q=>{
+    if(state.easyIds.includes(q.id)) return false;
+    if(cat !== "TODAS" && q.tema !== cat) return false;
+    if(search && !(q.statement.toLowerCase().includes(search) || q.tema.toLowerCase().includes(search) || q.fonte.toLowerCase().includes(search))) return false;
+    return true;
+  });
+  if(state.currentIndex >= filteredQuestions.length) state.currentIndex = 0;
+  if(state.currentIndex < 0) state.currentIndex = 0;
+}
+
+function renderCategorySelect(){
+  const sel = document.getElementById('categorySelect');
+  sel.innerHTML = "";
+  getCategories().forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c === "TODAS" ? "📚 Todos os temas" : c;
+    if(c === state.category) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderStats(){
+  const answered = Object.keys(state.answers).length;
+  const correct = Object.values(state.answers).filter(a=>a.status==='correct').length;
+  const wrong = Object.values(state.answers).filter(a=>a.status==='wrong').length;
+  const pct = answered ? Math.round((correct/answered)*100) : 0;
+  const easy = state.easyIds.length;
+  document.getElementById('statsbar').innerHTML = `
+    <div class="stat"><div class="num" style="color:var(--blue)">${TOTAL}</div><div class="lbl">Total questões</div></div>
+    <div class="stat"><div class="num" style="color:var(--green)">${correct}</div><div class="lbl">Acertos</div></div>
+    <div class="stat"><div class="num" style="color:var(--red)">${wrong}</div><div class="lbl">Erros</div></div>
+    <div class="stat"><div class="num" style="color:var(--yellow)">${pct}%</div><div class="lbl">Aproveitamento</div></div>
+    <div class="stat"><div class="num" style="color:var(--purple)">${easy}</div><div class="lbl">Marcadas fáceis</div></div>
+  `;
+}
+
+function renderQuestion(){
+  buildFiltered();
+  renderStats();
+  const card = document.getElementById('quizCard');
+  const counter = document.getElementById('qcounter');
+
+  if(filteredQuestions.length === 0){
+    counter.textContent = "";
+    card.innerHTML = `<div class="empty-msg">Nenhuma questão encontrada com esse filtro (ou todas já foram marcadas como fáceis 🎉).</div>`;
+    return;
+  }
+
+  const q = filteredQuestions[state.currentIndex];
+  counter.textContent = `Questão ${state.currentIndex+1} de ${filteredQuestions.length} (filtro atual)`;
+
+  const prevAnswer = state.answers[q.id];
+  answeredCurrent = !!prevAnswer;
+  currentSelected = prevAnswer ? prevAnswer.selected : null;
+  pendingSelection = null; // zera a seleção não confirmada a cada renderização
+
+  let html = `
+    <div class="tags">
+      <span class="tag">${q.tema}</span>
+      <span class="tag source">${q.fonte}</span>
+    </div>
+    ${q.caso ? `<div class="caso-box"><b>📋 Caso concreto:</b> ${q.caso}</div>` : ''}
+    <div class="statement">${q.statement}</div>
+    <div class="vf-buttons">
+      <button id="btnV" class="btn-green" ${answeredCurrent?'disabled':''} style="${answeredCurrent && currentSelected==='V' ? 'outline:3px solid #fff;' : ''}">✅ VERDADEIRO</button>
+      <button id="btnF" class="btn-red" ${answeredCurrent?'disabled':''} style="${answeredCurrent && currentSelected==='F' ? 'outline:3px solid #fff;' : ''}">❌ FALSO</button>
+    </div>
+    <div id="confirmRow" style="${answeredCurrent?'display:none;':''} margin-bottom:14px;">
+      <button id="confirmAnswerBtn" class="btn-blue" style="width:100%;" disabled>✔️ Confirmar resposta</button>
+    </div>
+    <div id="resultArea"></div>
+    <div class="nav-row">
+      <div class="nav-left">
+        <button class="btn-gray" id="prevBtn">⬅ Anterior</button>
+        <button class="btn-gray" id="nextBtn">Próxima ➡</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn-purple" id="easyBtn">⭐ Marcar como fácil</button>
+      </div>
+    </div>
+    <div class="hint">Escolha VERDADEIRO ou FALSO e clique em "Confirmar resposta". Use as setas ⬅️ ➡️ do teclado para navegar entre as questões.</div>
+  `;
+  card.innerHTML = html;
+
+  const btnV = document.getElementById('btnV');
+  const btnF = document.getElementById('btnF');
+  const confirmBtn = document.getElementById('confirmAnswerBtn');
+
+  function selectChoice(choice){
+    if(answeredCurrent) return;
+    pendingSelection = choice;
+    btnV.style.outline = choice==='V' ? '3px solid #fff' : 'none';
+    btnF.style.outline = choice==='F' ? '3px solid #fff' : 'none';
+    confirmBtn.disabled = false;
+  }
+
+  btnV.onclick = ()=>selectChoice('V');
+  btnF.onclick = ()=>selectChoice('F');
+  confirmBtn.onclick = ()=>{
+    if(!pendingSelection) return;
+    answerQuestion(q, pendingSelection);
+  };
+  document.getElementById('prevBtn').onclick = ()=>{ state.currentIndex--; if(state.currentIndex<0) state.currentIndex = filteredQuestions.length-1; saveMeta(); renderQuestion(); };
+  document.getElementById('nextBtn').onclick = ()=>{ state.currentIndex++; if(state.currentIndex>=filteredQuestions.length) state.currentIndex = 0; saveMeta(); renderQuestion(); };
+  document.getElementById('easyBtn').onclick = ()=>markEasy(q.id);
+
+  if(answeredCurrent){
+    renderResultArea(q, prevAnswer);
+  }
+}
+
+function answerQuestion(q, selected){
+  const isCorrect = (selected === 'V' && q.answer === true) || (selected === 'F' && q.answer === false);
+  state.answers[q.id] = {
+    status: isCorrect ? 'correct' : 'wrong',
+    selected: selected,
+    guess: null // será perguntado se acertou
+  };
+  pendingSelection = null;
+  saveAnswers();
+  renderQuestion();
+  if(isCorrect){
+    // pergunta se foi chute ou sabia -> renderResultArea já mostra os botões
+  }
+}
+
+function setGuess(qid, wasGuess){
+  if(state.answers[qid]){
+    state.answers[qid].guess = wasGuess;
+    saveAnswers();
+    renderQuestion();
+  }
+}
+
+function renderResultArea(q, ans){
+  const area = document.getElementById('resultArea');
+  const correctLabel = q.answer ? "VERDADEIRO" : "FALSO";
+  let bannerHtml = "";
+  if(ans.status === 'correct'){
+    bannerHtml = `<div class="result-banner correct">✅ Você acertou! O gabarito é <b>${correctLabel}</b>.</div>`;
+  } else {
+    bannerHtml = `<div class="result-banner wrong">❌ Você errou. O gabarito correto é <b class="correct-ans">${correctLabel}</b> (você marcou ${ans.selected === 'V' ? 'Verdadeiro' : 'Falso'}).</div>`;
+  }
+
+  let guessRow = "";
+  if(ans.status === 'correct' && ans.guess === null){
+    guessRow = `
+      <div class="guess-row">
+        <button class="btn-blue" id="knewBtn">🧠 Eu sabia a resposta</button>
+        <button class="btn-yellow" id="guessBtn">🎲 Acertei no chute</button>
+      </div>
+    `;
+  } else if(ans.status === 'correct' && ans.guess !== null){
+    guessRow = `<div class="hint">${ans.guess ? '🎲 Marcado como acerto no chute.' : '🧠 Marcado como acerto por conhecimento.'}</div>`;
+  }
+
+  area.innerHTML = bannerHtml + `<div class="justification">${ans.status==='correct' ? '✔️' : '📖'} <b>Justificativa:</b> ${q.just}</div>` + guessRow;
+
+  if(document.getElementById('knewBtn')) document.getElementById('knewBtn').onclick = ()=>setGuess(q.id, false);
+  if(document.getElementById('guessBtn')) document.getElementById('guessBtn').onclick = ()=>setGuess(q.id, true);
+}
+
+async function markEasy(qid){
+  if(!state.easyIds.includes(qid)){
+    state.easyIds.push(qid);
+    await saveEasy();
+    state.currentIndex = 0;
+    await saveMeta();
+    renderQuestion();
+  }
+}
+
+/* =========================================================
+   BANCO DE FÁCEIS
+   ========================================================= */
+function openBank(){
+  const list = document.getElementById('bankList');
+  if(state.easyIds.length === 0){
+    list.innerHTML = `<div class="empty-msg">Nenhuma questão marcada como fácil ainda.</div>`;
+  } else {
+    list.innerHTML = state.easyIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id===id);
+      if(!q) return "";
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,110)}${q.statement.length>110?'...':''}</div><button class="btn-red" onclick="removeEasy(${id})">Remover</button></div>`;
+    }).join("");
+  }
+  document.getElementById('bankModal').classList.add('show');
+}
+function removeEasy(id){
+  state.easyIds = state.easyIds.filter(x=>x!==id);
+  saveEasy();
+  openBank();
+  renderQuestion();
+}
+
+/* =========================================================
+   ESTATÍSTICAS DE ERROS/CHUTES
+   ========================================================= */
+function openStatsModal(){
+  const wrongList = document.getElementById('wrongList');
+  const guessList = document.getElementById('guessList');
+  const wrongIds = Object.keys(state.answers).filter(id=>state.answers[id].status==='wrong');
+  const guessIds = Object.keys(state.answers).filter(id=>state.answers[id].status==='correct' && state.answers[id].guess===true);
+
+  wrongList.innerHTML = wrongIds.length === 0 ? `<div class="empty-msg">Nenhum erro registrado ainda. 🎉</div>` :
+    wrongIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id==id);
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,120)}${q.statement.length>120?'...':''}</div><button class="btn-blue" onclick="jumpTo(${id})">Ir</button></div>`;
+    }).join("");
+
+  guessList.innerHTML = guessIds.length === 0 ? `<div class="empty-msg">Nenhum acerto no chute registrado ainda.</div>` :
+    guessIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id==id);
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,120)}${q.statement.length>120?'...':''}</div><button class="btn-blue" onclick="jumpTo(${id})">Ir</button></div>`;
+    }).join("");
+
+  document.getElementById('statsModal').classList.add('show');
+}
+function jumpTo(id){
+  closeModal('statsModal');
+  state.category = "TODAS";
+  state.search = "";
+  document.getElementById('categorySelect').value = "TODAS";
+  document.getElementById('searchInput').value = "";
+  buildFiltered();
+  const idx = filteredQuestions.findIndex(q=>q.id==id);
+  state.currentIndex = idx >= 0 ? idx : 0;
+  saveMeta();
+  renderQuestion();
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+/* =========================================================
+   IMPORTAR / EXPORTAR PROGRESSO (sem download de arquivo)
+   ========================================================= */
+let dataModalMode = "export";
+function openExport(){
+  dataModalMode = "export";
+  document.getElementById('dataModalTitle').textContent = "Exportar progresso";
+  document.getElementById('dataHint').textContent = "Copie o texto abaixo e guarde em local seguro. Depois use 'Importar progresso' para restaurar.";
+  document.getElementById('dataTextarea').value = JSON.stringify({answers: state.answers, easyIds: state.easyIds});
+  document.getElementById('dataConfirmBtn').textContent = "Fechar";
+  document.getElementById('dataModal').classList.add('show');
+}
+function openImport(){
+  dataModalMode = "import";
+  document.getElementById('dataModalTitle').textContent = "Importar progresso";
+  document.getElementById('dataHint').textContent = "Cole aqui o texto exportado anteriormente e clique em Confirmar.";
+  document.getElementById('dataTextarea').value = "";
+  document.getElementById('dataConfirmBtn').textContent = "Confirmar Importação";
+  document.getElementById('dataModal').classList.add('show');
+}
+async function confirmDataModal(){
+  if(dataModalMode === "export"){
+    closeModal('dataModal');
+    return;
+  }
+  try{
+    const parsed = JSON.parse(document.getElementById('dataTextarea').value);
+    if(parsed.answers) state.answers = parsed.answers;
+    if(parsed.easyIds) state.easyIds = parsed.easyIds;
+    await saveAnswers();
+    await saveEasy();
+    closeModal('dataModal');
+    renderQuestion();
+    alert("Progresso importado com sucesso!");
+  }catch(e){
+    alert("Texto inválido. Verifique se copiou corretamente o progresso exportado.");
+  }
+}
+
+/* =========================================================
+   RECOMEÇAR / ZERAR TUDO
+   ========================================================= */
+async function restartQuiz(){
+  if(!confirm("Recomeçar o quiz? Suas respostas serão apagadas, mas as questões marcadas como fáceis continuam excluídas.")) return;
+
+  // Recarrega a lista de fáceis diretamente do armazenamento ANTES de mexer em
+  // qualquer coisa, garantindo que usamos a versão mais atual (evita perder
+  // marcações feitas recentemente por uma eventual condição de corrida no save).
+  try{
+    const v = await storageGet('quiz-easy');
+    if(v) state.easyIds = JSON.parse(v);
+  }catch(e){}
+
+  state.answers = {};
+  state.currentIndex = 0;
+  await saveAnswers();
+  await saveMeta();
+  await saveEasy(); // regrava explicitamente a lista de fáceis (inalterada), garantindo que não seja perdida
+  renderQuestion();
+}
+async function resetAll(){
+  if(!confirm("Zerar TUDO? Isso vai apagar respostas E a lista de questões fáceis, voltando ao estado inicial completo.")) return;
+  state.answers = {};
+  state.easyIds = [];
+  state.currentIndex = 0;
+  await saveAnswers();
+  await saveEasy();
+  await saveMeta();
+  renderQuestion();
+}
+
+/* =========================================================
+   EVENTOS GERAIS
+   ========================================================= */
+function setupEvents(){
+  document.getElementById('categorySelect').onchange = (e)=>{
+    state.category = e.target.value;
+    state.currentIndex = 0;
+    saveMeta();
+    renderQuestion();
+  };
+  let searchTimeout;
+  document.getElementById('searchInput').oninput = (e)=>{
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(()=>{
+      state.search = e.target.value;
+      state.currentIndex = 0;
+      saveMeta();
+      renderQuestion();
+    }, 250);
+  };
+  document.getElementById('goToBtn').onclick = ()=>{
+    const val = parseInt(document.getElementById('goToInput').value, 10);
+    if(!isNaN(val) && val >= 1 && val <= filteredQuestions.length){
+      state.currentIndex = val - 1;
+      saveMeta();
+      renderQuestion();
+    } else {
+      alert("Número de questão inválido para o filtro atual (1 a " + filteredQuestions.length + ").");
+    }
+  };
+  document.getElementById('bankBtn').onclick = openBank;
+  document.getElementById('statsModalBtn').onclick = openStatsModal;
+  document.getElementById('exportBtn').onclick = openExport;
+  document.getElementById('importBtn').onclick = openImport;
+  document.getElementById('dataConfirmBtn').onclick = confirmDataModal;
+  document.getElementById('restartBtn').onclick = restartQuiz;
+  document.getElementById('resetAllBtn').onclick = resetAll;
+
+  document.addEventListener('keydown', (e)=>{
+    const modalOpen = document.querySelector('.modal-bg.show');
+    if(modalOpen) return;
+    if(e.key === 'ArrowRight'){
+      state.currentIndex++; if(state.currentIndex>=filteredQuestions.length) state.currentIndex = 0;
+      saveMeta(); renderQuestion();
+    } else if(e.key === 'ArrowLeft'){
+      state.currentIndex--; if(state.currentIndex<0) state.currentIndex = filteredQuestions.length-1;
+      saveMeta(); renderQuestion();
+    }
+  });
+
+  document.querySelectorAll('.modal-bg').forEach(m=>{
+    m.addEventListener('click', (e)=>{ if(e.target === m) m.classList.remove('show'); });
+  });
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+async function boot(){
+  await loadState();
+  renderCategorySelect();
+  document.getElementById('searchInput').value = state.search;
+  setupEvents();
+  renderQuestion();
+}
+boot();
+</script>
+</body>
+</html>
