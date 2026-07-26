@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Direito Constitucional - Jurisprudência STJ/STF - Parte 3</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --card2:#273549; --text:#e2e8f0; --muted:#94a3b8;
+    --green:#22c55e; --red:#ef4444; --blue:#3b82f6; --yellow:#eab308; --purple:#a855f7;
+    --border:#334155;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:var(--bg); color:var(--text);
+    min-height:100vh; padding:16px;
+  }
+  .wrap{max-width:900px; margin:0 auto;}
+  h1{font-size:1.4rem; margin:0 0 4px 0; color:#fff;}
+  .subtitle{color:var(--muted); font-size:.85rem; margin-bottom:16px;}
+  .statsbar{
+    display:flex; flex-wrap:wrap; gap:10px; background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:12px; margin-bottom:14px;
+  }
+  .stat{flex:1; min-width:90px; text-align:center;}
+  .stat .num{font-size:1.3rem; font-weight:700;}
+  .stat .lbl{font-size:.72rem; color:var(--muted);}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; align-items:center;
+  }
+  select, input[type=text], input[type=number]{
+    background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:8px;
+    padding:8px 10px; font-size:.85rem;
+  }
+  button{
+    cursor:pointer; border:none; border-radius:8px; padding:8px 12px; font-size:.85rem; font-weight:600;
+    transition:opacity .15s;
+  }
+  button:hover{opacity:.85;}
+  .btn-blue{background:var(--blue); color:#fff;}
+  .btn-gray{background:var(--card2); color:var(--text); border:1px solid var(--border);}
+  .btn-green{background:var(--green); color:#052e12;}
+  .btn-red{background:var(--red); color:#fff;}
+  .btn-yellow{background:var(--yellow); color:#3f2d00;}
+  .btn-purple{background:var(--purple); color:#fff;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px;
+  }
+  .tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .tag{
+    font-size:.68rem; padding:3px 9px; border-radius:20px; background:var(--card2); color:var(--muted);
+    border:1px solid var(--border);
+  }
+  .tag.source{background:#312e81; color:#c7d2fe; border-color:#4338ca;}
+  .statement{font-size:1.02rem; line-height:1.5; margin-bottom:16px;}
+  .caso-box{
+    background:#1b2436; border:1px solid #3b4a6b; border-left:4px solid var(--yellow); border-radius:8px;
+    padding:12px 14px; font-size:.86rem; line-height:1.55; margin-bottom:14px; color:#cbd5e1;
+  }
+  .caso-box b{color:var(--yellow);}
+  .vf-buttons{display:flex; gap:10px; margin-bottom:14px;}
+  .vf-buttons button{flex:1; padding:12px; font-size:.95rem;}
+  .result-banner{
+    padding:10px 14px; border-radius:10px; margin-bottom:12px; font-weight:700; font-size:.9rem;
+  }
+  .result-banner.correct{background:#052e12; color:var(--green); border:1px solid var(--green);}
+  .result-banner.wrong{background:#450a0a; color:var(--red); border:1px solid var(--red);}
+  .justification{
+    background:var(--card2); border-left:4px solid var(--blue); border-radius:8px; padding:12px 14px;
+    font-size:.88rem; line-height:1.5; margin-bottom:14px;
+  }
+  .justification b.correct-ans{color:var(--red);}
+  .guess-row{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
+  .guess-row button{flex:1; min-width:140px;}
+  .nav-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:6px;}
+  .nav-left, .nav-right{display:flex; gap:8px; flex-wrap:wrap;}
+  .qcounter{font-size:.8rem; color:var(--muted); text-align:center; margin-bottom:8px;}
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center;
+    z-index:100; padding:16px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; max-width:600px;
+    width:100%; max-height:80vh; overflow-y:auto;
+  }
+  .modal h2{margin-top:0; font-size:1.1rem;}
+  textarea{
+    width:100%; min-height:120px; background:var(--card2); color:var(--text); border:1px solid var(--border);
+    border-radius:8px; padding:10px; font-size:.8rem;
+  }
+  .list-item{
+    background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:8px;
+    font-size:.83rem; display:flex; justify-content:space-between; gap:10px; align-items:center;
+  }
+  .list-item .txt{flex:1;}
+  .close-x{float:right; background:none; color:var(--muted); font-size:1.2rem; padding:0 6px;}
+  .empty-msg{color:var(--muted); text-align:center; padding:20px; font-size:.9rem;}
+  .cat-chip{
+    font-size:.75rem; padding:6px 12px; border-radius:20px; background:var(--card2); color:var(--text);
+    border:1px solid var(--border); cursor:pointer;
+  }
+  .cat-chip.active{background:var(--blue); border-color:var(--blue); color:#fff;}
+  .catwrap{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .hint{font-size:.72rem; color:var(--muted); margin-top:6px;}
+  .footer-note{text-align:center; color:var(--muted); font-size:.7rem; margin-top:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚖️ Quiz V/F — Jurisprudência Constitucional (STJ/STF) — Parte 3/3</h1>
+  <div class="subtitle">Direito Constitucional para Carreiras Policiais — Bloco 1 — Parte 3 de 3 (julgados 91 a 132 do arquivo original, 183 questões). Questões elaboradas exclusivamente com base no material de informativos fornecido.</div>
+
+  <div class="statsbar" id="statsbar"></div>
+
+  <div class="controls">
+    <select id="categorySelect"></select>
+    <input type="text" id="searchInput" placeholder="🔎 Buscar por palavra-chave...">
+    <input type="number" id="goToInput" placeholder="Nº questão" style="width:110px;">
+    <button class="btn-blue" id="goToBtn">Ir</button>
+    <button class="btn-gray" id="bankBtn">📦 Banco de Fáceis</button>
+    <button class="btn-gray" id="statsModalBtn">📊 Ver erros/chutes</button>
+    <button class="btn-gray" id="exportBtn">Exportar progresso</button>
+    <button class="btn-gray" id="importBtn">Importar progresso</button>
+  </div>
+  <div class="controls">
+    <button class="btn-yellow" id="restartBtn">🔄 Recomeçar (mantém fáceis)</button>
+    <button class="btn-red" id="resetAllBtn">🗑️ Zerar tudo</button>
+  </div>
+
+  <div class="qcounter" id="qcounter"></div>
+  <div class="card" id="quizCard"></div>
+
+  <div class="footer-note">Progresso salvo automaticamente. Feche e volte quando quiser — o quiz continua de onde parou.</div>
+</div>
+
+<!-- Modal Banco de Fáceis -->
+<div class="modal-bg" id="bankModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('bankModal')">✕</button>
+    <h2>📦 Banco de Questões Fáceis</h2>
+    <div id="bankList"></div>
+  </div>
+</div>
+
+<!-- Modal Estatísticas -->
+<div class="modal-bg" id="statsModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('statsModal')">✕</button>
+    <h2>📊 Revisão: Erros e Acertos no Chute</h2>
+    <h3 style="color:var(--red);">❌ Questões erradas</h3>
+    <div id="wrongList"></div>
+    <h3 style="color:var(--yellow);">🎲 Acertos no chute (revisar!)</h3>
+    <div id="guessList"></div>
+  </div>
+</div>
+
+<!-- Modal Import/Export -->
+<div class="modal-bg" id="dataModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('dataModal')">✕</button>
+    <h2 id="dataModalTitle">Progresso</h2>
+    <textarea id="dataTextarea"></textarea>
+    <div class="hint" id="dataHint"></div>
+    <br>
+    <button class="btn-blue" id="dataConfirmBtn">Confirmar</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   BANCO DE QUESTÕES — 100% baseado no material fornecido
+   ========================================================= */
+const QUESTIONS = [
+{id:1, tema:"Segurança Pública / Inteligência (ABIN/SISBIN)", fonte:"STF Info 986", statement:"O parágrafo único do art. 4º da Lei nº 9.883/99, que trata do fornecimento de dados à ABIN pelos órgãos do SISBIN, foi declarado inconstitucional pelo STF, por violar a reserva de jurisdição sobre dados sigilosos.", answer:false, just:"ERRADO. O STF não declarou o dispositivo inconstitucional: conferiu-lhe interpretação conforme a Constituição, fixando quatro critérios para sua aplicação válida (ADI 6529 MC/DF, Info 986)."},
+{id:2, tema:"Segurança Pública / Inteligência (ABIN/SISBIN)", fonte:"STF Info 986", statement:"Segundo a interpretação conforme dada pelo STF, os órgãos do SISBIN somente podem fornecer dados à ABIN quando comprovado o interesse público da medida, e dados referentes a comunicações telefônicas ou sujeitos à reserva de jurisdição não podem ser compartilhados por essa via.", answer:true, just:"CORRETO. Esses são exatamente dois dos quatro critérios fixados pelo STF na ADI 6529 MC/DF, Rel. Min. Cármen Lúcia, julgada em 13/8/2020 (Info 986)."},
+{id:3, tema:"Segurança Pública / Rol Taxativo", fonte:"STF Info 983", statement:"É possível que a Constituição de um Estado-membro preveja a Polícia Científica como órgão integrante do sistema de segurança pública, desde que vinculada administrativamente à Polícia Civil.", answer:false, just:"ERRADO. O STF fixou que NÃO é possível atribuir à Polícia Científica caráter de órgão de segurança pública, independentemente de vinculação à Polícia Civil, pois o rol do art. 144, CF/88, é taxativo (ADI 2575/PR, Info 983) — nada impede, porém, que a Polícia Científica continue a existir como órgão pericial, sem esse caráter."},
+{id:4, tema:"Segurança Pública / Rol Taxativo", fonte:"STF Info 983", statement:"A ADI 2575/PR, sobre a impossibilidade de a Polícia Científica ser órgão de segurança pública, foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 24/6/2020.", answer:true, just:"CORRETO. A ADI 2575/PR foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 24/6/2020 (Info 983)."},
+{id:5, tema:"Competências Legislativas / Educação", fonte:"STF Info 980", statement:"É inconstitucional lei municipal que proíbe a divulgação de material com referência a 'ideologia de gênero' nas escolas municipais, havendo tanto inconstitucionalidade formal (usurpação de competência da União) quanto material (violação à liberdade de aprender e ensinar e ao pluralismo pedagógico).", answer:true, just:"CORRETO. Essa é exatamente a dupla inconstitucionalidade (formal e material) fixada pelo STF na ADPF 457, Rel. Min. Alexandre de Moraes, julgada em 27/04/2020."},
+{id:6, tema:"Controle de Constitucionalidade / Aspectos Procedimentais", fonte:"STF Info 976", statement:"A procuração do advogado que assina a petição inicial de ADI precisa mencionar especificamente a lei ou ato normativo impugnado, não bastando uma autorização genérica para o ajuizamento de ADI; contudo, esse vício, se não sanado, é insanável e leva ao não conhecimento definitivo da ação.", answer:false, just:"ERRADO. A primeira parte está correta, mas o STJ... na verdade o STF fixou que esse vício É SANÁVEL, sendo possível sua regularização antes que seja reconhecida a carência da ação (ADI 6051, Info 976)."},
+{id:7, tema:"Organização do Estado / Pandemia", fonte:"STF Info 976", statement:"Segundo o STF, na ADI 6343 MC-Ref/DF, Estados, DF e Municípios podem, mesmo sem autorização da União, adotar medidas de combate à pandemia como isolamento, quarentena e restrição à locomoção interestadual em rodovias, portos ou aeroportos, desde que embasadas em recomendação técnica fundamentada.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF nesse julgado, excluindo a exigência de autorização ou observância prévia ao ente federal para essas medidas específicas (Info 976)."},
+{id:8, tema:"Organização do Estado / Pandemia", fonte:"STF Info 976", statement:"Segundo o STF, os Estados e Municípios podem, mesmo sem autorização da União, fechar suas fronteiras para conter a pandemia, desde que o façam por decreto do respectivo Chefe do Executivo.", answer:false, just:"ERRADO. O STF ressalvou expressamente que Estados e Municípios NÃO podem fechar fronteiras, pois isso extrapolaria suas competências constitucionais — mesmo com as demais medidas de combate à pandemia autorizadas sem necessidade de aval da União."},
+{id:9, tema:"Controle de Constitucionalidade / Aspectos Procedimentais", fonte:"STF Info 907", statement:"A alteração do parâmetro constitucional utilizado em uma ADI, quando o processo ainda está em curso, prejudica o conhecimento da ação, exigindo o ajuizamento de uma nova ADI com o novo parâmetro.", answer:false, just:"ERRADO. O STF fixou o oposto na ADI 145/CE (Info 907): essa alteração NÃO prejudica o conhecimento da ADI, justamente para evitar que uma lei nascida claramente inconstitucional volte a produzir efeitos por mero acaso processual."},
+{id:10, tema:"Processo Legislativo / Medida Provisória", fonte:"STF Info 896", statement:"É possível a edição de medidas provisórias tratando sobre matéria ambiental, mas apenas veiculando normas favoráveis ao meio ambiente; normas que importem diminuição da proteção ambiental só podem ser editadas por lei formal, com amplo debate parlamentar.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 4717/DF, Rel. Min. Cármen Lúcia, julgada em 5/4/2018 (Info 896), reconhecendo a proteção ambiental como limite material implícito à edição de MP."},
+{id:11, tema:"Liberdade de Expressão / Discurso de Ódio", fonte:"STF Info 893", statement:"A incitação ao ódio público contra quaisquer denominações religiosas e seus seguidores está protegida pela cláusula constitucional de liberdade de expressão, ainda que praticada por líder religioso contra outra religião.", answer:false, just:"ERRADO. O STF fixou o oposto no RHC 146303/RJ (Info 893): essa incitação NÃO está protegida pela liberdade de expressão, podendo configurar o crime de racismo."},
+{id:12, tema:"Poder Executivo / Imunidade Formal", fonte:"STF Info 888", statement:"A imunidade formal prevista nos arts. 51, I, e 86 da CF/88 se estende a codenunciados em ação penal contra o Presidente da República, mesmo que esses codenunciados não ocupem os cargos de Presidente, Vice-Presidente ou Ministro de Estado.", answer:false, just:"ERRADO. O STF fixou o oposto: essa imunidade NÃO se estende aos codenunciados que não estejam investidos nesses cargos específicos, pois sua finalidade é proteger o exercício regular do cargo, e não beneficiar terceiros (Inq 4483/4327, Info 888)."},
+{id:13, tema:"Controle de Constitucionalidade / Efeito Vinculante", fonte:"STF Info 886", statement:"Quando o Plenário do STF decide sobre a constitucionalidade de uma lei em controle incidental (difuso), essa decisão passa a ter os mesmos efeitos do controle concentrado — eficácia erga omnes e efeito vinculante —, cabendo ao Senado apenas dar publicidade à decisão.", answer:true, just:"CORRETO. Essa é exatamente a mutação constitucional do art. 52, X, CF/88, reconhecida pelo STF nas ADI 3406/RJ e ADI 3470/RJ, Rel. Min. Rosa Weber, julgadas em 29/11/2017 (Info 886) — tema que o próprio STF reconheceu ainda não estar totalmente pacificado."},
+{id:14, tema:"Direito Ambiental / Fiscalização", fonte:"STF Info 1084", statement:"É inconstitucional lei estadual que proíbe os órgãos ambientais e a polícia militar de destruírem e inutilizarem bens particulares apreendidos em operações de fiscalização ambiental, por violar a competência da União para normas gerais de proteção ao meio ambiente e sua competência privativa sobre direito penal e processual penal.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 7203/RO, Rel. Min. Gilmar Mendes, julgada em 01/03/2023 (Info 1084), combinando os arts. 24, VI e VII, e 22, I, da CF/88."},
+{id:15, tema:"Competências Legislativas / Educação", fonte:"STF Info 1082", statement:"É formalmente inconstitucional lei estadual que proíbe a 'linguagem neutra' na grade curricular e no material didático de instituições de ensino, mesmo sob a justificativa de proteger os estudantes, por violar a competência privativa da União para legislar sobre diretrizes e bases da educação nacional.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 7019/RO, Rel. Min. Edson Fachin, julgada em 10/02/2023 (Info 1082)."},
+{id:16, tema:"Controle de Constitucionalidade / Coisa Julgada Tributária", fonte:"STF Info 1082", statement:"Segundo o STF, nos Temas 881 e 885, as decisões proferidas em ação direta ou em sede de repercussão geral interrompem automaticamente os efeitos temporais das decisões transitadas em julgado nas relações jurídicas tributárias de trato sucessivo, respeitadas a irretroatividade, a anterioridade e a noventena.", answer:true, just:"CORRETO. Essa é exatamente a segunda parte da tese fixada nos RE 955227/BA (Tema 885) e RE 949297/CE (Tema 881), ambos julgados em 8/02/2023 (Info 1082)."},
+{id:17, tema:"Controle de Constitucionalidade / Coisa Julgada Tributária", fonte:"STF Info 1082", statement:"Segundo o STF, as decisões proferidas pelo STF em controle incidental de constitucionalidade, anteriores à instituição do regime de repercussão geral, impactam automaticamente a coisa julgada já formada, mesmo em relações jurídicas tributárias de trato sucessivo.", answer:false, just:"ERRADO. O STF fixou o oposto: essas decisões antigas (anteriores à repercussão geral), em controle incidental, NÃO impactam automaticamente a coisa julgada formada, mesmo nas relações de trato sucessivo (Temas 881 e 885, Info 1082)."},
+{id:18, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 1081", statement:"As imunidades materiais e formais conferidas aos membros do Congresso Nacional (Deputados Federais e Senadores) pelo art. 53 da CF/88 se estendem aos Deputados Estaduais, por força do §1º do art. 27 da Constituição Federal.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF nas ADI 5824/RJ e ADI 5.825/MT, Rel. Min. Edson Fachin, julgadas em 16/12/2022 (Info 1081)."},
+{id:19, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1081", statement:"É constitucional ato normativo estadual que, respeitando as condições mínimas definidas em diploma federal de normas gerais, estabelece exigência adicional (mais restritiva) para a manutenção do porte de arma de fogo por servidores estaduais aposentados das forças de segurança pública.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 7024/PR, Rel. Min. Roberto Barroso, julgada em 16/12/2022 (Info 1081): os Estados podem editar normas mais restritivas ao suplementar normas gerais federais sobre segurança pública."},
+{id:20, tema:"Competências Legislativas / Direito do Consumidor", fonte:"STF Info 1081", statement:"É constitucional lei estadual que proíba, no âmbito de seu território, a fabricação, venda e comercialização de armas de brinquedo que simulam armas de fogo reais, por se inserir na competência concorrente sobre direito do consumidor e proteção à infância e à juventude, e não na competência privativa da União sobre direito penal ou material bélico.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 5126/SP, Rel. Min. Gilmar Mendes, julgada em 17/12/2022 (Info 1081)."},
+{id:21, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1076", statement:"É incompatível com a Constituição Federal norma de Constituição estadual que estabelece a natureza jurídica da Polícia Civil como função essencial à atividade jurisdicional do Estado e que atribui aos Delegados de Polícia a garantia de independência funcional.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 5517/ES, Rel. Min. Nunes Marques, julgada em 21/11/2022 (Info 1076), com base no art. 144, §6º, CF/88 (subordinação da Polícia Civil ao Governador)."},
+{id:22, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1076", statement:"É formalmente inconstitucional emenda à Constituição estadual, de iniciativa parlamentar, que atribui às funções de polícia judiciária exercidas pelo Delegado de Polícia natureza jurídica e caráter essencial ao Estado, por comprometer o vínculo de subordinação da Polícia Civil ao Governador.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 5528/TO, Rel. Min. Nunes Marques, julgada em 21/11/2022 (Info 1076), no mesmo Informativo da ADI 5517/ES."},
+{id:23, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1074", statement:"É inconstitucional norma de Constituição estadual, de iniciativa parlamentar, que disponha sobre a nomeação do diretor-geral da Polícia Civil a partir de lista tríplice elaborada pelo Conselho Superior de Polícia, por usurpar a iniciativa privativa do Governador do Estado e esvaziar a regra de subordinação das forças policiais ao Chefe do Executivo.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 6923/RO, Rel. Min. Edson Fachin, julgada em 28/10/2022 (Info 1074), com base no art. 61, §1º, II, 'c' e 'e', c/c art. 144, §6º, CF/88."},
+{id:24, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1073", statement:"Nos casos de internações pós-parto que durem mais de duas semanas, o termo inicial da licença-maternidade e do salário-maternidade é a alta hospitalar da mãe ou do recém-nascido, o que ocorrer por último, prorrogando-se ambos os benefícios por igual período ao da internação.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 6327/DF, Rel. Min. Edson Fachin, julgada em 21/10/2022 (Info 1073), posteriormente positivada pela Lei nº 15.222/2025."},
+{id:25, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"É constitucional lei estadual, de iniciativa parlamentar, que determina a reserva de vagas, no mesmo estabelecimento de ensino, para irmãos que frequentem a mesma etapa ou ciclo escolar, por disciplinar medida que consolida políticas de acesso educacional e de maior convívio familiar.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 7149/RJ, Rel. Min. Ricardo Lewandowski, julgada em 23/9/2022 (Info 1069)."},
+{id:26, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"Segundo o STF, no RE 1008166/SC (Tema 548), a educação infantil compreende apenas a pré-escola (de 4 a 5 anos), não abrangendo a creche (de 0 a 3 anos), cuja oferta pelo Poder Público não pode ser exigida individualmente por via judicial.", answer:false, just:"ERRADO. O STF fixou o oposto: a educação infantil compreende tanto a creche (0 a 3 anos) quanto a pré-escola (4 a 5 anos), e sua oferta pelo Poder Público PODE ser exigida individualmente, como ocorreu no caso concreto examinado (Tema 548, Info 1069)."},
+{id:27, tema:"Direitos Sociais / Trabalho Escravo", fonte:"STF (ADPF 509/DF)", statement:"A divulgação, por portaria fundamentada na legislação de regência, de cadastro de empregadores que submeteram trabalhadores a condição análoga à de escravo ('lista suja') é constitucional, desde que a inclusão do empregador ocorra após decisão administrativa irrecorrível, assegurados o contraditório e a ampla defesa.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADPF 509/DF, Rel. Min. Marco Aurélio, julgada em 16/09/2020, que também esclareceu não se tratar de cadastro sancionador, mas de instrumento de publicização e acesso à informação."},
+{id:28, tema:"Ministério Público / Atuação", fonte:"STF (ADI 4.693/BA)", statement:"É constitucional previsão regimental de Tribunal de Justiça que possibilita o arquivamento de investigação contra magistrado sem vista prévia dos autos ao Ministério Público, dando-lhe apenas ciência posterior da decisão, já que o sistema acusatório não exige a participação prévia do MP em todas as fases da investigação.", answer:false, just:"ERRADO. O STF declarou essa previsão flagrantemente inconstitucional na ADI 4.693/BA, Rel. Min. Alexandre de Moraes, julgada em 11/10/2018: o sistema acusatório consagra ao MP a titularidade privativa da ação penal, cabendo a ele decidir sobre denúncia ou arquivamento, com participação prévia assegurada, e não apenas ciência posterior."},
+{id:29, tema:"Segurança Pública / Guarda Municipal", fonte:"STF (RE 1281774)", statement:"A Guarda Municipal pode e deve prender quem se encontre em situação de flagrante delito, nos termos do art. 301 do CPP, mas não pode efetuar diligências típicas de investigação criminal, como ingressar em residência de pessoa em cujo poder nada de ilícito foi encontrado.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF no RE 1281774 AgR-ED-AgR, Rel. Min. Alexandre de Moraes, Rel. p/ Acórdão Min. Luís Roberto Barroso, julgado em 13/06/2022, DJE 26/08/2022."},
+{id:30, tema:"Direitos Sociais / Serviço Militar", fonte:"STF (Tema 15, SV 6)", statement:"Não viola a Constituição o estabelecimento de remuneração inferior ao salário mínimo para as praças prestadoras de serviço militar inicial (obrigatório), pois a garantia de remuneração não inferior ao salário mínimo não foi estendida pela CF/88 aos militares.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF no RE 570.177/MG (Tema 15), julgado em 30/04/2008 (Info 505), posteriormente assentada na Súmula Vinculante 6."},
+{id:31, tema:"Segurança Pública / Anistia", fonte:"STF Info 1056", statement:"É formalmente inconstitucional norma federal que concede anistia a policiais e bombeiros militares estaduais por infrações disciplinares decorrentes de participação em movimentos reivindicatórios, pois a anistia de infrações disciplinares de servidores estaduais deve ser concedida pelos próprios entes estaduais, em respeito à autonomia federativa.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 4869/DF, Rel. Min. Cármen Lúcia, julgada em 27/5/2022 (Info 1056), sobre a Lei federal nº 12.505/2011."},
+{id:32, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1054", statement:"O servidor público que seja pai solo, de família em que não há presença materna, faz jus à licença-maternidade e ao salário-maternidade pelo prazo de 180 dias, da mesma forma garantida à mulher pela legislação de regência, com base no dever de proteção integral da criança e no princípio da paternidade responsável.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF no RE 1348854/DF (Tema 1182), Rel. Min. Alexandre de Moraes, julgado em 12/5/2022 (Info 1054)."},
+{id:33, tema:"Organização do Estado / Intervenção Federal", fonte:"STJ Info 732", statement:"Segundo o STJ, no IF 113-PR, a excepcionalidade e a gravidade que circundam a intervenção federal, somadas à complexidade do cumprimento de uma ordem de desocupação de imóvel rural ocupado pelo MST, podem sobrepor-se ao interesse particular dos proprietários, justificando o indeferimento da intervenção quando não há recusa ilícita do ente estatal.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STJ (Corte Especial) no IF 113-PR, Rel. Min. Jorge Mussi, julgado em 06/04/2022 (Info 732), para negar a intervenção federal no caso concreto, por não haver recusa ilícita do Estado."},
+{id:34, tema:"Competências Legislativas / Educação", fonte:"STF (ADI 5484/AL)", statement:"É inconstitucional lei estadual que dispõe sobre formação específica exigida para a docência de disciplina na educação básica, pois o magistério na educação básica submete-se à competência legislativa privativa da União para legislar sobre diretrizes e bases da educação nacional.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 5484/AL, Rel. Min. Luiz Fux, julgada em 15/04/2020, por exorbitar o âmbito normativo da Lei nº 9.394/1996 (LDB)."},
+{id:35, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 881", statement:"O Poder Judiciário possui competência para impor a parlamentares, por autoridade própria, as medidas cautelares do art. 319 do CPP, seja em substituição à prisão em flagrante por crime inafiançável, seja autonomamente em circunstâncias de excepcional gravidade — mas, no caso de Deputados Federais e Senadores, essa competência é do STF.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 5526/DF ('caso Aécio Neves'), rel. orig. Min. Edson Fachin, red. p/ o ac. Min. Alexandre de Moraes, julgada em 11/10/2017 (Info 881), com base no art. 102, I, 'b', CF/88."},
+{id:36, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 881", statement:"Se a medida cautelar imposta pelo STF a Deputado Federal ou Senador impossibilitar, direta ou indiretamente, o exercício do mandato, o Supremo deverá encaminhar sua decisão, no prazo de 24 horas, à respectiva Casa Legislativa, que poderá rejeitar ('derrubar') a medida cautelar imposta.", answer:true, just:"CORRETO. Essa é exatamente a ressalva fixada pelo STF na ADI 5526/DF (Info 881), aplicando por analogia a regra do §2º do art. 53, CF/88, também às medidas cautelares diversas da prisão."},
+{id:37, tema:"Processo Legislativo / Medida Provisória", fonte:"STF Info 870", statement:"Segundo o STF, no MS 27931/DF, o trancamento da pauta por conta de medida provisória não votada no prazo de 45 dias (art. 62, §6º, CF/88) alcança todas as deliberações legislativas da Casa, inclusive propostas de emenda constitucional e projetos de lei complementar, sem qualquer exceção.", answer:false, just:"ERRADO. O STF, ao interpretar o art. 62, §6º, CF/88, não adotou exegese literal: fixou que o trancamento de pauta alcança apenas votações de projetos de leis ORDINÁRIAS sobre temas passíveis de MP, permanecendo livres para votação PECs, projetos de lei complementar, de resolução e de decreto legislativo (MS 27931/DF, Rel. Min. Celso de Mello, Info 870)."},
+{id:38, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 872", statement:"Não há necessidade de prévia autorização da Assembleia Legislativa para que o STJ receba denúncia ou queixa-crime e instaure ação penal contra Governador de Estado por crime comum, sendo inconstitucional previsão de Constituição estadual que condicione essa instauração a tal autorização.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF nas ADI 4777/BA, ADI 4674/RS e ADI 4362/DF, rel. orig. Min. Dias Toffoli, red. p/ o acórdão Min. Roberto Barroso, julgadas em 9/8/2017 (Info 872), reafirmada em julgados posteriores (ADI 5540/MG, Info 863)."},
+{id:39, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 872", statement:"Se o STJ receber denúncia ou queixa-crime contra Governador de Estado, ele ficará automaticamente suspenso de suas funções no Poder Executivo estadual, sem necessidade de decisão fundamentada específica sobre o afastamento.", answer:false, just:"ERRADO. O STF fixou o oposto: o afastamento do cargo NÃO se dá de forma automática; o STJ, ao receber a denúncia ou queixa, decide de forma fundamentada se há necessidade de afastamento do Governador, podendo ainda aplicar outras medidas cautelares penais (Info 872)."},
+{id:40, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF (ADI 3922, mudança 25/10/2021)", statement:"Segundo o entendimento atual do STF, norma estadual pode exigir que o Chefe da Polícia Civil seja um Delegado integrante da classe final da carreira quando essa previsão for originária da Constituição estadual ou decorrer de projeto de iniciativa do Governador do Estado, mas não quando decorrer de projeto de iniciativa parlamentar.", answer:true, just:"CORRETO. Essa é exatamente a distinção fixada pelo STF na ADI 3922, Rel. Min. Rosa Weber, julgada em 25/10/2021, superando o entendimento anterior da ADI 3038/SC (Info 771)."},
+{id:41, tema:"Poder Judiciário / Súmula Vinculante", fonte:"STF Info 800", statement:"Para admitir-se a revisão ou o cancelamento de uma súmula vinculante, é necessário demonstrar evidente superação da jurisprudência do STF, alteração legislativa quanto ao tema, ou modificação substantiva de contexto político, econômico ou social — não bastando o mero descontentamento com o conteúdo da súmula.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na PSV 13/DF, julgada em 24/9/2015 (Info 800), aplicada para negar o pedido da Cobrapol de cancelamento da Súmula Vinculante 11."},
+{id:42, tema:"Processo Legislativo / Reserva de Lei Complementar", fonte:"STF (ADI 2314/RJ e ADI 5003/SC)", statement:"O entendimento do STF sobre se a Constituição estadual pode prever que a Lei Orgânica da Polícia Civil tenha status de lei complementar sofreu uma reviravolta: em 2015 (ADI 2314/RJ), o STF admitiu essa possibilidade, mas em 2019 (ADI 5003/SC), fixou que a Constituição estadual não pode ampliar as hipóteses de reserva de lei complementar além das já previstas na Constituição Federal.", answer:true, just:"CORRETO. Essa é exatamente a evolução jurisprudencial apontada no material: a ADI 2314/RJ (2015, Info 790) permitiu a exigência de LC pelo constituinte estadual, mas a ADI 5003/SC (2019, Info 962) fixou entendimento contrário, vedando a ampliação das hipóteses de reserva de LC pela Constituição estadual."},
+{id:43, tema:"Segurança Pública / Isonomia de Vencimentos", fonte:"STF Info 768", statement:"É inconstitucional norma de Constituição estadual que preveja a isonomia de vencimentos entre os membros das Polícias Civil e Militar, por violar tanto a competência exclusiva do Governador sobre política remuneratória (art. 61, §1º, II, 'a', CF/88) quanto a vedação de equiparação entre servidores de carreiras distintas (art. 37, XIII, CF/88).", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 3777/BA, Rel. Min. Luiz Fux, julgada em 19/11/2014 (Info 768)."},
+{id:44, tema:"Investigação Criminal / Inquérito Policial", fonte:"STF Info 741", statement:"É inconstitucional lei estadual que preveja a tramitação direta do inquérito policial entre a polícia e o Ministério Público, mas é constitucional lei estadual que preveja a possibilidade de o MP requisitar informações quando o inquérito policial de indiciado solto não for encerrado em 30 dias.", answer:true, just:"CORRETO. Essa é exatamente a dupla tese fixada pelo STF na ADI 2886/RJ, red. p/ o acórdão Min. Joaquim Barbosa, julgada em 3/4/2014 (Info 741)."},
+{id:45, tema:"Segurança Pública / Vencimentos no Distrito Federal", fonte:"STF (Súmula Vinculante 39)", statement:"Segundo a Súmula Vinculante 39 do STF, compete privativamente à União legislar sobre vencimentos dos membros das polícias civil e militar e do corpo de bombeiros militar do Distrito Federal.", answer:true, just:"CORRETO. Essa é exatamente a redação da Súmula Vinculante 39 do STF, decorrente do fato de que, no DF, essas forças de segurança são mantidas e organizadas pela União (art. 21, XIV, CF/88)."},
+{id:46, tema:"Segurança Pública / Armas Apreendidas", fonte:"STF Info 705", statement:"O Estado-membro não tem competência para legislar sobre o uso de armas de fogo apreendidas, sendo essa matéria de competência da União; assim, é inconstitucional lei estadual que estabeleça que as armas de fogo apreendidas serão utilizadas pelas polícias civil e militar.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 3193/SP, Rel. Min. Marco Aurélio, julgada em 9/5/2013 (Info 705)."},
+{id:47, tema:"Segurança Pública / Advocacia", fonte:"STF Info 735", statement:"A lei que veda o exercício da atividade de advocacia por aqueles que desempenham, direta ou indiretamente, atividade policial afronta o princípio da isonomia, por tratar de forma diferenciada uma categoria profissional sem justificativa razoável.", answer:false, just:"ERRADO. O STF fixou o oposto na ADI 3541/DF, Rel. Min. Dias Toffoli, julgada em 12/2/2014 (Info 735): essa vedação NÃO afronta o princípio da isonomia, sendo constitucional a lei que veda a advocacia a quem exerce atividade policial."},
+{id:48, tema:"Segurança Pública / Inteligência (ABIN/SISBIN)", fonte:"STF Info 986", statement:"A ADI 6529 MC/DF, sobre os critérios de compatibilidade do art. 4º da Lei 9.883/99 com a Constituição, foi julgada pelo Plenário do STF, Rel. Min. Cármen Lúcia, em 13/8/2020, em sede de medida cautelar.", answer:true, just:"CORRETO. A ADI 6529 MC/DF foi julgada pelo Plenário do STF, Rel. Min. Cármen Lúcia, em 13/8/2020, em sede de medida cautelar (Info 986)."},
+{id:49, tema:"Segurança Pública / Inteligência (ABIN/SISBIN)", fonte:"STF Info 986", statement:"Segundo o STF, nas hipóteses cabíveis de fornecimento de informações à ABIN, é imprescindível a existência de sistemas eletrônicos de segurança e registro de acesso, inclusive para efeito de responsabilização em caso de eventuais omissões, desvios ou abusos.", answer:true, just:"CORRETO. Esse é exatamente o quarto critério fixado pelo STF na interpretação conforme dada ao parágrafo único do art. 4º da Lei 9.883/99 (Info 986)."},
+{id:50, tema:"Segurança Pública / Rol Taxativo", fonte:"STF Info 983", statement:"Segundo o STF, na ADI 2575/PR, os Estados-membros e o Distrito Federal devem seguir o modelo federal quanto aos órgãos de segurança pública, não podendo criar órgãos diversos daqueles previstos no art. 144 da CF/88.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para vedar que a Constituição estadual do Paraná previsse a Polícia Científica como órgão de segurança pública."},
+{id:51, tema:"Competências Legislativas / Educação", fonte:"STF Info 980", statement:"A ADPF 457, sobre a proibição municipal à divulgação de material sobre 'ideologia de gênero', foi julgada pelo Plenário do STF, Rel. Min. Alexandre de Moraes, em 27/04/2020.", answer:true, just:"CORRETO. A ADPF 457 foi julgada pelo Plenário do STF, Rel. Min. Alexandre de Moraes, em 27/04/2020 (Info 980)."},
+{id:52, tema:"Competências Legislativas / Educação", fonte:"STF Info 980", statement:"Segundo o STF, na ADPF 457, a lei municipal que proíbe a divulgação de material sobre 'ideologia de gênero' contraria um dos objetivos fundamentais da República, que é a promoção do bem de todos sem preconceitos (art. 3º, IV, CF/88).", answer:true, just:"CORRETO. Esse foi exatamente um dos fundamentos de inconstitucionalidade material citados pelo STF nesse julgado."},
+{id:53, tema:"Controle de Constitucionalidade / Aspectos Procedimentais", fonte:"STF Info 976", statement:"A ADI 6051, sobre a exigência de procuração com poderes específicos para ajuizamento de ADI, foi julgada pelo Plenário do STF, Rel. Min. Cármen Lúcia, em 27/03/2020.", answer:true, just:"CORRETO. A ADI 6051 foi julgada pelo Plenário do STF, Rel. Min. Cármen Lúcia, em 27/03/2020 (Info 976)."},
+{id:54, tema:"Organização do Estado / Pandemia", fonte:"STF Info 976", statement:"A ADI 6343 MC-Ref/DF, sobre a autonomia de Estados e Municípios para medidas de combate à Covid-19, teve como relator originário o Min. Marco Aurélio, mas o redator do acórdão foi o Min. Alexandre de Moraes, julgada em 6/5/2020.", answer:true, just:"CORRETO. A ADI 6343 MC-Ref/DF foi julgada pelo Plenário, rel. orig. Min. Marco Aurélio, red. p/ o ac. Min. Alexandre de Moraes, em 6/5/2020 (Info 976)."},
+{id:55, tema:"Organização do Estado / Pandemia", fonte:"STF Info 976", statement:"Segundo o STF, na ADI 6343 MC-Ref/DF, a Lei nº 13.979/2020 previu, em seu art. 3º, um rol taxativo de exatamente oito medidas que poderiam ser adotadas pelo poder público para o combate ao coronavírus, sem possibilidade de outras medidas não previstas na lei.", answer:false, just:"ERRADO. O STF classificou o rol do art. 3º da Lei nº 13.979/2020 como EXEMPLIFICATIVO (e não taxativo), ainda que composto por oito medidas enumeradas na lei."},
+{id:56, tema:"Controle de Constitucionalidade / Aspectos Procedimentais", fonte:"STF Info 907", statement:"A ADI 145/CE, sobre a não prejudicialidade do conhecimento da ADI por alteração do parâmetro constitucional, foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 20/6/2018.", answer:true, just:"CORRETO. A ADI 145/CE foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 20/6/2018 (Info 907)."},
+{id:57, tema:"Processo Legislativo / Medida Provisória", fonte:"STF Info 896", statement:"Segundo o STF, na ADI 4717/DF, a proteção ao meio ambiente é um limite material implícito à edição de medida provisória, ainda que não conste expressamente do elenco de limitações previstas no art. 62, §1º, CF/88.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF nesse julgado (Info 896) para vedar MP que diminua a proteção ambiental, especialmente quanto a unidades de conservação."},
+{id:58, tema:"Liberdade de Expressão / Discurso de Ódio", fonte:"STF Info 893", statement:"O RHC 146303/RJ, sobre a incitação de ódio por líder religioso, foi julgado pela 2ª Turma do STF, rel. Min. Edson Fachin, red. p/ o ac. Min. Dias Toffoli, em 6/3/2018, devendo ser comparado com o RHC 134682/BA, julgado anteriormente em 2016.", answer:true, just:"CORRETO. O RHC 146303/RJ foi julgado pela 2ª Turma do STF em 6/3/2018 (Info 893), com uma ressalva do próprio material de estudo para compará-lo ao RHC 134682/BA, julgado em 29/11/2016 (Info 849)."},
+{id:59, tema:"Poder Executivo / Imunidade Formal", fonte:"STF Info 888", statement:"Os Inq 4483 AgR-segundo/DF e Inq 4327 AgR-segundo/DF, sobre a não extensão da imunidade formal a codenunciados, foram julgados pelo Plenário do STF, Rel. Min. Edson Fachin, em 14 e 19/12/2017.", answer:true, just:"CORRETO. Ambos os inquéritos foram julgados pelo Plenário do STF, Rel. Min. Edson Fachin, em datas próximas (14 e 19/12/2017), conforme Info 888."},
+{id:60, tema:"Controle de Constitucionalidade / Efeito Vinculante", fonte:"STF Info 886", statement:"Segundo o STF, nas ADI 3406/RJ e ADI 3470/RJ, o próprio STF reconheceu que o tema da mutação constitucional do art. 52, X, CF/88, ainda não está pacificado, havendo debates inclusive quanto à nomenclatura das teorias adotadas pela Corte.", answer:true, just:"CORRETO. Essa ressalva foi expressamente feita no material de estudo, indicando que o tema, embora decidido nesse julgado específico, permanece em debate doutrinário e jurisprudencial."},
+{id:61, tema:"Direito Ambiental / Fiscalização", fonte:"STF Info 1084", statement:"A ADI 7203/RO, sobre a vedação à destruição de bens apreendidos em fiscalização ambiental, foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 01/03/2023.", answer:true, just:"CORRETO. A ADI 7203/RO foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 01/03/2023 (Info 1084)."},
+{id:62, tema:"Competências Legislativas / Educação", fonte:"STF Info 1082", statement:"A ADI 7019/RO, sobre a proibição estadual de linguagem neutra nas escolas, foi julgada pelo Plenário do STF, Rel. Min. Edson Fachin, em 10/02/2023, cerca de três semanas antes do julgamento da ADI 7203/RO sobre fiscalização ambiental.", answer:true, just:"CORRETO. A ADI 7019/RO foi julgada em 10/02/2023 e a ADI 7203/RO em 01/03/2023, ambas pelo Plenário do STF, com cerca de três semanas de diferença (Informativos 1082 e 1084)."},
+{id:63, tema:"Controle de Constitucionalidade / Coisa Julgada Tributária", fonte:"STF Info 1082", statement:"O RE 955227/BA (Tema 885) e o RE 949297/CE (Tema 881), sobre os efeitos da coisa julgada tributária, foram julgados no mesmo dia (8/02/2023) pelo Plenário do STF, com o Min. Roberto Barroso como relator do primeiro e redator do acórdão do segundo.", answer:true, just:"CORRETO. Ambos os REs foram julgados em 8/02/2023: o RE 955227/BA teve o Min. Roberto Barroso como relator, e o RE 949297/CE teve o Min. Edson Fachin como relator, mas o Min. Roberto Barroso como redator do acórdão (Info 1082)."},
+{id:64, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 1081", statement:"As ADI 5824/RJ e ADI 5.825/MT, sobre a extensão das imunidades formais aos Deputados Estaduais, foram julgadas pelo Plenário do STF, Rel. Min. Edson Fachin, em 16/12/2022.", answer:true, just:"CORRETO. As ADI 5824/RJ e ADI 5.825/MT foram julgadas pelo Plenário do STF, Rel. Min. Edson Fachin, em 16/12/2022 (Info 1081)."},
+{id:65, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1081", statement:"A ADI 7024/PR, sobre exigência adicional para porte de arma de servidores estaduais aposentados, foi julgada pelo Plenário do STF, Rel. Min. Roberto Barroso, no mesmo dia em que foram julgadas as ADI 5824/RJ e ADI 5.825/MT sobre imunidade de Deputados Estaduais.", answer:true, just:"CORRETO. Todos esses julgados (ADI 7024/PR, ADI 5824/RJ e ADI 5.825/MT) foram decididos pelo Plenário do STF em 16/12/2022, conforme Info 1081, embora com relatores diferentes."},
+{id:66, tema:"Competências Legislativas / Direito do Consumidor", fonte:"STF Info 1081", statement:"Segundo o STF, na ADI 5126/SP, a mera circunstância de uma norma demandar atuação positiva do Poder Executivo (como designar o órgão responsável pela fiscalização) não a insere no rol de leis cuja iniciativa seria privativa do Chefe do Executivo.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para afastar a alegação de vício de iniciativa na lei paulista sobre armas de brinquedo (ADI 5126/SP, Info 1081)."},
+{id:67, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1076", statement:"A ADI 5517/ES e a ADI 5528/TO, ambas sobre a subordinação da Polícia Civil ao Governador do Estado, foram julgadas pelo Plenário do STF, Rel. Min. Nunes Marques, no mesmo dia (21/11/2022).", answer:true, just:"CORRETO. Ambas as ADIs (5517/ES e 5528/TO) foram julgadas pelo Plenário do STF, Rel. Min. Nunes Marques, em 21/11/2022 (Info 1076)."},
+{id:68, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1076", statement:"Segundo o STF, na ADI 5517/ES, a Constituição Federal catalogou, em seção específica, os órgãos inseridos no sistema de segurança pública, entre os quais a Polícia Civil (art. 144, IV), de modo que, por simetria, não cabe ao constituinte estadual inovar atribuindo-lhe caráter de função essencial à Justiça, equiparável a MP e Judiciário.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para declarar inconstitucional a norma capixaba que equiparava a Polícia Civil às funções essenciais à Justiça (Info 1076)."},
+{id:69, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1074", statement:"A ADI 6923/RO, sobre a inconstitucionalidade da lista tríplice para escolha do diretor-geral da Polícia Civil, foi julgada pelo Plenário do STF, Rel. Min. Edson Fachin, em 28/10/2022, cerca de três semanas antes das ADI 5517/ES e 5528/TO.", answer:true, just:"CORRETO. A ADI 6923/RO foi julgada em 28/10/2022 (Info 1074), e as ADI 5517/ES e 5528/TO em 21/11/2022 (Info 1076) — ambos os julgamentos do Plenário do STF, com cerca de três semanas e meia de diferença."},
+{id:70, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1073", statement:"A ADI 6327/DF, sobre o termo inicial da licença-maternidade em internações pós-parto prolongadas, foi julgada pelo Plenário do STF, Rel. Min. Edson Fachin, em 21/10/2022, tendo seu entendimento posteriormente positivado pela Lei nº 15.222/2025.", answer:true, just:"CORRETO. A ADI 6327/DF foi julgada pelo Plenário do STF, Rel. Min. Edson Fachin, em 21/10/2022 (Info 1073), com o entendimento posteriormente incorporado à legislação ordinária."},
+{id:71, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"A ADI 7149/RJ, sobre reserva de vagas para irmãos na mesma escola, foi julgada pelo Plenário do STF, Rel. Min. Ricardo Lewandowski, em 23/9/2022, um dia antes do julgamento do RE 1008166/SC sobre o dever de creche e pré-escola.", answer:true, just:"CORRETO. A ADI 7149/RJ foi julgada em 23/9/2022 e o RE 1008166/SC em 22/9/2022, ambos pelo Plenário do STF no mesmo Informativo 1069, com um dia de diferença."},
+{id:72, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"O RE 1008166/SC, sobre o dever estatal de assegurar creche e pré-escola, foi julgado sob o rito de repercussão geral, correspondendo ao Tema 548, Rel. Min. Luiz Fux.", answer:true, just:"CORRETO. O RE 1008166/SC foi julgado pelo Plenário em repercussão geral (Tema 548), Rel. Min. Luiz Fux, em 22/9/2022 (Info 1069)."},
+{id:73, tema:"Direitos Sociais / Trabalho Escravo", fonte:"STF (ADPF 509/DF)", statement:"Segundo o STF, na ADPF 509/DF, a divulgação do cadastro de empregadores ('lista suja') não pode ser enquadrada como sanção, pois sua finalidade é o acesso à informação, mediante publicização de política de combate ao trabalho escravo, e não a punição direta do empregador.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para validar a constitucionalidade da 'lista suja' do trabalho escravo (ADPF 509/DF, Rel. Min. Marco Aurélio, julgada em 16/09/2020)."},
+{id:74, tema:"Ministério Público / Atuação", fonte:"STF (ADI 4.693/BA)", statement:"A ADI 4.693/BA, sobre a inconstitucionalidade de previsão regimental do TJ da Bahia que excluía o MP da investigação de magistrados, foi julgada pelo Plenário do STF, Rel. Min. Alexandre de Moraes, em 11/10/2018.", answer:true, just:"CORRETO. A ADI 4.693/BA foi julgada pelo Plenário do STF, Rel. Min. Alexandre de Moraes, em 11/10/2018."},
+{id:75, tema:"Ministério Público / Atuação", fonte:"STF (ADI 4.693/BA)", statement:"Segundo o STF, na ADI 4.693/BA, o sistema acusatório consagra constitucionalmente a titularidade privativa da ação penal ao Ministério Público (art. 129, I, CF/88), sendo dever do Poder Judiciário exercer atividade de supervisão judicial para fazer cessar qualquer ilegal coação por parte do Estado-acusador.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para declarar a inconstitucionalidade do dispositivo regimental do TJ da Bahia."},
+{id:76, tema:"Segurança Pública / Guarda Municipal", fonte:"STF (RE 1281774)", statement:"No caso concreto julgado no RE 1281774, a prisão pela Guarda Municipal ultrapassou os limites próprios da prisão em flagrante, tendo sido realizada a partir de denúncia anônima, seguida de diligências investigativas e de ingresso à residência do suspeito.", answer:true, just:"CORRETO. Esses são exatamente os fatos do caso concreto mencionados no julgado do STF (RE 1281774 AgR-ED-AgR, julgado em 13/06/2022)."},
+{id:77, tema:"Direitos Sociais / Serviço Militar", fonte:"STF (Tema 15, SV 6)", statement:"Segundo o STF, no RE 570.177/MG, os cidadãos que prestam serviço militar obrigatório exercem um múnus público relacionado com a defesa da soberania da pátria, e a obrigação do Estado quanto aos conscritos limita-se a fornecer-lhes as condições materiais para a adequada prestação do serviço militar.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF no RE 570.177/MG (Tema 15), julgado em 30/04/2008 (Info 505), posteriormente assentada na Súmula Vinculante 6."},
+{id:78, tema:"Segurança Pública / Anistia", fonte:"STF Info 1056", statement:"No caso concreto julgado na ADI 4869/DF, a Lei federal nº 12.505/2011 concedeu anistia aos policiais e bombeiros militares de diversos Estados punidos por participar de movimentos reivindicatórios, tendo o STF considerado essa norma federal materialmente válida, mas formalmente inconstitucional.", answer:true, just:"CORRETO. O STF fixou a inconstitucionalidade FORMAL dessa lei federal (violação à autonomia estadual e ao art. 42 e art. 144, §6º, CF/88), e não uma inconstitucionalidade material quanto ao conteúdo da anistia em si."},
+{id:79, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1054", statement:"O RE 1348854/DF, sobre a licença-maternidade ao pai solo, foi julgado sob o rito de repercussão geral, correspondendo ao Tema 1182, Rel. Min. Alexandre de Moraes, julgado em 12/5/2022.", answer:true, just:"CORRETO. O RE 1348854/DF foi julgado pelo Plenário em repercussão geral (Tema 1182), Rel. Min. Alexandre de Moraes, em 12/5/2022 (Info 1054)."},
+{id:80, tema:"Organização do Estado / Intervenção Federal", fonte:"STJ Info 732", statement:"Segundo o STJ, no IF 113-PR, existem decisões mais antigas do próprio STJ (como o IF 115/PR, de 2017) que haviam deferido a intervenção federal em casos semelhantes de descumprimento de ordem de reintegração de posse envolvendo o MST.", answer:true, just:"CORRETO. O próprio material de estudo faz essa ressalva: há precedentes anteriores do STJ (IF 115/PR, Rel. Min. Herman Benjamin, DJe de 21/6/2017) que deferiram a intervenção em casos similares, contrastando com o IF 113-PR (Info 732)."},
+{id:81, tema:"Competências Legislativas / Educação", fonte:"STF (ADI 5484/AL)", statement:"A ADI 5484/AL, sobre a inconstitucionalidade de lei estadual sobre formação específica para docência, foi julgada pelo Plenário do STF, Rel. Min. Luiz Fux, em 15/04/2020, fundamentando-se na usurpação da Lei nº 9.394/1996 (LDB).", answer:true, just:"CORRETO. A ADI 5484/AL foi julgada pelo Plenário do STF, Rel. Min. Luiz Fux, em 15/04/2020, com fundamento na usurpação da competência da União sobre diretrizes e bases da educação nacional (LDB)."},
+{id:82, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 881", statement:"O caso conhecido como 'caso Aécio Neves', julgado na ADI 5526/DF, teve como relator original o Min. Edson Fachin, mas o redator do acórdão foi o Min. Alexandre de Moraes, julgado pelo Plenário em 11/10/2017.", answer:true, just:"CORRETO. A ADI 5526/DF foi julgada pelo Plenário do STF, rel. orig. Min. Edson Fachin, red. p/ o ac. Min. Alexandre de Moraes, em 11/10/2017 (Info 881)."},
+{id:83, tema:"Processo Legislativo / Medida Provisória", fonte:"STF Info 870", statement:"O MS 27931/DF, sobre o alcance do trancamento de pauta por MP não votada em 45 dias, foi julgado pelo Plenário do STF, Rel. Min. Celso de Mello, em 29/6/2017.", answer:true, just:"CORRETO. O MS 27931/DF foi julgado pelo Plenário do STF, Rel. Min. Celso de Mello, em 29/6/2017 (Info 870)."},
+{id:84, tema:"Processo Legislativo / Medida Provisória", fonte:"STF Info 870", statement:"Segundo o STF, no MS 27931/DF, uma MP somente pode tratar sobre assuntos próprios de lei ordinária, desde que não incida em nenhuma das proibições do art. 62, §1º, da CF/88, sendo essa a razão pela qual apenas projetos de lei ordinária sobre esses mesmos temas ficam sobrestados pelo trancamento de pauta.", answer:true, just:"CORRETO. Essa é exatamente a lógica usada pelo STF para restringir o alcance do trancamento de pauta apenas às leis ordinárias sobre temas passíveis de MP (Info 870)."},
+{id:85, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 872", statement:"Além das ADI 4777/BA, ADI 4674/RS e ADI 4362/DF (Info 872), o STF reafirmou o mesmo entendimento sobre a desnecessidade de autorização da ALE para denúncia contra Governador nas ADI 5540/MG (Info 863) e ADI 4764/AC, ADI 4797/MT e ADI 4798/PI (Info 863).", answer:true, just:"CORRETO. O material de estudo lista exatamente esses julgados reafirmando a mesma tese, em Informativos diferentes do STF (872 e 863)."},
+{id:86, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF (ADI 3922, mudança 25/10/2021)", statement:"Segundo o STF, na ADI 3922, a instituição de requisitos restritivos à escolha do Chefe da Polícia Civil, quando não decorrente de norma originária da Constituição estadual, deve observar a cláusula de reserva de iniciativa do art. 61, §1º, II, 'c' e 'e', CF/88, aplicável aos Estados por força do art. 25 da CF/88.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 3922, Rel. Min. Rosa Weber, julgada em 25/10/2021, para diferenciar normas originárias de normas de iniciativa parlamentar sobre o tema."},
+{id:87, tema:"Poder Judiciário / Súmula Vinculante", fonte:"STF Info 800", statement:"A PSV 13/DF, sobre os requisitos de revisão ou cancelamento de súmula vinculante, foi julgada pelo Plenário do STF em 24/9/2015, sendo posteriormente aplicada para negar pedido da Cobrapol de cancelamento da Súmula Vinculante 11 (sobre uso de algemas).", answer:true, just:"CORRETO. A PSV 13/DF foi julgada pelo Plenário do STF em 24/9/2015 (Info 800), e a Súmula Vinculante 11 (algemas) foi objeto do pedido de cancelamento negado à Cobrapol por falta de comprovação dos requisitos."},
+{id:88, tema:"Processo Legislativo / Reserva de Lei Complementar", fonte:"STF (ADI 2314/RJ)", statement:"A ADI 2314/RJ, sobre a possibilidade de a Constituição estadual exigir que a Lei Orgânica da Polícia Civil tenha status de lei complementar, foi julgada pelo Plenário do STF, rel. orig. Min. Joaquim Barbosa, red. p/ o acórdão Min. Marco Aurélio, em 17/6/2015.", answer:true, just:"CORRETO. A ADI 2314/RJ foi julgada pelo Plenário do STF, rel. orig. Min. Joaquim Barbosa, red. p/ o acórdão Min. Marco Aurélio, em 17/6/2015 (Info 790)."},
+{id:89, tema:"Processo Legislativo / Reserva de Lei Complementar", fonte:"STF (ADI 5003/SC)", statement:"A ADI 5003/SC, que fixou entendimento contrário ao da ADI 2314/RJ quanto à ampliação das hipóteses de reserva de lei complementar pela Constituição estadual, foi julgada pelo Plenário do STF, Rel. Min. Luiz Fux, em 5/12/2019.", answer:true, just:"CORRETO. A ADI 5003/SC foi julgada pelo Plenário do STF, Rel. Min. Luiz Fux, em 5/12/2019 (Info 962), superando o entendimento anterior da ADI 2314/RJ."},
+{id:90, tema:"Segurança Pública / Isonomia de Vencimentos", fonte:"STF Info 768", statement:"A ADI 3777/BA, sobre a inconstitucionalidade da isonomia de vencimentos entre Polícia Civil e Militar prevista em Constituição estadual, foi julgada pelo Plenário do STF, Rel. Min. Luiz Fux, em 19/11/2014.", answer:true, just:"CORRETO. A ADI 3777/BA foi julgada pelo Plenário do STF, Rel. Min. Luiz Fux, em 19/11/2014 (Info 768)."},
+{id:91, tema:"Investigação Criminal / Inquérito Policial", fonte:"STF Info 741", statement:"A ADI 2886/RJ, sobre a tramitação do inquérito policial entre a polícia e o Ministério Público, foi julgada pelo Plenário do STF, red. p/ o acórdão Min. Joaquim Barbosa, em 3/4/2014, sendo um dos julgados mais antigos do bloco analisado sobre segurança pública.", answer:true, just:"CORRETO. A ADI 2886/RJ foi julgada pelo Plenário do STF, red. p/ o acórdão Min. Joaquim Barbosa, em 3/4/2014 (Info 741)."},
+{id:92, tema:"Segurança Pública / Vencimentos no Distrito Federal", fonte:"STF (Súmula Vinculante 39)", statement:"O fundamento para a Súmula Vinculante 39 do STF, sobre a competência da União para legislar sobre vencimentos das polícias civil e militar e do corpo de bombeiros militar do DF, decorre do fato de que essas forças são mantidas e organizadas pela União no Distrito Federal, e não pelo próprio DF.", answer:true, just:"CORRETO. Essa é exatamente a razão histórica e constitucional (art. 21, XIV, CF/88) para a competência privativa da União sobre vencimentos dessas forças de segurança no DF."},
+{id:93, tema:"Segurança Pública / Armas Apreendidas", fonte:"STF Info 705", statement:"A ADI 3193/SP, sobre a impossibilidade de lei estadual determinar o uso de armas de fogo apreendidas pelas polícias civil e militar, foi julgada pelo Plenário do STF, Rel. Min. Marco Aurélio, em 9/5/2013.", answer:true, just:"CORRETO. A ADI 3193/SP foi julgada pelo Plenário do STF, Rel. Min. Marco Aurélio, em 9/5/2013 (Info 705)."},
+{id:94, tema:"Segurança Pública / Advocacia", fonte:"STF Info 735", statement:"A ADI 3541/DF, sobre a constitucionalidade da vedação ao exercício da advocacia por quem desempenha atividade policial, foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 12/2/2014, sendo um dos julgados mais antigos do bloco de segurança pública analisado.", answer:true, just:"CORRETO. A ADI 3541/DF foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 12/2/2014 (Info 735), um dos precedentes mais antigos do conjunto de julgados sobre segurança pública neste material."},
+{id:95, tema:"Segurança Pública / Inteligência (ABIN/SISBIN)", fonte:"STF Info 986", statement:"Segundo o STF, na ADI 6529 MC/DF, toda e qualquer decisão que solicitar dados à ABIN por parte de órgãos do SISBIN deverá ser devidamente motivada, para possibilitar eventual controle de legalidade pelo Poder Judiciário.", answer:true, just:"CORRETO. Esse é exatamente o segundo dos quatro critérios fixados pelo STF na interpretação conforme dada ao dispositivo da Lei 9.883/99 (Info 986)."},
+{id:96, tema:"Segurança Pública / Rol Taxativo", fonte:"STF Info 983", statement:"Segundo o STF, na ADI 2575/PR, nada impede que a Polícia Científica, criada pelo Estado-membro para ser o órgão responsável pelas perícias, continue a existir e a desempenhar suas funções, desde que se afaste qualquer interpretação que lhe outorgue caráter de órgão de segurança pública.", answer:true, just:"CORRETO. Essa é exatamente a ressalva feita pelo STF: a Polícia Científica pode continuar existindo com suas funções periciais, apenas sem o caráter constitucional de órgão de segurança pública (Info 983)."},
+{id:97, tema:"Competências Legislativas / Educação", fonte:"STF Info 980", statement:"Segundo o STF, na ADPF 457, a lei municipal que proíbe a divulgação de material sobre 'ideologia de gênero' viola a liberdade de aprender, ensinar, pesquisar e divulgar o pensamento, a arte e o saber, prevista no art. 206, II, CF/88, bem como o pluralismo de ideias e de concepções pedagógicas do art. 206, III.", answer:true, just:"CORRETO. Esses são exatamente os dois fundamentos de inconstitucionalidade material citados pelo STF nesse julgado (Info 980)."},
+{id:98, tema:"Controle de Constitucionalidade / Aspectos Procedimentais", fonte:"STF Info 976", statement:"Segundo o STF, na ADI 6051, a exigência de que a procuração indique especificamente o ato normativo impugnado tem por consequência, se não cumprida, o não conhecimento definitivo e irreversível da ADI, mesmo que o vício seja corrigido posteriormente.", answer:false, just:"ERRADO. O STF fixou que esse vício é SANÁVEL: é possível a regularização da procuração antes que seja reconhecida a carência da ação — não se trata de vício insanável e irreversível (ADI 6051, Info 976)."},
+{id:99, tema:"Direito Ambiental / Fiscalização", fonte:"STF Info 1084", statement:"Segundo o STF, na ADI 7203/RO, a lei estadual que proibia a destruição de bens apreendidos em fiscalização ambiental violava tanto a competência da União para normas gerais de proteção ambiental (art. 24, VI e VII, CF/88) quanto sua competência privativa sobre direito penal e processual penal (art. 22, I, CF/88).", answer:true, just:"CORRETO. Essa é exatamente a dupla fundamentação (competência ambiental concorrente + competência privativa sobre direito penal) usada pelo STF nesse julgado (Info 1084)."},
+{id:100, tema:"Controle de Constitucionalidade / Coisa Julgada Tributária", fonte:"STF Info 1082", statement:"Segundo o STF, nos Temas 881 e 885, houve uma mutação constitucional do art. 52, X, CF/88, também aplicável às decisões proferidas em recurso extraordinário com repercussão geral, que passam a ter efeitos vinculantes e eficácia erga omnes desde a decisão, cabendo ao Senado apenas dar publicidade.", answer:true, just:"CORRETO. Essa é exatamente a extensão da mutação constitucional reconhecida pelo STF nesse julgado, equiparando os efeitos do RE com repercussão geral aos do controle concentrado (Info 1082)."},
+{id:101, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1076", statement:"Segundo o STF, na ADI 5528/TO, são incompatíveis, sob o ângulo material, com o vínculo de subordinação ao Governador estabelecido no art. 144, §6º, CF/88, a atribuição de natureza jurídica ao cargo de delegado de polícia e a inclusão das funções por ele exercidas entre as funções essenciais do Estado.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação material usada pelo STF na ADI 5528/TO (Info 1076), além da inconstitucionalidade formal por se tratar de emenda de iniciativa parlamentar."},
+{id:102, tema:"Direitos Sociais / Trabalho Escravo", fonte:"STF (ADPF 509/DF)", statement:"Segundo o STF, na ADPF 509/DF, a inclusão do empregador no cadastro de trabalho escravo ('lista suja') somente ocorre após decisão administrativa irrecorrível, assegurados o contraditório e a ampla defesa, quando identificada por auditor-fiscal a exploração de trabalho em condição análoga à de escravo e lavrado auto de infração.", answer:true, just:"CORRETO. Essa é exatamente a sistemática de garantias processuais destacada pelo STF ao validar a constitucionalidade da 'lista suja' do trabalho escravo (Info sem número, ADPF 509/DF)."},
+{id:103, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"Segundo o STF, na ADI 7149/RJ, a reserva de vagas para irmãos na mesma escola é medida que visa consolidar políticas públicas de acesso ao sistema educacional e do maior convívio familiar possível, sendo constitucional mesmo decorrendo de projeto de iniciativa parlamentar.", answer:true, just:"CORRETO. Diferentemente de outros casos sobre segurança pública em que a iniciativa parlamentar foi vedada, o STF considerou constitucional essa lei sobre matéria educacional mesmo sendo de iniciativa parlamentar (ADI 7149/RJ, Info 1069)."},
+{id:104, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"Segundo o STF, no RE 1008166/SC (Tema 548), a educação básica em todas as suas fases (educação infantil, ensino fundamental e ensino médio) constitui direito fundamental assegurado por normas constitucionais de eficácia contida, dependendo de regulamentação legal para produzir efeitos.", answer:false, just:"ERRADO. O STF fixou o oposto: essas normas têm eficácia PLENA e aplicabilidade direta e imediata, e não eficácia contida dependente de regulamentação (Tema 548, Info 1069)."},
+{id:105, tema:"Ministério Público / Atuação", fonte:"STF (ADI 4.693/BA)", statement:"Segundo o STF, na ADI 4.693/BA, o dispositivo regimental do TJ da Bahia declarado inconstitucional era o artigo 379, parágrafo único, do Regimento Interno daquele Tribunal.", answer:true, just:"CORRETO. Esse é exatamente o dispositivo regimental mencionado no julgado como flagrantemente inconstitucional (ADI 4.693/BA)."},
+{id:106, tema:"Segurança Pública / Anistia", fonte:"STF Info 1056", statement:"Segundo o STF, na ADI 4869/DF, a competência estadual sobre a disciplina e regime dos policiais e bombeiros militares estaduais é realçada pelos arts. 42 e 144, §6º, CF/88, o que impede a União de conceder-lhes anistia disciplinar por lei federal.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para declarar formalmente inconstitucional a Lei federal nº 12.505/2011 (Info 1056)."},
+{id:107, tema:"Organização do Estado / Intervenção Federal", fonte:"STJ Info 732", statement:"Segundo o STJ, no IF 113-PR, a situação fática do descumprimento da ordem de reintegração de posse em imóvel ocupado pelo MST revelava questão de cunho social e coletivo, que desbordava da esfera meramente individual da parte autora da ação de reintegração.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STJ para negar a intervenção federal, reconhecendo a complexidade social e coletiva da situação (IF 113-PR, Info 732)."},
+{id:108, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 881", statement:"Segundo o STF, na ADI 5526/DF, a competência do Poder Judiciário para impor medidas cautelares do art. 319 do CPP a parlamentares alcança tanto a substituição de prisão em flagrante por crime inafiançável quanto a imposição autônoma dessas medidas em circunstâncias de excepcional gravidade, sem necessidade de flagrante prévio.", answer:true, just:"CORRETO. Essa é exatamente a dupla hipótese fixada pelo STF na ADI 5526/DF (Info 881): substituição de prisão em flagrante OU imposição autônoma em casos de excepcional gravidade."},
+{id:109, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 872", statement:"Segundo o STF, se a Constituição Estadual exigir autorização da Assembleia Legislativa para que o Governador seja processado criminalmente por crime comum, essa previsão é considerada constitucional, por se tratar de matéria de auto-organização dos Estados-membros.", answer:false, just:"ERRADO. O STF fixou o oposto: essa previsão, se existente na Constituição estadual, é considerada INCONSTITUCIONAL, sendo vedado às unidades federativas condicionar a instauração de ação penal contra Governador à prévia autorização da Casa Legislativa (Info 872)."},
+{id:110, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF (ADI 3922, mudança 25/10/2021)", statement:"Segundo o entendimento atual do STF (ADI 3922), tratando-se de norma originária da Constituição estadual que exija que o Chefe da Polícia Civil seja Delegado da classe final da carreira, não há falar em usurpação da prerrogativa de iniciativa do Governador, pois as regras federais de reserva de iniciativa não sujeitam o poder constituinte decorrente das Assembleias Legislativas estaduais (art. 11 do ADCT), ressalvada fraude comprovada.", answer:true, just:"CORRETO. Essa é exatamente a distinção fixada pelo STF na ADI 3922 (Info não numerado, julgado em 25/10/2021), diferenciando normas originárias da Constituição estadual de projetos de iniciativa parlamentar posteriores."},
+{id:111, tema:"Poder Judiciário / Súmula Vinculante", fonte:"STF Info 800", statement:"Segundo o STF, na PSV 13/DF, o mero descontentamento ou eventual divergência quanto ao conteúdo de uma súmula vinculante autoriza que o legitimado ingresse com pedido de cancelamento ou rediscussão da matéria, independentemente de outros requisitos.", answer:false, just:"ERRADO. O STF fixou o oposto: o mero descontentamento NÃO autoriza o pedido de cancelamento ou rediscussão, sendo necessário demonstrar superação de jurisprudência, alteração legislativa, ou modificação substantiva de contexto (PSV 13/DF, Info 800)."},
+{id:112, tema:"Segurança Pública / Isonomia de Vencimentos", fonte:"STF Info 768", statement:"Segundo o STF, na ADI 3777/BA, o estabelecimento de política remuneratória dos servidores do Poder Executivo estadual é de competência exclusiva da Assembleia Legislativa, e não do Governador do Estado.", answer:false, just:"ERRADO. O STF fixou o oposto: essa competência é EXCLUSIVA DO GOVERNADOR DO ESTADO (art. 61, §1º, II, 'a', CF/88), sendo por isso inconstitucional a norma estadual que impunha isonomia de vencimentos entre Polícia Civil e Militar (Info 768)."},
+{id:113, tema:"Investigação Criminal / Inquérito Policial", fonte:"STF Info 741", statement:"Segundo o STF, na ADI 2886/RJ, a tramitação direta do inquérito policial entre a polícia e o Ministério Público, sem intervenção judicial, é inconstitucional, mas a requisição de informações pelo MP ao término de 30 dias de inquérito com indiciado solto é constitucional.", answer:true, just:"CORRETO. Essa é exatamente a dupla tese fixada pelo STF na ADI 2886/RJ (Info 741): a tramitação direta é inconstitucional, mas a requisição de informações após 30 dias com indiciado solto é constitucional."},
+{id:114, tema:"Segurança Pública / Armas Apreendidas", fonte:"STF Info 705", statement:"Segundo o STF, na ADI 3193/SP, a competência sobre o destino e uso de armas de fogo apreendidas é da União, e não dos Estados-membros, mesmo quando essas armas estejam sob custódia das polícias estaduais.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF na ADI 3193/SP (Info 705): mesmo estando sob custódia estadual, a competência sobre o destino das armas apreendidas é da União."},
+{id:115, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1074", statement:"Segundo o STF, na ADI 6923/RO, deve-se prestigiar a regra do art. 144, §6º, CF/88, sendo inconstitucional o esvaziamento dessa norma pela criação de requisitos como a formação de lista tríplice, por não se poder enfraquecer, por mecanismos corporativos, a compreensão de que as forças policiais estão subordinadas ao poder civil.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para declarar inconstitucional a exigência de lista tríplice para a nomeação do diretor-geral da Polícia Civil de Rondônia (Info 1074)."},
+{id:116, tema:"Segurança Pública / Vencimentos no Distrito Federal", fonte:"STF (Súmula Vinculante 39)", statement:"A Súmula Vinculante 39 do STF trata especificamente da competência sobre vencimentos das polícias civil e militar e do corpo de bombeiros militar do Distrito Federal, e não de outros Estados-membros da Federação.", answer:true, just:"CORRETO. Essa Súmula Vinculante trata especificamente do regime do Distrito Federal, cujas forças de segurança são organizadas e mantidas pela União (art. 21, XIV, CF/88), diferentemente do que ocorre nos demais Estados."},
+{id:117, tema:"Segurança Pública / Advocacia", fonte:"STF Info 735", statement:"Segundo o STF, na ADI 3541/DF, a vedação ao exercício da advocacia por quem desempenha, direta ou indiretamente, atividade policial é constitucional, sem que isso configure discriminação vedada pelo princípio da isonomia, dada a natureza distinta das atividades e o potencial conflito de interesses.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para validar essa vedação legal na ADI 3541/DF, Rel. Min. Dias Toffoli, julgada em 12/2/2014 (Info 735)."},
+{id:118, tema:"Competências Legislativas / Educação", fonte:"STF Info 980", statement:"A ADPF 457 discutiu lei municipal (e não estadual ou federal) que proibia a divulgação de material com referência a 'ideologia de gênero' nas escolas municipais, sendo essa a razão da inconstitucionalidade formal por usurpação da competência da União.", answer:true, just:"CORRETO. Tratava-se especificamente de uma lei MUNICIPAL, o que reforça a inconstitucionalidade formal por usurpação da competência privativa da União sobre diretrizes e bases da educação nacional (ADPF 457, Info 980)."},
+{id:119, tema:"Organização do Estado / Pandemia", fonte:"STF Info 976", statement:"Segundo o STF, na ADI 6343 MC-Ref/DF, a adoção de medidas restritivas relativas à locomoção e ao transporte, por qualquer ente federativo, deve estar embasada em recomendação técnica fundamentada de órgãos da vigilância sanitária, preservando o transporte de produtos e serviços essenciais.", answer:true, just:"CORRETO. Essa é exatamente uma das condicionantes fixadas pelo STF para a adoção de medidas restritivas de locomoção e transporte por Estados e Municípios durante a pandemia (Info 976)."},
+{id:120, tema:"Direito Ambiental / Fiscalização", fonte:"STF Info 1084", statement:"O julgado sobre a ADI 7203/RO envolveu uma lei do Estado de Rondônia que impedia órgãos ambientais e a polícia militar de destruírem bens particulares apreendidos em fiscalização ambiental — situação que, na prática, dificultava a atuação repressiva contra ilícitos ambientais.", answer:true, just:"CORRETO. Esse é exatamente o contexto do caso concreto julgado pelo STF na ADI 7203/RO (Info 1084), envolvendo lei do Estado de Rondônia."},
+{id:121, tema:"Competências Legislativas / Educação", fonte:"STF Info 1082", statement:"O julgado sobre a ADI 7019/RO, que proibiu lei estadual contra linguagem neutra, também envolveu uma lei do Estado de Rondônia, assim como a ADI 7203/RO sobre fiscalização ambiental.", answer:true, just:"CORRETO. Ambas as ADIs (7019/RO e 7203/RO) envolveram leis do Estado de Rondônia, julgadas pelo STF em Informativos próximos (1082 e 1084, respectivamente)."},
+{id:122, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1074", statement:"O julgado sobre a ADI 6923/RO, que vedou a lista tríplice para diretor-geral da Polícia Civil, também envolveu uma lei do Estado de Rondônia, assim como as ADI 7019/RO e 7203/RO.", answer:true, just:"CORRETO. As três ADIs (6923/RO, 7019/RO e 7203/RO) envolveram leis do Estado de Rondônia, julgadas pelo STF em Informativos diferentes (1074, 1082 e 1084, respectivamente)."},
+{id:123, tema:"Segurança Pública / Isonomia de Vencimentos", fonte:"STF Info 768", statement:"O julgado sobre a ADI 3777/BA, que vedou a isonomia de vencimentos entre Polícia Civil e Militar, envolveu norma da Constituição do Estado da Bahia.", answer:true, just:"CORRETO. A ADI 3777/BA, julgada pelo STF em 19/11/2014 (Info 768), envolveu exatamente norma da Constituição do Estado da Bahia."},
+{id:124, tema:"Segurança Pública / Anistia", fonte:"STF Info 1056", statement:"A ADI 4869/DF, embora questione uma lei FEDERAL (Lei nº 12.505/2011), foi ajuizada perante o STF com o número de processo referenciando o Distrito Federal (DF), padrão processual usual para ADIs contra normas federais.", answer:true, just:"CORRETO. ADIs contra normas federais (leis ou atos normativos da União) são processadas com a sigla '/DF', ainda que a lei impugnada tenha efeitos sobre todo o território nacional, como ocorreu com a Lei nº 12.505/2011 na ADI 4869/DF."},
+{id:125, tema:"Ministério Público / Atuação", fonte:"STF (ADI 4.693/BA)", statement:"A ADI 4.693/BA, sobre a exclusão do MP na investigação de magistrados pelo TJ da Bahia, envolveu uma norma REGIMENTAL (do próprio Tribunal), e não uma lei estadual propriamente dita.", answer:true, just:"CORRETO. O objeto da ADI 4.693/BA foi o art. 379, parágrafo único, do Regimento Interno do Tribunal de Justiça da Bahia — um ato normativo regimental do próprio Tribunal, e não uma lei estadual."},
+{id:126, tema:"Direitos Sociais / Serviço Militar", fonte:"STF (Tema 15, SV 6)", statement:"O RE 570.177/MG, sobre o soldo do serviço militar obrigatório, foi julgado em 2008, tornando-se, entre os julgados constitucionais analisados neste bloco, um dos precedentes mais antigos.", answer:true, just:"CORRETO. O RE 570.177/MG foi julgado em 30/04/2008 (Info 505), sendo de fato um dos julgados mais antigos entre os analisados neste material, posteriormente assentado na Súmula Vinculante 6."},
+{id:127, tema:"Processo Legislativo / Reserva de Lei Complementar", fonte:"STF (ADI 2314/RJ)", statement:"O julgado sobre a ADI 2314/RJ envolveu norma da Constituição do Estado do Rio de Janeiro que previa status de lei complementar para a Lei Orgânica da Polícia Civil daquele Estado.", answer:true, just:"CORRETO. A ADI 2314/RJ, julgada em 17/6/2015 (Info 790), envolveu exatamente essa questão relativa ao Estado do Rio de Janeiro."},
+{id:128, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 881", statement:"O 'caso Aécio Neves' (ADI 5526/DF), sobre medidas cautelares aplicáveis a parlamentares, envolveu discussão sobre a possibilidade de o STF impor tais medidas mesmo sem prisão em flagrante prévia, em circunstâncias de excepcional gravidade.", answer:true, just:"CORRETO. Esse foi exatamente um dos pontos centrais discutidos e decididos na ADI 5526/DF (Info 881), ficando conhecido como 'caso Aécio Neves'."},
+{id:129, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1076", statement:"As ADI 5517/ES e ADI 5528/TO, embora tratando de temas semelhantes (subordinação da Polícia Civil ao Governador), envolveram normas de Estados diferentes: Espírito Santo e Tocantins, respectivamente.", answer:true, just:"CORRETO. A ADI 5517/ES envolveu norma do Espírito Santo e a ADI 5528/TO envolveu norma do Tocantins, ambas julgadas pelo STF no mesmo dia e Informativo (21/11/2022, Info 1076)."},
+{id:130, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1081", statement:"A ADI 7024/PR, sobre exigência adicional para porte de arma de servidores aposentados, envolveu norma do Estado do Paraná.", answer:true, just:"CORRETO. A ADI 7024/PR, julgada pelo STF em 16/12/2022 (Info 1081), envolveu exatamente norma do Estado do Paraná."},
+{id:131, tema:"Competências Legislativas / Direito do Consumidor", fonte:"STF Info 1081", statement:"A ADI 5126/SP, sobre a proibição de armas de brinquedo que simulam armas reais, envolveu norma do Estado de São Paulo.", answer:true, just:"CORRETO. A ADI 5126/SP, julgada pelo STF em 17/12/2022 (Info 1081), envolveu exatamente norma do Estado de São Paulo."},
+{id:132, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 1081", statement:"As ADI 5824/RJ e ADI 5.825/MT, sobre a extensão das imunidades formais a Deputados Estaduais, envolveram normas dos Estados do Rio de Janeiro e do Mato Grosso, respectivamente.", answer:true, just:"CORRETO. A ADI 5824/RJ envolveu norma do Rio de Janeiro e a ADI 5.825/MT envolveu norma do Mato Grosso, ambas julgadas pelo STF em 16/12/2022 (Info 1081)."},
+{id:133, tema:"Segurança Pública / Rol Taxativo", fonte:"STF Info 983", statement:"A ADI 2575/PR, sobre a impossibilidade de a Polícia Científica ser órgão de segurança pública, envolveu norma da Constituição do Estado do Paraná.", answer:true, just:"CORRETO. A ADI 2575/PR, julgada em 24/6/2020 (Info 983), envolveu exatamente norma da Constituição do Estado do Paraná."},
+{id:134, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"A ADI 7149/RJ, sobre reserva de vagas para irmãos na mesma escola, envolveu lei do Estado do Rio de Janeiro.", answer:true, just:"CORRETO. A ADI 7149/RJ, julgada em 23/9/2022 (Info 1069), envolveu exatamente lei do Estado do Rio de Janeiro."},
+{id:135, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"O RE 1008166/SC, sobre o dever de creche e pré-escola, teve origem em processo oriundo do Estado de Santa Catarina, julgado sob o rito de repercussão geral.", answer:true, just:"CORRETO. O RE 1008166/SC, julgado em 22/9/2022 sob o Tema 548 (Info 1069), teve origem em processo de Santa Catarina."},
+{id:136, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1073", statement:"A ADI 6327/DF, sobre o termo inicial da licença-maternidade em internações prolongadas, foi ajuizada contra normas de abrangência federal, e não de um Estado específico, daí o sufixo '/DF'.", answer:true, just:"CORRETO. Como se tratava de norma federal, a ação foi processada com o sufixo '/DF' junto ao STF, ainda que a discussão tivesse impacto nacional sobre a licença-maternidade (ADI 6327/DF, Info 1073)."},
+{id:137, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1054", statement:"O RE 1348854/DF, sobre a licença-maternidade ao pai solo, discutiu especificamente o caso de servidor público federal, e não da iniciativa privada, dado o sufixo '/DF' do processo.", answer:false, just:"ERRADO. O sufixo '/DF' em recursos extraordinários normalmente indica apenas o tribunal de origem (TRF da 1ª Região, com sede em Brasília/DF, por exemplo), não significando necessariamente que o caso trate apenas de servidores federais — a tese fixada no Tema 1182 abrange o servidor público em geral, sem se restringir à esfera federal."},
+{id:138, tema:"Segurança Pública / Anistia", fonte:"STF Info 1056", statement:"Segundo o STF, na ADI 4869/DF, a União possui competência para legislar concedendo anistia para crimes, mas não para infrações administrativas disciplinares de servidores estaduais, tema que compete aos próprios entes estaduais.", answer:true, just:"CORRETO. Essa é exatamente a distinção fixada pelo STF: anistia para CRIMES é competência da União; anistia para infrações DISCIPLINARES de servidores estaduais compete aos próprios Estados (ADI 4869/DF, Info 1056)."},
+{id:139, tema:"Investigação Criminal / Inquérito Policial", fonte:"STF Info 741", statement:"A ADI 2886/RJ, sobre a tramitação do inquérito policial, envolveu norma do Estado do Rio de Janeiro, sendo um dos julgados mais antigos do conjunto de precedentes sobre segurança pública analisados neste material.", answer:true, just:"CORRETO. A ADI 2886/RJ, julgada em 3/4/2014 (Info 741), envolveu norma do Rio de Janeiro e está entre os precedentes mais antigos do bloco de segurança pública deste material."},
+{id:140, tema:"Segurança Pública / Armas Apreendidas", fonte:"STF Info 705", statement:"A ADI 3193/SP, sobre a impossibilidade de lei estadual determinar o uso de armas apreendidas, envolveu norma do Estado de São Paulo, julgada em 2013, um dos precedentes mais antigos deste bloco.", answer:true, just:"CORRETO. A ADI 3193/SP, julgada em 9/5/2013 (Info 705), envolveu norma de São Paulo e está entre os julgados mais antigos analisados neste material sobre segurança pública."},
+{id:141, tema:"Segurança Pública / Advocacia", fonte:"STF Info 735", statement:"A ADI 3541/DF, sobre a vedação à advocacia por quem exerce atividade policial, discutiu norma de abrangência nacional (federal), e não de um Estado específico.", answer:true, just:"CORRETO. Tratando-se de norma federal (o sufixo '/DF' assim indica), a vedação discutida na ADI 3541/DF tinha abrangência nacional, e não se limitava a um Estado específico (Info 735)."},
+{id:142, tema:"Segurança Pública / Rol Taxativo", fonte:"STF Info 983", statement:"Segundo o STF, na ADI 2575/PR, a Constituição estadual do Paraná não poderia prever a Polícia Científica como órgão de segurança pública, mesmo que essa previsão constasse de norma originária da Assembleia Constituinte estadual de 1989.", answer:true, just:"CORRETO. Independentemente de a norma ser originária ou não, o STF fixou que o rol do art. 144, CF/88 é taxativo e não admite a criação de outros órgãos de segurança pública pelos Estados (ADI 2575/PR, Info 983)."},
+{id:143, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 872", statement:"As ADI 4777/BA, ADI 4674/RS e ADI 4362/DF, sobre a desnecessidade de autorização da ALE para denúncia contra Governador, envolveram normas dos Estados da Bahia, Rio Grande do Sul, e uma norma de abrangência federal (DF), respectivamente.", answer:true, just:"CORRETO. Essas três ADIs, julgadas conjuntamente pelo STF em 9/8/2017 (Info 872), envolveram normas da Bahia, do Rio Grande do Sul e uma de abrangência federal."},
+{id:144, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 863", statement:"A ADI 5540/MG, que reafirmou a desnecessidade de autorização da ALE para denúncia contra Governador, envolveu norma do Estado de Minas Gerais, julgada pelo STF em 3/5/2017.", answer:true, just:"CORRETO. A ADI 5540/MG, Rel. Min. Edson Fachin, julgada em 3/5/2017 (Info 863), envolveu exatamente norma do Estado de Minas Gerais."},
+{id:145, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 863", statement:"As ADI 4764/AC, ADI 4797/MT e ADI 4798/PI, que também reafirmaram a mesma tese sobre denúncia contra Governador, envolveram normas dos Estados do Acre, Mato Grosso e Piauí, respectivamente, julgadas em 4/5/2017.", answer:true, just:"CORRETO. Essas três ADIs, rel. orig. Min. Celso de Mello, red. p/ o ac. Min. Roberto Barroso, foram julgadas pelo STF em 4/5/2017 (Info 863), envolvendo normas do Acre, Mato Grosso e Piauí."},
+{id:146, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF (ADI 3922 e ADI 3038/SC)", statement:"O 'ENTENDIMENTO ANTERIOR' do STF sobre a exigência de que o Chefe da Polícia Civil seja Delegado de carreira estava fixado na ADI 3038/SC, julgada em 11/12/2014 (Info 771), envolvendo norma do Estado de Santa Catarina.", answer:true, just:"CORRETO. A ADI 3038/SC, rel. Min. Marco Aurélio, julgada em 11/12/2014 (Info 771), envolveu norma de Santa Catarina e representa o entendimento anterior sobre o tema, posteriormente mitigado pela ADI 3922 em 2021."},
+{id:147, tema:"Poder Judiciário / Súmula Vinculante", fonte:"STF Info 800", statement:"O caso concreto mencionado no julgado sobre a PSV 13/DF envolveu pedido da Confederação Brasileira dos Trabalhadores Policiais Civis (Cobrapol) para cancelar especificamente a Súmula Vinculante 11, referente ao uso de algemas.", answer:true, just:"CORRETO. Esse é exatamente o caso concreto mencionado no material: a Cobrapol pediu o cancelamento da Súmula Vinculante 11 (algemas), pedido que o STF negou por falta de comprovação dos requisitos da PSV 13/DF (Info 800)."},
+{id:148, tema:"Organização do Estado / Intervenção Federal", fonte:"STJ Info 732", statement:"O IF 113-PR, sobre a intervenção federal por descumprimento de reintegração de posse envolvendo o MST, tratou de um imóvel rural localizado no Estado do Paraná.", answer:true, just:"CORRETO. O IF 113-PR, julgado pela Corte Especial do STJ em 06/04/2022 (Info 732), envolveu exatamente um imóvel rural situado no Estado do Paraná."},
+{id:149, tema:"Segurança Pública / Guarda Municipal", fonte:"STF (RE 1281774)", statement:"Segundo o STF, no RE 1281774, o fundamento legal para a prisão em flagrante realizada pela Guarda Municipal está no art. 301 do CPP, que autoriza qualquer pessoa a prender quem se encontre em situação de flagrante delito.", answer:true, just:"CORRETO. Essa é exatamente a base legal citada pelo STF para legitimar a prisão em flagrante realizada pela Guarda Municipal, ainda que ela não possa realizar diligências investigativas típicas (RE 1281774)."},
+{id:150, tema:"Competências Legislativas / Educação", fonte:"STF (ADI 5484/AL)", statement:"A ADI 5484/AL, sobre a inconstitucionalidade de lei estadual sobre formação específica para docência, envolveu norma do Estado de Alagoas.", answer:true, just:"CORRETO. A ADI 5484/AL, julgada em 15/04/2020, envolveu exatamente norma do Estado de Alagoas, declarada inconstitucional por usurpar a competência da União sobre diretrizes e bases da educação nacional."},
+{id:151, tema:"Direitos Sociais / Trabalho Escravo", fonte:"STF (ADPF 509/DF)", statement:"A ADPF 509/DF, sobre a constitucionalidade da 'lista suja' do trabalho escravo, discutiu uma portaria de abrangência federal, e não uma lei estadual específica.", answer:true, just:"CORRETO. Tratava-se de uma portaria de abrangência federal (fundamentada na legislação de regência), e não de lei estadual, daí o sufixo '/DF' da ação (ADPF 509/DF)."},
+{id:152, tema:"Controle de Constitucionalidade / Coisa Julgada Tributária", fonte:"STF Info 1082", statement:"O RE 955227/BA, sobre os efeitos temporais da coisa julgada tributária, envolveu processo oriundo do Estado da Bahia, enquanto o RE 949297/CE envolveu processo oriundo do Ceará.", answer:true, just:"CORRETO. Os sufixos dos processos indicam exatamente essa origem: RE 955227/BA (Bahia) e RE 949297/CE (Ceará), ambos julgados pelo Plenário do STF em 8/02/2023 (Temas 885 e 881, Info 1082)."},
+{id:153, tema:"Controle de Constitucionalidade / Efeito Vinculante", fonte:"STF Info 886", statement:"As ADI 3406/RJ e ADI 3470/RJ, sobre o efeito vinculante de declaração incidental de inconstitucionalidade, envolveram normas do Estado do Rio de Janeiro.", answer:true, just:"CORRETO. Ambas as ADIs (3406/RJ e 3470/RJ), julgadas pelo Plenário do STF em 29/11/2017 (Info 886), envolveram normas do Estado do Rio de Janeiro."},
+{id:154, tema:"Liberdade de Expressão / Discurso de Ódio", fonte:"STF Info 893", statement:"O RHC 146303/RJ, sobre incitação de ódio por líder religioso, envolveu processo oriundo do Estado do Rio de Janeiro, julgado pela 2ª Turma do STF em 6/3/2018.", answer:true, just:"CORRETO. O RHC 146303/RJ, julgado pela 2ª Turma do STF em 6/3/2018 (Info 893), teve origem em processo do Rio de Janeiro."},
+{id:155, tema:"Poder Executivo / Imunidade Formal", fonte:"STF Info 888", statement:"Os Inq 4483 AgR-segundo/DF e Inq 4327 AgR-segundo/DF, sobre a não extensão da imunidade formal a codenunciados, trataram de inquéritos de abrangência federal, envolvendo autoridades com foro por prerrogativa de função perante o STF.", answer:true, just:"CORRETO. Tratando-se de inquéritos perante o STF (com o sufixo '/DF'), esses julgados envolveram autoridades com foro por prerrogativa de função perante a própria Corte (Info 888)."},
+{id:156, tema:"Segurança Pública / Inteligência (ABIN/SISBIN)", fonte:"STF Info 986", statement:"A ADI 6529 MC/DF, sobre os critérios de compatibilidade constitucional do parágrafo único do art. 4º da Lei 9.883/99, discutiu norma de abrangência federal que rege o funcionamento do Sistema Brasileiro de Inteligência (SISBIN) e da ABIN.", answer:true, just:"CORRETO. A Lei nº 9.883/99, objeto da ADI 6529 MC/DF, é norma federal que instituiu o Sistema Brasileiro de Inteligência e a Agência Brasileira de Inteligência (ABIN), daí o sufixo '/DF' da ação (Info 986)."},
+{id:157, tema:"Processo Legislativo / Medida Provisória", fonte:"STF Info 896", statement:"A ADI 4717/DF, sobre os limites materiais implícitos à edição de medida provisória em matéria ambiental, discutiu MP de abrangência federal que reduzia unidades de conservação.", answer:true, just:"CORRETO. A ADI 4717/DF, julgada pelo STF em 5/4/2018 (Info 896), discutiu exatamente uma medida provisória federal que reduzia a proteção de unidades de conservação ambiental."},
+{id:158, tema:"Direitos Sociais / Serviço Militar", fonte:"STF (Tema 15, SV 6)", statement:"Segundo o STF, no RE 570.177/MG, o regime a que se submetem os militares não se confunde com o regime aplicável aos servidores civis, visto que os militares têm direitos, garantias, prerrogativas e impedimentos próprios, distintos dos civis.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF para não estender aos militares a garantia de remuneração não inferior ao salário mínimo, prevista para outras categorias de trabalhadores (Tema 15, Info 505)."},
+{id:159, tema:"Competências Legislativas / Educação", fonte:"STF Info 1082", statement:"Segundo o STF, na ADI 7019/RO, a tese fixada foi de que norma estadual que, a pretexto de proteger os estudantes, proíbe modalidade de uso da língua portuguesa (linguagem neutra) viola a competência legislativa da União.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF na ADI 7019/RO (Info 1082)."},
+{id:160, tema:"Segurança Pública / Rol Taxativo", fonte:"STF Info 983", statement:"Segundo o STF, na ADI 2575/PR, o rol do art. 144 da CF/88 aponta os órgãos incumbidos do exercício da segurança pública, e esse rol é taxativo, de modo que os Estados-membros e o Distrito Federal devem seguir o modelo federal.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF na ADI 2575/PR (Info 983)."},
+{id:161, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 1081", statement:"Segundo o STF, nas ADI 5824/RJ e ADI 5.825/MT, são constitucionais dispositivos da Constituição Estadual que estendem aos Deputados Estaduais as imunidades formais previstas no art. 53 da CF/88 para Deputados Federais e Senadores.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF nesses julgados (Info 1081)."},
+{id:162, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1081", statement:"Segundo o STF, na ADI 7024/PR, não há qualquer óbice constitucional a que o Estado, no exercício de sua competência suplementar sobre segurança pública, estabeleça exigência adicional (mais restritiva que a norma federal) para a manutenção do porte de arma por servidores estaduais aposentados das forças de segurança.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 7024/PR para validar a norma paranaense (Info 1081)."},
+{id:163, tema:"Competências Legislativas / Direito do Consumidor", fonte:"STF Info 1081", statement:"Segundo o STF, na ADI 5126/SP, a proibição de armas de brinquedo que simulam armas reais se insere na competência concorrente dos Estados sobre direito do consumidor e proteção à infância e à juventude (art. 24, V, VIII e XV, e art. 227, CF/88), podendo o Estado prever sanções administrativas com base no art. 24, §2º, CF/88.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 5126/SP para validar a lei paulista (Info 1081)."},
+{id:164, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1076", statement:"Segundo o STF, na ADI 5517/ES, a outorga ao delegado de polícia de tratamento jurídico e prerrogativas próprias dos membros do Judiciário e do Ministério Público não se compatibiliza com a vinculação hierárquico-administrativa ao Chefe do Executivo, discrepando do modelo concebido pela Constituição.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 5517/ES (Info 1076)."},
+{id:165, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1074", statement:"Segundo o STF, na ADI 6923/RO, a instituição de requisitos para a nomeação do Delegado-Chefe da Polícia Civil é matéria de iniciativa privativa do Governador do Estado, nos termos do art. 61, §1º, II, 'c' e 'e', da CF/88, aplicável aos Estados por força do art. 25 da CF/88.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 6923/RO para declarar inconstitucional a exigência de lista tríplice de iniciativa parlamentar (Info 1074)."},
+{id:166, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1073", statement:"Segundo o STF, na ADI 6327/DF, os benefícios da licença-maternidade e do salário-maternidade não podem ser reduzidos de modo irrazoável e conflitante com o direito social de proteção à maternidade e à infância, o que justifica sua prorrogação em casos de internação pós-parto prolongada.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 6327/DF (Info 1073)."},
+{id:167, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1069", statement:"Segundo o STF, no RE 1008166/SC (Tema 548), o Poder Público tem o dever jurídico de dar efetividade integral às normas constitucionais sobre acesso à educação básica, incluindo a oferta individual de creche e pré-escola quando exigida judicialmente.", answer:true, just:"CORRETO. Essa é exatamente a terceira tese fixada pelo STF no Tema 548 (Info 1069)."},
+{id:168, tema:"Direitos Sociais / Trabalho Escravo", fonte:"STF (ADPF 509/DF)", statement:"Segundo o STF, na ADPF 509/DF, descabe enquadrar como sancionador o cadastro de empregadores que submeteram trabalhadores a condição análoga à de escravo, cuja finalidade é o acesso à informação mediante publicização de política de combate ao trabalho escravo.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF na ADPF 509/DF (julgada em 16/09/2020)."},
+{id:169, tema:"Ministério Público / Atuação", fonte:"STF (ADI 4.693/BA)", statement:"Segundo o STF, na ADI 4.693/BA, é dever do Poder Judiciário exercer a 'atividade de supervisão judicial', fazendo cessar toda e qualquer ilegal coação por parte do Estado-acusador, mesmo quando a investigação envolve magistrados.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 4.693/BA (julgada em 11/10/2018)."},
+{id:170, tema:"Segurança Pública / Guarda Municipal", fonte:"STF (RE 1281774)", statement:"Segundo o STF, no RE 1281774, os agentes da Guarda Municipal não podem efetuar diligências típicas de investigação criminal para ingressar em residência ou propriedade de pessoa em cujo poder nada de ilícito foi encontrado, ainda que a prisão tenha se originado de denúncia anônima.", answer:true, just:"CORRETO. Essa é exatamente a tese fixada pelo STF no RE 1281774, aplicada ao caso concreto em que a prisão ultrapassou os limites da prisão em flagrante (julgado em 13/06/2022)."},
+{id:171, tema:"Segurança Pública / Anistia", fonte:"STF Info 1056", statement:"Segundo o STF, na ADI 4869/DF, a anistia de infrações disciplinares cometidas por servidores estaduais deve ser concedida pelos próprios entes estaduais, tendo em vista a autonomia que caracteriza a Federação brasileira.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF na ADI 4869/DF (Info 1056)."},
+{id:172, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1054", statement:"Segundo o STF, no RE 1348854/DF (Tema 1182), a licença-maternidade prevista no art. 7º, XVIII, CF/88, e regulamentada pelo art. 207 da Lei 8.112/90, estende-se ao pai genitor monoparental, à luz do art. 227 da Constituição e do princípio da paternidade responsável.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF no Tema 1182 (Info 1054)."},
+{id:173, tema:"Organização do Estado / Intervenção Federal", fonte:"STJ Info 732", statement:"Segundo o STJ, no IF 113-PR, a excepcionalidade e a gravidade que circundam a intervenção federal se sobrepõem ao interesse particular dos proprietários do imóvel, quando não há recusa ilícita do ente estatal em cumprir a decisão judicial.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STJ para negar a intervenção federal no IF 113-PR (Info 732)."},
+{id:174, tema:"Competências Legislativas / Educação", fonte:"STF (ADI 5484/AL)", statement:"Segundo o STF, na ADI 5484/AL, o magistério na educação básica submete-se à competência legislativa privativa da União para legislar sobre diretrizes e bases da educação nacional, o que torna inconstitucional lei estadual que exija formação específica para a docência de disciplina na educação básica.", answer:true, just:"CORRETO. Essa é exatamente a redação da fundamentação usada pelo STF na ADI 5484/AL (julgada em 15/04/2020)."},
+{id:175, tema:"Poder Legislativo / Imunidade Parlamentar", fonte:"STF Info 881", statement:"Segundo o STF, na ADI 5526/DF, aplica-se por analogia a regra do §2º do art. 53 da CF/88 também às medidas cautelares diversas da prisão impostas pelo STF a Deputados Federais e Senadores.", answer:true, just:"CORRETO. Essa é exatamente a extensão analógica fixada pelo STF na ADI 5526/DF ('caso Aécio Neves', Info 881)."},
+{id:176, tema:"Processo Legislativo / Medida Provisória", fonte:"STF Info 870", statement:"Segundo o STF, no MS 27931/DF, mesmo havendo MP trancando a pauta por não ter sido apreciada no prazo de 45 dias, a Câmara ou o Senado poderão votar normalmente propostas de emenda constitucional, projetos de lei complementar, de resolução e de decreto legislativo.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF no MS 27931/DF (Info 870)."},
+{id:177, tema:"Poder Executivo / Foro por Prerrogativa", fonte:"STF Info 872", statement:"Segundo o STF, nas ADI 4777/BA, ADI 4674/RS e ADI 4362/DF, é vedado às unidades federativas instituir normas que condicionem a instauração de ação penal contra Governador por crime comum à prévia autorização da Casa Legislativa.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF nesses julgados (Info 872)."},
+{id:178, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF (ADI 3922)", statement:"Segundo o STF, na ADI 3922, não há qualquer óbice constitucional de índole material à estipulação normativa de critérios razoáveis e objetivos à escolha do Chefe da Polícia Civil pelo Governador do Estado, tal como a exigência de que o ocupante do cargo seja eleito entre os integrantes da última classe da carreira.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF na ADI 3922 (julgada em 25/10/2021)."},
+{id:179, tema:"Poder Judiciário / Súmula Vinculante", fonte:"STF Info 800", statement:"Segundo o STF, na PSV 13/DF, para admitir-se a revisão ou o cancelamento de súmula vinculante, é necessário demonstrar evidente superação da jurisprudência do STF no tratamento da matéria, alteração legislativa quanto ao tema, ou modificação substantiva de contexto político, econômico ou social.", answer:true, just:"CORRETO. Essa é exatamente a redação da tese fixada pelo STF na PSV 13/DF (Info 800)."},
+{id:180, tema:"Segurança Pública / Isonomia de Vencimentos", fonte:"STF Info 768", statement:"Segundo o STF, na ADI 3777/BA, a norma que preveja isonomia de vencimentos entre Polícia Civil e Militar ofende o art. 37, XIII, da CF/88, que proíbe a vinculação ou equiparação de quaisquer espécies remuneratórias para efeito de remuneração de pessoal do serviço público.", answer:true, just:"CORRETO. Esse é exatamente um dos fundamentos usados pelo STF na ADI 3777/BA, ao lado da violação à competência exclusiva do Governador sobre política remuneratória (Info 768)."},
+{id:181, tema:"Investigação Criminal / Inquérito Policial", fonte:"STF Info 741", statement:"Segundo o STF, na ADI 2886/RJ, a tramitação direta do inquérito policial entre a polícia e o Ministério Público, sem qualquer intervenção judicial, retira do Judiciário o controle sobre eventuais ilegalidades cometidas durante a investigação, o que motivou a declaração de inconstitucionalidade dessa modalidade.", answer:true, just:"CORRETO. Essa é a lógica subjacente à declaração de inconstitucionalidade da tramitação direta na ADI 2886/RJ (Info 741), preservando o controle judicial sobre o inquérito policial."},
+{id:182, tema:"Segurança Pública / Armas Apreendidas", fonte:"STF Info 705", statement:"Segundo o STF, na ADI 3193/SP, ainda que as armas de fogo apreendidas estejam fisicamente sob custódia das polícias estaduais, a competência para legislar sobre seu uso e destinação final é da União, e não dos Estados-membros.", answer:true, just:"CORRETO. Essa é exatamente a fundamentação usada pelo STF na ADI 3193/SP para declarar inconstitucional a lei paulista sobre o uso de armas apreendidas (Info 705)."},
+{id:183, tema:"Segurança Pública / Advocacia", fonte:"STF Info 735", statement:"Segundo o STF, na ADI 3541/DF, a vedação ao exercício da advocacia por aqueles que desempenham, direta ou indiretamente, atividade policial busca evitar potencial conflito de interesses entre a função investigativa/persecutória e a função de defesa técnica privada.", answer:true, just:"CORRETO. Essa é a lógica subjacente à validação dessa vedação pelo STF na ADI 3541/DF, Rel. Min. Dias Toffoli, julgada em 12/2/2014 (Info 735), sem violação ao princípio da isonomia."},
+];
+
+const TOTAL = QUESTIONS.length;
+
+/* =========================================================
+   ESTADO / STORAGE
+   ========================================================= */
+let state = {
+  answers: {},      // {id: {status:'correct'|'wrong', guess:true|false|null}}
+  easyIds: [],       // ids marcados como fáceis (excluídos permanentemente)
+  currentIndex: 0,
+  category: "TODAS",
+  search: ""
+};
+let filteredQuestions = [];
+let answeredCurrent = false;
+let currentSelected = null; // 'V' ou 'F'
+let pendingSelection = null; // seleção feita mas ainda não confirmada
+
+const LS_PREFIX = 'quizdc_parte3_';
+
+// Wrapper com fallback duplo: tenta window.storage (preview da Claude) e
+// SEMPRE espelha em localStorage (funciona também se o arquivo for aberto
+// direto no navegador, fora do preview). Garante que o progresso sobrevive
+// a fechar/reabrir o navegador em qualquer um dos dois cenários.
+async function storageGet(key){
+  try{
+    if(window.storage && typeof window.storage.get === 'function'){
+      const r = await window.storage.get(key, false);
+      if(r && typeof r.value !== 'undefined' && r.value !== null) return r.value;
+    }
+  }catch(e){}
+  try{
+    const v = localStorage.getItem(LS_PREFIX + key);
+    if(v !== null) return v;
+  }catch(e){}
+  return null;
+}
+async function storageSet(key, value){
+  try{
+    if(window.storage && typeof window.storage.set === 'function'){
+      await window.storage.set(key, value, false);
+    }
+  }catch(e){}
+  try{
+    localStorage.setItem(LS_PREFIX + key, value);
+  }catch(e){}
+}
+
+async function loadState(){
+  try{
+    const v = await storageGet('quiz-answers');
+    if(v) state.answers = JSON.parse(v);
+  }catch(e){}
+  try{
+    const v = await storageGet('quiz-easy');
+    if(v) state.easyIds = JSON.parse(v);
+  }catch(e){}
+  try{
+    const v = await storageGet('quiz-meta');
+    if(v){
+      const m = JSON.parse(v);
+      state.currentIndex = m.currentIndex || 0;
+      state.category = m.category || "TODAS";
+      state.search = m.search || "";
+    }
+  }catch(e){}
+}
+
+async function saveAnswers(){
+  try{ await storageSet('quiz-answers', JSON.stringify(state.answers)); }catch(e){}
+}
+async function saveEasy(){
+  try{ await storageSet('quiz-easy', JSON.stringify(state.easyIds)); }catch(e){}
+}
+async function saveMeta(){
+  try{ await storageSet('quiz-meta', JSON.stringify({currentIndex: state.currentIndex, category: state.category, search: state.search})); }catch(e){}
+}
+
+/* =========================================================
+   INICIALIZAÇÃO
+   ========================================================= */
+function getCategories(){
+  const set = new Set(QUESTIONS.map(q=>q.tema));
+  return ["TODAS", ...Array.from(set).sort()];
+}
+
+function buildFiltered(){
+  const cat = state.category;
+  const search = state.search.trim().toLowerCase();
+  filteredQuestions = QUESTIONS.filter(q=>{
+    if(state.easyIds.includes(q.id)) return false;
+    if(cat !== "TODAS" && q.tema !== cat) return false;
+    if(search && !(q.statement.toLowerCase().includes(search) || q.tema.toLowerCase().includes(search) || q.fonte.toLowerCase().includes(search))) return false;
+    return true;
+  });
+  if(state.currentIndex >= filteredQuestions.length) state.currentIndex = 0;
+  if(state.currentIndex < 0) state.currentIndex = 0;
+}
+
+function renderCategorySelect(){
+  const sel = document.getElementById('categorySelect');
+  sel.innerHTML = "";
+  getCategories().forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c === "TODAS" ? "📚 Todos os temas" : c;
+    if(c === state.category) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderStats(){
+  const answered = Object.keys(state.answers).length;
+  const correct = Object.values(state.answers).filter(a=>a.status==='correct').length;
+  const wrong = Object.values(state.answers).filter(a=>a.status==='wrong').length;
+  const pct = answered ? Math.round((correct/answered)*100) : 0;
+  const easy = state.easyIds.length;
+  document.getElementById('statsbar').innerHTML = `
+    <div class="stat"><div class="num" style="color:var(--blue)">${TOTAL}</div><div class="lbl">Total questões</div></div>
+    <div class="stat"><div class="num" style="color:var(--green)">${correct}</div><div class="lbl">Acertos</div></div>
+    <div class="stat"><div class="num" style="color:var(--red)">${wrong}</div><div class="lbl">Erros</div></div>
+    <div class="stat"><div class="num" style="color:var(--yellow)">${pct}%</div><div class="lbl">Aproveitamento</div></div>
+    <div class="stat"><div class="num" style="color:var(--purple)">${easy}</div><div class="lbl">Marcadas fáceis</div></div>
+  `;
+}
+
+function renderQuestion(){
+  buildFiltered();
+  renderStats();
+  const card = document.getElementById('quizCard');
+  const counter = document.getElementById('qcounter');
+
+  if(filteredQuestions.length === 0){
+    counter.textContent = "";
+    card.innerHTML = `<div class="empty-msg">Nenhuma questão encontrada com esse filtro (ou todas já foram marcadas como fáceis 🎉).</div>`;
+    return;
+  }
+
+  const q = filteredQuestions[state.currentIndex];
+  counter.textContent = `Questão ${state.currentIndex+1} de ${filteredQuestions.length} (filtro atual)`;
+
+  const prevAnswer = state.answers[q.id];
+  answeredCurrent = !!prevAnswer;
+  currentSelected = prevAnswer ? prevAnswer.selected : null;
+  pendingSelection = null; // zera a seleção não confirmada a cada renderização
+
+  let html = `
+    <div class="tags">
+      <span class="tag">${q.tema}</span>
+      <span class="tag source">${q.fonte}</span>
+    </div>
+    ${q.caso ? `<div class="caso-box"><b>📋 Caso concreto:</b> ${q.caso}</div>` : ''}
+    <div class="statement">${q.statement}</div>
+    <div class="vf-buttons">
+      <button id="btnV" class="btn-green" ${answeredCurrent?'disabled':''} style="${answeredCurrent && currentSelected==='V' ? 'outline:3px solid #fff;' : ''}">✅ VERDADEIRO</button>
+      <button id="btnF" class="btn-red" ${answeredCurrent?'disabled':''} style="${answeredCurrent && currentSelected==='F' ? 'outline:3px solid #fff;' : ''}">❌ FALSO</button>
+    </div>
+    <div id="confirmRow" style="${answeredCurrent?'display:none;':''} margin-bottom:14px;">
+      <button id="confirmAnswerBtn" class="btn-blue" style="width:100%;" disabled>✔️ Confirmar resposta</button>
+    </div>
+    <div id="resultArea"></div>
+    <div class="nav-row">
+      <div class="nav-left">
+        <button class="btn-gray" id="prevBtn">⬅ Anterior</button>
+        <button class="btn-gray" id="nextBtn">Próxima ➡</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn-purple" id="easyBtn">⭐ Marcar como fácil</button>
+      </div>
+    </div>
+    <div class="hint">Escolha VERDADEIRO ou FALSO e clique em "Confirmar resposta". Use as setas ⬅️ ➡️ do teclado para navegar entre as questões.</div>
+  `;
+  card.innerHTML = html;
+
+  const btnV = document.getElementById('btnV');
+  const btnF = document.getElementById('btnF');
+  const confirmBtn = document.getElementById('confirmAnswerBtn');
+
+  function selectChoice(choice){
+    if(answeredCurrent) return;
+    pendingSelection = choice;
+    btnV.style.outline = choice==='V' ? '3px solid #fff' : 'none';
+    btnF.style.outline = choice==='F' ? '3px solid #fff' : 'none';
+    confirmBtn.disabled = false;
+  }
+
+  btnV.onclick = ()=>selectChoice('V');
+  btnF.onclick = ()=>selectChoice('F');
+  confirmBtn.onclick = ()=>{
+    if(!pendingSelection) return;
+    answerQuestion(q, pendingSelection);
+  };
+  document.getElementById('prevBtn').onclick = ()=>{ state.currentIndex--; if(state.currentIndex<0) state.currentIndex = filteredQuestions.length-1; saveMeta(); renderQuestion(); };
+  document.getElementById('nextBtn').onclick = ()=>{ state.currentIndex++; if(state.currentIndex>=filteredQuestions.length) state.currentIndex = 0; saveMeta(); renderQuestion(); };
+  document.getElementById('easyBtn').onclick = ()=>markEasy(q.id);
+
+  if(answeredCurrent){
+    renderResultArea(q, prevAnswer);
+  }
+}
+
+function answerQuestion(q, selected){
+  const isCorrect = (selected === 'V' && q.answer === true) || (selected === 'F' && q.answer === false);
+  state.answers[q.id] = {
+    status: isCorrect ? 'correct' : 'wrong',
+    selected: selected,
+    guess: null // será perguntado se acertou
+  };
+  pendingSelection = null;
+  saveAnswers();
+  renderQuestion();
+  if(isCorrect){
+    // pergunta se foi chute ou sabia -> renderResultArea já mostra os botões
+  }
+}
+
+function setGuess(qid, wasGuess){
+  if(state.answers[qid]){
+    state.answers[qid].guess = wasGuess;
+    saveAnswers();
+    renderQuestion();
+  }
+}
+
+function renderResultArea(q, ans){
+  const area = document.getElementById('resultArea');
+  const correctLabel = q.answer ? "VERDADEIRO" : "FALSO";
+  let bannerHtml = "";
+  if(ans.status === 'correct'){
+    bannerHtml = `<div class="result-banner correct">✅ Você acertou! O gabarito é <b>${correctLabel}</b>.</div>`;
+  } else {
+    bannerHtml = `<div class="result-banner wrong">❌ Você errou. O gabarito correto é <b class="correct-ans">${correctLabel}</b> (você marcou ${ans.selected === 'V' ? 'Verdadeiro' : 'Falso'}).</div>`;
+  }
+
+  let guessRow = "";
+  if(ans.status === 'correct' && ans.guess === null){
+    guessRow = `
+      <div class="guess-row">
+        <button class="btn-blue" id="knewBtn">🧠 Eu sabia a resposta</button>
+        <button class="btn-yellow" id="guessBtn">🎲 Acertei no chute</button>
+      </div>
+    `;
+  } else if(ans.status === 'correct' && ans.guess !== null){
+    guessRow = `<div class="hint">${ans.guess ? '🎲 Marcado como acerto no chute.' : '🧠 Marcado como acerto por conhecimento.'}</div>`;
+  }
+
+  area.innerHTML = bannerHtml + `<div class="justification">${ans.status==='correct' ? '✔️' : '📖'} <b>Justificativa:</b> ${q.just}</div>` + guessRow;
+
+  if(document.getElementById('knewBtn')) document.getElementById('knewBtn').onclick = ()=>setGuess(q.id, false);
+  if(document.getElementById('guessBtn')) document.getElementById('guessBtn').onclick = ()=>setGuess(q.id, true);
+}
+
+async function markEasy(qid){
+  if(!state.easyIds.includes(qid)){
+    state.easyIds.push(qid);
+    await saveEasy();
+    state.currentIndex = 0;
+    await saveMeta();
+    renderQuestion();
+  }
+}
+
+/* =========================================================
+   BANCO DE FÁCEIS
+   ========================================================= */
+function openBank(){
+  const list = document.getElementById('bankList');
+  if(state.easyIds.length === 0){
+    list.innerHTML = `<div class="empty-msg">Nenhuma questão marcada como fácil ainda.</div>`;
+  } else {
+    list.innerHTML = state.easyIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id===id);
+      if(!q) return "";
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,110)}${q.statement.length>110?'...':''}</div><button class="btn-red" onclick="removeEasy(${id})">Remover</button></div>`;
+    }).join("");
+  }
+  document.getElementById('bankModal').classList.add('show');
+}
+function removeEasy(id){
+  state.easyIds = state.easyIds.filter(x=>x!==id);
+  saveEasy();
+  openBank();
+  renderQuestion();
+}
+
+/* =========================================================
+   ESTATÍSTICAS DE ERROS/CHUTES
+   ========================================================= */
+function openStatsModal(){
+  const wrongList = document.getElementById('wrongList');
+  const guessList = document.getElementById('guessList');
+  const wrongIds = Object.keys(state.answers).filter(id=>state.answers[id].status==='wrong');
+  const guessIds = Object.keys(state.answers).filter(id=>state.answers[id].status==='correct' && state.answers[id].guess===true);
+
+  wrongList.innerHTML = wrongIds.length === 0 ? `<div class="empty-msg">Nenhum erro registrado ainda. 🎉</div>` :
+    wrongIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id==id);
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,120)}${q.statement.length>120?'...':''}</div><button class="btn-blue" onclick="jumpTo(${id})">Ir</button></div>`;
+    }).join("");
+
+  guessList.innerHTML = guessIds.length === 0 ? `<div class="empty-msg">Nenhum acerto no chute registrado ainda.</div>` :
+    guessIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id==id);
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,120)}${q.statement.length>120?'...':''}</div><button class="btn-blue" onclick="jumpTo(${id})">Ir</button></div>`;
+    }).join("");
+
+  document.getElementById('statsModal').classList.add('show');
+}
+function jumpTo(id){
+  closeModal('statsModal');
+  state.category = "TODAS";
+  state.search = "";
+  document.getElementById('categorySelect').value = "TODAS";
+  document.getElementById('searchInput').value = "";
+  buildFiltered();
+  const idx = filteredQuestions.findIndex(q=>q.id==id);
+  state.currentIndex = idx >= 0 ? idx : 0;
+  saveMeta();
+  renderQuestion();
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+/* =========================================================
+   IMPORTAR / EXPORTAR PROGRESSO (sem download de arquivo)
+   ========================================================= */
+let dataModalMode = "export";
+function openExport(){
+  dataModalMode = "export";
+  document.getElementById('dataModalTitle').textContent = "Exportar progresso";
+  document.getElementById('dataHint').textContent = "Copie o texto abaixo e guarde em local seguro. Depois use 'Importar progresso' para restaurar.";
+  document.getElementById('dataTextarea').value = JSON.stringify({answers: state.answers, easyIds: state.easyIds});
+  document.getElementById('dataConfirmBtn').textContent = "Fechar";
+  document.getElementById('dataModal').classList.add('show');
+}
+function openImport(){
+  dataModalMode = "import";
+  document.getElementById('dataModalTitle').textContent = "Importar progresso";
+  document.getElementById('dataHint').textContent = "Cole aqui o texto exportado anteriormente e clique em Confirmar.";
+  document.getElementById('dataTextarea').value = "";
+  document.getElementById('dataConfirmBtn').textContent = "Confirmar Importação";
+  document.getElementById('dataModal').classList.add('show');
+}
+async function confirmDataModal(){
+  if(dataModalMode === "export"){
+    closeModal('dataModal');
+    return;
+  }
+  try{
+    const parsed = JSON.parse(document.getElementById('dataTextarea').value);
+    if(parsed.answers) state.answers = parsed.answers;
+    if(parsed.easyIds) state.easyIds = parsed.easyIds;
+    await saveAnswers();
+    await saveEasy();
+    closeModal('dataModal');
+    renderQuestion();
+    alert("Progresso importado com sucesso!");
+  }catch(e){
+    alert("Texto inválido. Verifique se copiou corretamente o progresso exportado.");
+  }
+}
+
+/* =========================================================
+   RECOMEÇAR / ZERAR TUDO
+   ========================================================= */
+async function restartQuiz(){
+  if(!confirm("Recomeçar o quiz? Suas respostas serão apagadas, mas as questões marcadas como fáceis continuam excluídas.")) return;
+
+  // Recarrega a lista de fáceis diretamente do armazenamento ANTES de mexer em
+  // qualquer coisa, garantindo que usamos a versão mais atual (evita perder
+  // marcações feitas recentemente por uma eventual condição de corrida no save).
+  try{
+    const v = await storageGet('quiz-easy');
+    if(v) state.easyIds = JSON.parse(v);
+  }catch(e){}
+
+  state.answers = {};
+  state.currentIndex = 0;
+  await saveAnswers();
+  await saveMeta();
+  await saveEasy(); // regrava explicitamente a lista de fáceis (inalterada), garantindo que não seja perdida
+  renderQuestion();
+}
+async function resetAll(){
+  if(!confirm("Zerar TUDO? Isso vai apagar respostas E a lista de questões fáceis, voltando ao estado inicial completo.")) return;
+  state.answers = {};
+  state.easyIds = [];
+  state.currentIndex = 0;
+  await saveAnswers();
+  await saveEasy();
+  await saveMeta();
+  renderQuestion();
+}
+
+/* =========================================================
+   EVENTOS GERAIS
+   ========================================================= */
+function setupEvents(){
+  document.getElementById('categorySelect').onchange = (e)=>{
+    state.category = e.target.value;
+    state.currentIndex = 0;
+    saveMeta();
+    renderQuestion();
+  };
+  let searchTimeout;
+  document.getElementById('searchInput').oninput = (e)=>{
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(()=>{
+      state.search = e.target.value;
+      state.currentIndex = 0;
+      saveMeta();
+      renderQuestion();
+    }, 250);
+  };
+  document.getElementById('goToBtn').onclick = ()=>{
+    const val = parseInt(document.getElementById('goToInput').value, 10);
+    if(!isNaN(val) && val >= 1 && val <= filteredQuestions.length){
+      state.currentIndex = val - 1;
+      saveMeta();
+      renderQuestion();
+    } else {
+      alert("Número de questão inválido para o filtro atual (1 a " + filteredQuestions.length + ").");
+    }
+  };
+  document.getElementById('bankBtn').onclick = openBank;
+  document.getElementById('statsModalBtn').onclick = openStatsModal;
+  document.getElementById('exportBtn').onclick = openExport;
+  document.getElementById('importBtn').onclick = openImport;
+  document.getElementById('dataConfirmBtn').onclick = confirmDataModal;
+  document.getElementById('restartBtn').onclick = restartQuiz;
+  document.getElementById('resetAllBtn').onclick = resetAll;
+
+  document.addEventListener('keydown', (e)=>{
+    const modalOpen = document.querySelector('.modal-bg.show');
+    if(modalOpen) return;
+    if(e.key === 'ArrowRight'){
+      state.currentIndex++; if(state.currentIndex>=filteredQuestions.length) state.currentIndex = 0;
+      saveMeta(); renderQuestion();
+    } else if(e.key === 'ArrowLeft'){
+      state.currentIndex--; if(state.currentIndex<0) state.currentIndex = filteredQuestions.length-1;
+      saveMeta(); renderQuestion();
+    }
+  });
+
+  document.querySelectorAll('.modal-bg').forEach(m=>{
+    m.addEventListener('click', (e)=>{ if(e.target === m) m.classList.remove('show'); });
+  });
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+async function boot(){
+  await loadState();
+  renderCategorySelect();
+  document.getElementById('searchInput').value = state.search;
+  setupEvents();
+  renderQuestion();
+}
+boot();
+</script>
+</body>
+</html>

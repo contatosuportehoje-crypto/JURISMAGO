@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Direito Constitucional - Jurisprudência STJ/STF - Parte 1</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --card2:#273549; --text:#e2e8f0; --muted:#94a3b8;
+    --green:#22c55e; --red:#ef4444; --blue:#3b82f6; --yellow:#eab308; --purple:#a855f7;
+    --border:#334155;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:var(--bg); color:var(--text);
+    min-height:100vh; padding:16px;
+  }
+  .wrap{max-width:900px; margin:0 auto;}
+  h1{font-size:1.4rem; margin:0 0 4px 0; color:#fff;}
+  .subtitle{color:var(--muted); font-size:.85rem; margin-bottom:16px;}
+  .statsbar{
+    display:flex; flex-wrap:wrap; gap:10px; background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:12px; margin-bottom:14px;
+  }
+  .stat{flex:1; min-width:90px; text-align:center;}
+  .stat .num{font-size:1.3rem; font-weight:700;}
+  .stat .lbl{font-size:.72rem; color:var(--muted);}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; align-items:center;
+  }
+  select, input[type=text], input[type=number]{
+    background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:8px;
+    padding:8px 10px; font-size:.85rem;
+  }
+  button{
+    cursor:pointer; border:none; border-radius:8px; padding:8px 12px; font-size:.85rem; font-weight:600;
+    transition:opacity .15s;
+  }
+  button:hover{opacity:.85;}
+  .btn-blue{background:var(--blue); color:#fff;}
+  .btn-gray{background:var(--card2); color:var(--text); border:1px solid var(--border);}
+  .btn-green{background:var(--green); color:#052e12;}
+  .btn-red{background:var(--red); color:#fff;}
+  .btn-yellow{background:var(--yellow); color:#3f2d00;}
+  .btn-purple{background:var(--purple); color:#fff;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px;
+  }
+  .tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .tag{
+    font-size:.68rem; padding:3px 9px; border-radius:20px; background:var(--card2); color:var(--muted);
+    border:1px solid var(--border);
+  }
+  .tag.source{background:#312e81; color:#c7d2fe; border-color:#4338ca;}
+  .statement{font-size:1.02rem; line-height:1.5; margin-bottom:16px;}
+  .caso-box{
+    background:#1b2436; border:1px solid #3b4a6b; border-left:4px solid var(--yellow); border-radius:8px;
+    padding:12px 14px; font-size:.86rem; line-height:1.55; margin-bottom:14px; color:#cbd5e1;
+  }
+  .caso-box b{color:var(--yellow);}
+  .vf-buttons{display:flex; gap:10px; margin-bottom:14px;}
+  .vf-buttons button{flex:1; padding:12px; font-size:.95rem;}
+  .result-banner{
+    padding:10px 14px; border-radius:10px; margin-bottom:12px; font-weight:700; font-size:.9rem;
+  }
+  .result-banner.correct{background:#052e12; color:var(--green); border:1px solid var(--green);}
+  .result-banner.wrong{background:#450a0a; color:var(--red); border:1px solid var(--red);}
+  .justification{
+    background:var(--card2); border-left:4px solid var(--blue); border-radius:8px; padding:12px 14px;
+    font-size:.88rem; line-height:1.5; margin-bottom:14px;
+  }
+  .justification b.correct-ans{color:var(--red);}
+  .guess-row{display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;}
+  .guess-row button{flex:1; min-width:140px;}
+  .nav-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:6px;}
+  .nav-left, .nav-right{display:flex; gap:8px; flex-wrap:wrap;}
+  .qcounter{font-size:.8rem; color:var(--muted); text-align:center; margin-bottom:8px;}
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center;
+    z-index:100; padding:16px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; max-width:600px;
+    width:100%; max-height:80vh; overflow-y:auto;
+  }
+  .modal h2{margin-top:0; font-size:1.1rem;}
+  textarea{
+    width:100%; min-height:120px; background:var(--card2); color:var(--text); border:1px solid var(--border);
+    border-radius:8px; padding:10px; font-size:.8rem;
+  }
+  .list-item{
+    background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:8px;
+    font-size:.83rem; display:flex; justify-content:space-between; gap:10px; align-items:center;
+  }
+  .list-item .txt{flex:1;}
+  .close-x{float:right; background:none; color:var(--muted); font-size:1.2rem; padding:0 6px;}
+  .empty-msg{color:var(--muted); text-align:center; padding:20px; font-size:.9rem;}
+  .cat-chip{
+    font-size:.75rem; padding:6px 12px; border-radius:20px; background:var(--card2); color:var(--text);
+    border:1px solid var(--border); cursor:pointer;
+  }
+  .cat-chip.active{background:var(--blue); border-color:var(--blue); color:#fff;}
+  .catwrap{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .hint{font-size:.72rem; color:var(--muted); margin-top:6px;}
+  .footer-note{text-align:center; color:var(--muted); font-size:.7rem; margin-top:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚖️ Quiz V/F — Jurisprudência Constitucional (STJ/STF) — Parte 1/3</h1>
+  <div class="subtitle">Direito Constitucional para Carreiras Policiais — Bloco 1 — Parte 1 de 3 (julgados 1 a 45 do arquivo original, 183 questões). Questões elaboradas exclusivamente com base no material de informativos fornecido.</div>
+
+  <div class="statsbar" id="statsbar"></div>
+
+  <div class="controls">
+    <select id="categorySelect"></select>
+    <input type="text" id="searchInput" placeholder="🔎 Buscar por palavra-chave...">
+    <input type="number" id="goToInput" placeholder="Nº questão" style="width:110px;">
+    <button class="btn-blue" id="goToBtn">Ir</button>
+    <button class="btn-gray" id="bankBtn">📦 Banco de Fáceis</button>
+    <button class="btn-gray" id="statsModalBtn">📊 Ver erros/chutes</button>
+    <button class="btn-gray" id="exportBtn">Exportar progresso</button>
+    <button class="btn-gray" id="importBtn">Importar progresso</button>
+  </div>
+  <div class="controls">
+    <button class="btn-yellow" id="restartBtn">🔄 Recomeçar (mantém fáceis)</button>
+    <button class="btn-red" id="resetAllBtn">🗑️ Zerar tudo</button>
+  </div>
+
+  <div class="qcounter" id="qcounter"></div>
+  <div class="card" id="quizCard"></div>
+
+  <div class="footer-note">Progresso salvo automaticamente. Feche e volte quando quiser — o quiz continua de onde parou.</div>
+</div>
+
+<!-- Modal Banco de Fáceis -->
+<div class="modal-bg" id="bankModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('bankModal')">✕</button>
+    <h2>📦 Banco de Questões Fáceis</h2>
+    <div id="bankList"></div>
+  </div>
+</div>
+
+<!-- Modal Estatísticas -->
+<div class="modal-bg" id="statsModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('statsModal')">✕</button>
+    <h2>📊 Revisão: Erros e Acertos no Chute</h2>
+    <h3 style="color:var(--red);">❌ Questões erradas</h3>
+    <div id="wrongList"></div>
+    <h3 style="color:var(--yellow);">🎲 Acertos no chute (revisar!)</h3>
+    <div id="guessList"></div>
+  </div>
+</div>
+
+<!-- Modal Import/Export -->
+<div class="modal-bg" id="dataModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('dataModal')">✕</button>
+    <h2 id="dataModalTitle">Progresso</h2>
+    <textarea id="dataTextarea"></textarea>
+    <div class="hint" id="dataHint"></div>
+    <br>
+    <button class="btn-blue" id="dataConfirmBtn">Confirmar</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   BANCO DE QUESTÕES — 100% baseado no material fornecido
+   ========================================================= */
+const QUESTIONS = [
+{id:1, tema:"Segurança Pública / Processos Estruturais", fonte:"STJ Info 894", caso:"São Paulo teve uma série de manifestações de rua que terminaram em confronto com a Polícia Militar, com relatos de uso excessivo da força, policiais sem identificação e dispersões sem aviso. A Defensoria Pública de SP ajuizou ação civil pública pedindo que o Estado fosse condenado a expedir ato normativo definindo parâmetros de atuação da PM no policiamento de manifestações. O STJ condenou o Estado de São Paulo a elaborar um plano dialógico destinado à construção do protocolo de atuação da PM em manifestações públicas.", statement:"A ausência de regulamentação da atuação da Polícia Militar em manifestações públicas e a inexistência de protocolos que definam parâmetros técnicos para o uso proporcional e progressivo da força configuram omissão estatal que legitima a intervenção judicial, sem ofensa à separação de poderes.", answer:true, just:"CORRETO. O STJ fixou exatamente essa tese no AgInt no AREsp 2.068.297-SP: a falta de parâmetros para o uso da força configura omissão estatal apta a legitimar a intervenção do Judiciário."},
+{id:2, tema:"Segurança Pública / Processos Estruturais", fonte:"STJ Info 894", caso:"São Paulo teve uma série de manifestações de rua que terminaram em confronto com a Polícia Militar, com relatos de uso excessivo da força, policiais sem identificação e dispersões sem aviso. A Defensoria Pública de SP ajuizou ação civil pública pedindo que o Estado fosse condenado a expedir ato normativo definindo parâmetros de atuação da PM no policiamento de manifestações. O STJ condenou o Estado de São Paulo a elaborar um plano dialógico destinado à construção do protocolo de atuação da PM em manifestações públicas.", statement:"Segundo o STJ, a obrigação imposta ao Estado de São Paulo de regulamentar a atuação da PM em manifestações públicas configura um problema estrutural, decorrente de falhas sistêmicas que demandam intervenções graduais e monitoradas pelo Judiciário.", answer:true, just:"CORRETO. O STJ classificou o caso como problema estrutural — situação complexa e persistente decorrente de falhas sistêmicas — que exige solução por meio de processo estrutural, com plano dialógico monitorado judicialmente."},
+{id:3, tema:"Segurança Pública / Processos Estruturais", fonte:"STJ Info 894", caso:"São Paulo teve uma série de manifestações de rua que terminaram em confronto com a Polícia Militar, com relatos de uso excessivo da força, policiais sem identificação e dispersões sem aviso. A Defensoria Pública de SP ajuizou ação civil pública pedindo que o Estado fosse condenado a expedir ato normativo definindo parâmetros de atuação da PM no policiamento de manifestações. O STJ condenou o Estado de São Paulo a elaborar um plano dialógico destinado à construção do protocolo de atuação da PM em manifestações públicas.", statement:"O plano dialógico destinado à construção do protocolo de atuação da Polícia Militar em manifestações deve ser elaborado unilateralmente pelo Estado, sem necessidade de apresentação, acompanhamento ou aprovação pelo juízo da execução.", answer:false, just:"ERRADO. O STJ determinou justamente o contrário: o plano deverá ser apresentado, acompanhado e aprovado pelo juízo da execução, característica típica dos processos estruturais."},
+{id:4, tema:"Saúde / Tratamento no Exterior", fonte:"STJ Info 894", caso:"Alice nasceu prematura e, por enterocolite necrosante, teve retirados o intestino delgado e parte do grosso, desenvolvendo síndrome do intestino ultracurto com dependência de nutrição parenteral. Representada pela mãe, ajuizou ação contra a União pedindo o custeio de transplante intestinal e tratamento no Jackson Memorial Hospital (EUA), alegando que nenhum paciente transplantado no Brasil sobreviveu. O STJ negou o pedido.", statement:"O custeio estatal de tratamento médico no exterior é medida excepcional, que exige a demonstração cumulativa da inexistência de alternativa terapêutica eficaz no país, comprovação científica robusta de eficácia e segurança, imprescindibilidade clínica e incapacidade financeira.", answer:true, just:"CORRETO. Essa é a primeira tese fixada pelo STJ no REsp 1.860.543-PR: o custeio no exterior somente é admissível mediante essa demonstração cumulativa, com deferência às políticas públicas do SUS."},
+{id:5, tema:"Saúde / Tratamento no Exterior", fonte:"STJ Info 894", caso:"Alice nasceu prematura e, por enterocolite necrosante, teve retirados o intestino delgado e parte do grosso, desenvolvendo síndrome do intestino ultracurto com dependência de nutrição parenteral. Representada pela mãe, ajuizou ação contra a União pedindo o custeio de transplante intestinal e tratamento no Jackson Memorial Hospital (EUA), alegando que nenhum paciente transplantado no Brasil sobreviveu. O STJ negou o pedido.", statement:"Segundo o STJ, existe direito subjetivo à melhor tecnologia médica disponível em centros estrangeiros, bastando ao paciente demonstrar que o serviço no exterior possui taxas de sobrevida superiores às nacionais.", answer:false, just:"ERRADO. O STJ fixou expressamente que NÃO há direito subjetivo à melhor tecnologia disponível em centros estrangeiros, exigindo-se imprescindibilidade concreta do tratamento no exterior, em respeito à isonomia e à racionalidade na alocação de recursos públicos."},
+{id:6, tema:"Saúde / Tratamento no Exterior", fonte:"STJ Info 894", caso:"Alice nasceu prematura e, por enterocolite necrosante, teve retirados o intestino delgado e parte do grosso, desenvolvendo síndrome do intestino ultracurto com dependência de nutrição parenteral. Representada pela mãe, ajuizou ação contra a União pedindo o custeio de transplante intestinal e tratamento no Jackson Memorial Hospital (EUA), alegando que nenhum paciente transplantado no Brasil sobreviveu. O STJ negou o pedido.", statement:"A presença de centros nacionais habilitados para transplante intestinal isolado ou multivisceral afasta, em princípio, a necessidade de deslocamento ao exterior, salvo prova de ineficácia ou risco específico acrescido da alternativa nacional.", answer:true, just:"CORRETO. Essa é a segunda tese fixada pelo STJ: a existência de centros nacionais habilitados afasta, em regra, a necessidade de tratamento no exterior, ressalvada prova de ineficácia ou risco concreto."},
+{id:7, tema:"Provimento Derivado / Cargos Públicos", fonte:"STF Info 1222", caso:"Na Polícia Civil do Mato Grosso do Sul, o antigo cargo de datiloscopista policial (exigência de 1º grau) foi sendo transformado por leis sucessivas: em 1989 virou papiloscopista policial (2º grau); em 2005, perito papiloscopista (bacharelado). Em 2024, nova lei integrou o perito papiloscopista à carreira de perito oficial forense, a mesma dos peritos criminais, sem novo concurso para quem já estava no cargo. O STF considerou a lei constitucional.", statement:"A alteração dos requisitos de escolaridade e da denominação de um cargo público, mantidas as atribuições originais, configura provimento derivado vedado pela Constituição, exigindo novo concurso público.", answer:false, just:"ERRADO. O STF decidiu o oposto: alterar requisitos de escolaridade e a denominação de um cargo já existente, mantidas as atribuições, não configura provimento derivado, mas modernização da estrutura de pessoal."},
+{id:8, tema:"Provimento Derivado / Cargos Públicos", fonte:"STF Info 1222", caso:"Na Polícia Civil do Mato Grosso do Sul, o antigo cargo de datiloscopista policial (exigência de 1º grau) foi sendo transformado por leis sucessivas: em 1989 virou papiloscopista policial (2º grau); em 2005, perito papiloscopista (bacharelado). Em 2024, nova lei integrou o perito papiloscopista à carreira de perito oficial forense, a mesma dos peritos criminais, sem novo concurso para quem já estava no cargo. O STF considerou a lei constitucional.", statement:"A organização das carreiras da Polícia Civil estadual é matéria de competência legislativa concorrente entre União e Estados, e não de direito processual penal privativo da União.", answer:true, just:"CORRETO. O STF enquadrou a matéria no art. 24, XVI, da CF/88 (competência concorrente), afastando a alegação de violação à competência privativa da União sobre processo penal (art. 22, I, CF/88)."},
+{id:9, tema:"Provimento Derivado / Cargos Públicos", fonte:"STF Info 1222", caso:"Na Polícia Civil do Mato Grosso do Sul, o antigo cargo de datiloscopista policial (exigência de 1º grau) foi sendo transformado por leis sucessivas: em 1989 virou papiloscopista policial (2º grau); em 2005, perito papiloscopista (bacharelado). Em 2024, nova lei integrou o perito papiloscopista à carreira de perito oficial forense, a mesma dos peritos criminais, sem novo concurso para quem já estava no cargo. O STF considerou a lei constitucional.", statement:"O rol de peritos de natureza criminal previsto no art. 5º da Lei nº 12.030/2009 é taxativo, impedindo que os Estados criem especialidades de perícia não previstas expressamente na lei federal, como a papiloscopia.", answer:false, just:"ERRADO. O STF entendeu que esse rol não é exaustivo: a própria lei ressalva a legislação específica de cada ente federado, permitindo aos Estados criar especialidades de perícia não previstas na lei federal."},
+{id:10, tema:"Controle de Constitucionalidade / Legitimidade", fonte:"STF Info 1220", caso:"A Constituição do Estado do Ceará incluiu o Conselho Seccional da OAB entre os legitimados a propor ADI perante o TJ para questionar leis estaduais e municipais. O TJCE, porém, interpretou que a OAB só poderia impugnar normas estaduais, vedada a impugnação de normas municipais. O STF não concordou com essa interpretação restritiva.", statement:"Uma vez que a Constituição estadual opte por incluir o Conselho Seccional da OAB entre os legitimados a propor ADI perante o Tribunal de Justiça, essa legitimidade tem caráter universal, não podendo ser restringida apenas às leis estaduais.", answer:true, just:"CORRETO. O STF fixou que, tendo a Constituição estadual conferido essa legitimidade à OAB, é inconstitucional restringi-la apenas a leis estaduais, vedando a impugnação de normas municipais."},
+{id:11, tema:"Controle de Constitucionalidade / Legitimidade", fonte:"STF Info 1220", caso:"A Constituição do Estado do Ceará incluiu o Conselho Seccional da OAB entre os legitimados a propor ADI perante o TJ para questionar leis estaduais e municipais. O TJCE, porém, interpretou que a OAB só poderia impugnar normas estaduais, vedada a impugnação de normas municipais. O STF não concordou com essa interpretação restritiva.", statement:"A Constituição Estadual está constitucionalmente obrigada a incluir o Conselho Seccional da OAB entre os legitimados a propor ADI perante o Tribunal de Justiça local.", answer:false, just:"ERRADO. O STF esclareceu que a Constituição Estadual não estava obrigada a incluir a OAB entre os legitimados; a questão é que, uma vez feita essa opção, a legitimidade concedida se torna universal."},
+{id:12, tema:"Poder Judiciário / Regime Jurídico", fonte:"STF Info 1219", caso:"Um juiz de direito respondeu a processo administrativo disciplinar, e o Tribunal de Justiça aplicou a pena de aposentadoria compulsória, mantida pelo CNJ em revisão disciplinar. O magistrado ajuizou ação originária no STF contra a decisão do CNJ. O STF decidiu que a aposentadoria compulsória punitiva não foi recepcionada pela Constituição após a EC 103/2019.", statement:"É vedada, após a EC 103/2019, a aplicação da pena de aposentadoria compulsória como sanção disciplinar a magistrados, pois o novo art. 40 da CF/88 não prevê essa modalidade entre as hipóteses de aposentadoria do regime próprio.", answer:true, just:"CORRETO. O STF fixou que a EC 103/2019 deixou de prever a aposentadoria compulsória como sanção (hipótese antes inserida pela EC 45/2004), tornando inconcebível aplicá-la como punição, já que aposentadoria é um direito previdenciário."},
+{id:13, tema:"Poder Judiciário / Regime Jurídico", fonte:"STF Info 1219", caso:"Um juiz de direito respondeu a processo administrativo disciplinar, e o Tribunal de Justiça aplicou a pena de aposentadoria compulsória, mantida pelo CNJ em revisão disciplinar. O magistrado ajuizou ação originária no STF contra a decisão do CNJ. O STF decidiu que a aposentadoria compulsória punitiva não foi recepcionada pela Constituição após a EC 103/2019.", statement:"Extinta a aposentadoria compulsória como sanção, a consequência das infrações graves cometidas por magistrados passa a ser a perda do cargo, que pode ser decretada diretamente pelo CNJ em decisão administrativa, sem necessidade de ação judicial.", answer:false, just:"ERRADO. O STF fixou que a perda do cargo do magistrado, respeitada a vitaliciedade, exige sentença judicial transitada em julgado, cabendo à AGU ajuizar ação de perda do cargo perante o STF (art. 102, I, 'r', CF/88), e não decisão puramente administrativa do CNJ."},
+{id:14, tema:"Poder Judiciário / Regime Jurídico", fonte:"STF Info 1219", caso:"Um juiz de direito respondeu a processo administrativo disciplinar, e o Tribunal de Justiça aplicou a pena de aposentadoria compulsória, mantida pelo CNJ em revisão disciplinar. O magistrado ajuizou ação originária no STF contra a decisão do CNJ. O STF decidiu que a aposentadoria compulsória punitiva não foi recepcionada pela Constituição após a EC 103/2019.", statement:"A competência para julgar a ação de perda do cargo de magistrado, quando o CNJ considerar cabível a punição mais gravosa, é do próprio Tribunal de Justiça de origem, e não do STF.", answer:false, just:"ERRADO. O STF fixou sua própria competência originária para essa ação (art. 102, I, 'r', CF/88), pelo princípio do paralelismo das formas: se só o STF pode desconstituir decisão do CNJ, só ele pode mantê-la ou substituí-la pela ação de perda do cargo."},
+{id:15, tema:"Direitos Fundamentais / Pessoas com Deficiência", fonte:"STF Info 1217", caso:"O Estado do Piauí editou normas retirando garantias de pessoas com deficiência em concursos públicos sempre que a carreira fosse classificada como de 'aptidão plena', afastando o direito de inscrição em igualdade de condições e a reserva de vagas em concursos militares e cargos que exigissem tal aptidão. O STF julgou esses dispositivos inconstitucionais.", statement:"A legislação federal (Estatuto da Pessoa com Deficiência) exige apenas que a deficiência seja compatível com as tarefas do cargo, vedando expressamente a exigência de aptidão plena em processos seletivos.", answer:true, just:"CORRETO. O STF citou o art. 34, §3º, da Lei nº 13.146/2015, que veda expressamente a exigência de aptidão plena, entendimento que serviu de piso de proteção federal não reduzível pelos Estados."},
+{id:16, tema:"Direitos Fundamentais / Pessoas com Deficiência", fonte:"STF Info 1217", caso:"O Estado do Piauí editou normas retirando garantias de pessoas com deficiência em concursos públicos sempre que a carreira fosse classificada como de 'aptidão plena', afastando o direito de inscrição em igualdade de condições e a reserva de vagas em concursos militares e cargos que exigissem tal aptidão. O STF julgou esses dispositivos inconstitucionais.", statement:"Em matéria de proteção e integração social das pessoas com deficiência (competência legislativa concorrente), o Estado-membro pode reduzir livremente o piso de proteção estabelecido pela norma geral federal, desde que justifique a peculiaridade local.", answer:false, just:"ERRADO. O STF fixou que, em temas de direitos fundamentais de grupo vulnerável, a norma geral federal funciona como piso de proteção que pode ser ampliado, mas nunca reduzido pelos Estados, ainda que sob justificativa de peculiaridade local."},
+{id:17, tema:"Competências Legislativas / Educação", fonte:"STF Info 1216", caso:"A Lei nº 12.479/2025 do Estado do Espírito Santo assegurava a pais e responsáveis o direito de vedar a participação de filhos em 'atividades pedagógicas de gênero' em escolas públicas e privadas, impondo às instituições o dever de informar previamente os pais, sob pena de responsabilização civil e penal. O STF julgou essa lei inconstitucional.", statement:"A lei capixaba que assegura aos pais o direito de vetar a participação dos filhos em atividades pedagógicas sobre gênero é formalmente inconstitucional, por invadir a competência privativa da União para legislar sobre diretrizes e bases da educação nacional.", answer:true, just:"CORRETO. O STF entendeu que a lei, a pretexto de regular interesse local, interferiu indevidamente no currículo nacional (LDB), invadindo a competência da União prevista no art. 22, XXIV, CF/88."},
+{id:18, tema:"Competências Legislativas / Educação", fonte:"STF Info 1216", caso:"A Lei nº 12.479/2025 do Estado do Espírito Santo assegurava a pais e responsáveis o direito de vedar a participação de filhos em 'atividades pedagógicas de gênero' em escolas públicas e privadas, impondo às instituições o dever de informar previamente os pais, sob pena de responsabilização civil e penal. O STF julgou essa lei inconstitucional.", statement:"No campo da competência concorrente sobre educação, é lícito ao Estado-membro, a pretexto de suplementar a norma federal, criar norma específica em descompasso com a norma nacional, para atender peculiaridades locais.", answer:false, just:"ERRADO. O STF fixou que o Estado não pode, a pretexto de suplementar, criar norma específica em descompasso com a norma nacional — foi exatamente essa a inconstitucionalidade formal reconhecida na lei capixaba."},
+{id:19, tema:"Competências Legislativas / Portaria Virtual", fonte:"STF Info 1216", caso:"A Lei nº 7.686/2025 do Distrito Federal proibiu a implantação de portaria virtual em condomínios com mais de 45 unidades e tornou obrigatória, para os condomínios que já a utilizassem, a contratação de seguro específico contra sinistros, roubos e furtos. O STF decidiu que essa lei é inconstitucional.", statement:"É inconstitucional lei distrital que proíbe a implementação de sistemas de portaria virtual em condomínios com mais de 45 unidades e impõe contratação obrigatória de seguros específicos, por usurpar a competência privativa da União para legislar sobre direito civil e política de seguros.", answer:true, just:"CORRETO. O STF reconheceu inconstitucionalidade formal (usurpação da competência da União sobre direito civil e seguros) e também material, por violação à livre iniciativa, livre concorrência e propriedade privada."},
+{id:20, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1215", caso:"A CF/88, no art. 144, §9º, determina que a remuneração dos policiais seja fixada por subsídio em parcela única (art. 39, §4º). Passados mais de 25 anos da EC 19/1998, o Estado de Minas Gerais ainda não editara lei para implementar esse regime aos delegados. A Associação dos Delegados de Polícia do Brasil ajuizou ADO pedindo prazo para o Governador editar a lei. O STF reconheceu a omissão e fixou prazo de 24 meses.", statement:"A inércia prolongada do Estado-membro em editar lei instituindo o subsídio em parcela única para os delegados de polícia, nos termos do art. 144, §9º c/c art. 39, §4º, da CF/88, configura omissão inconstitucional, ainda que a mora legislativa favoreça a multiplicação de verbas acessórias.", answer:true, just:"CORRETO. O STF reconheceu a omissão inconstitucional estadual (mora legislativa) e fixou prazo de 24 meses para sua superação, por violação aos princípios da transparência, racionalidade administrativa e uniformidade remuneratória."},
+{id:21, tema:"Advocacia Pública", fonte:"STF Info 1215", caso:"João foi aprovado no concurso da AGU em 2007 e, antes da posse, inscreveu-se na OAB-RO, conforme exigia o edital. Após assumir o cargo de Advogado da União, passou a questionar a obrigatoriedade dessa inscrição, sustentando que a nomeação em cargo com atribuição de representar a União em juízo já lhe daria capacidade postulatória, dispensando a OAB. O STF decidiu que a exigência de inscrição na OAB para advogados públicos é constitucional.", statement:"É constitucional a exigência de inscrição na OAB para os advogados públicos, pois a Constituição não estabelece distinção ontológica entre a advocacia pública e a privada, tratando-as como carreira única e essencial à administração da Justiça.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF no RE 609.517/RO (Tema 936 de repercussão geral): a inscrição na OAB é indispensável aos advogados públicos."},
+{id:22, tema:"Advocacia Pública", fonte:"STF Info 1215", caso:"João foi aprovado no concurso da AGU em 2007 e, antes da posse, inscreveu-se na OAB-RO, conforme exigia o edital. Após assumir o cargo de Advogado da União, passou a questionar a obrigatoriedade dessa inscrição, sustentando que a nomeação em cargo com atribuição de representar a União em juízo já lhe daria capacidade postulatória, dispensando a OAB. O STF decidiu que a exigência de inscrição na OAB para advogados públicos é constitucional.", statement:"Ao atuarem em tal qualidade, os advogados públicos submetem-se exclusivamente ao poder disciplinar da OAB, e não ao órgão correicional próprio de sua carreira.", answer:false, just:"ERRADO. O STF fixou justamente o inverso: garantida a submissão dos advogados públicos, quando atuam nessa qualidade, exclusivamente ao poder disciplinar do órgão correicional competente de seu regime jurídico próprio (e não ao poder disciplinar da OAB)."},
+{id:23, tema:"Direitos Fundamentais / Ações Afirmativas", fonte:"STF Info 1213", caso:"A Lei 19.722/2026 de Santa Catarina vedou a adoção de cotas e outras ações afirmativas em instituições de ensino superior públicas, exceto cotas para PCD, critério econômico e egressos de escolas públicas — na prática, vedando apenas as cotas étnico-raciais. Seis ADIs foram ajuizadas. O STF julgou a lei inconstitucional.", statement:"As ações afirmativas baseadas em critérios étnico-raciais não violam o princípio da isonomia, ao contrário, concretizam a igualdade material, concebida como igual respeito às diferenças e mandado de combate às desigualdades materiais.", answer:true, just:"CORRETO. O STF reafirmou esse entendimento, já consolidado em precedentes como a ADPF 186/DF, o RE 597.285/RS e a ADC 41/DF, para declarar inconstitucional a lei catarinense."},
+{id:24, tema:"Direitos Fundamentais / Ações Afirmativas", fonte:"STF Info 1213", caso:"A Lei 19.722/2026 de Santa Catarina vedou a adoção de cotas e outras ações afirmativas em instituições de ensino superior públicas, exceto cotas para PCD, critério econômico e egressos de escolas públicas — na prática, vedando apenas as cotas étnico-raciais. Seis ADIs foram ajuizadas. O STF julgou a lei inconstitucional.", statement:"Os Estados-membros possuem ampla margem de conformação para interromper, a qualquer momento e sem exigência de avaliação prévia, modalidades de ação afirmativa étnico-racial já reconhecidas como constitucionais.", answer:false, just:"ERRADO. O STF fixou que a interrupção de política pública de ação afirmativa étnico-racial exige prévia avaliação de seus efeitos, das consequências da descontinuidade e dos resultados alcançados — o que não ocorreu na Lei catarinense, aprovada sem audiência pública nem estudo técnico."},
+{id:25, tema:"Direitos Fundamentais / Ações Afirmativas", fonte:"STF Info 1213", caso:"A Lei 19.722/2026 de Santa Catarina vedou a adoção de cotas e outras ações afirmativas em instituições de ensino superior públicas, exceto cotas para PCD, critério econômico e egressos de escolas públicas — na prática, vedando apenas as cotas étnico-raciais. Seis ADIs foram ajuizadas. O STF julgou a lei inconstitucional.", statement:"A Convenção Interamericana contra o Racismo, a Discriminação Racial e Formas Correlatas de Intolerância, internalizada com status de emenda constitucional, impõe aos Estados Partes o dever de adotar ações afirmativas, afirmando que tais medidas não são discriminatórias.", answer:true, just:"CORRETO. O STF utilizou o Decreto 10.932/2022 (que internalizou a Convenção com status de emenda constitucional, nos termos do art. 5º, §3º, CF/88) como parâmetro de controle de constitucionalidade para declarar a lei catarinense inconstitucional."},
+{id:26, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1212", caso:"A Câmara Municipal de São Paulo aprovou emenda à Lei Orgânica acrescentando ao art. 88 a expressão 'também denominada Polícia Municipal de São Paulo', de modo que a Guarda Civil Metropolitana passou a ostentar oficialmente esse nome adicional. O STF julgou essa mudança inconstitucional.", statement:"É vedada a substituição da expressão constitucional 'Guardas Municipais' por 'Polícia Municipal' ou denominações similares, por determinação do art. 144, §8º, da CF/88, regulamentado pelas Leis 13.022/2014 e 13.675/2018.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF na ADPF 1.214/SP: a nomenclatura 'guardas municipais' não foi acidental, refletindo escolha jurídica que distingue esses órgãos dos demais de segurança pública, sendo vedada a denominação 'Polícia Municipal'."},
+{id:27, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1211", caso:"A LONPC (Lei Federal 14.735/2023) estabeleceu que a bolsa-auxílio durante o curso de formação é facultativa, mas, se concedida, não pode ser inferior a 50% da remuneração da classe inicial do cargo. A Lei estadual nº 18.430/2023 de Pernambuco fixou a bolsa-auxílio do Delegado de Polícia em R$ 2.900,00, equivalente a apenas 23,77% da remuneração inicial. O STF declarou a inconstitucionalidade dessa fixação.", statement:"É inconstitucional a fixação, por lei estadual, de bolsa-auxílio para curso de formação de Delegado de Polícia em patamar inferior ao mínimo de 50% estabelecido pela Lei Orgânica Nacional das Polícias Civis (LONPC), por violar o regime de competência concorrente.", answer:true, just:"CORRETO. O STF declarou a inconstitucionalidade do dispositivo estadual pernambucano, por afronta ao art. 24, §§1º e 4º, da CF/88 e ao piso de 50% previsto no art. 22 da LONPC."},
+{id:28, tema:"Controle de Constitucionalidade / Efeito Repristinatório", fonte:"STF Info 1211", caso:"Ao julgar a ADI contra a lei estadual pernambucana da bolsa-auxílio, o STF constatou que a lei anterior revogada padecia do mesmo vício de inconstitucionalidade, mas a autora da ação havia impugnado apenas a lei mais recente, sem pedido específico quanto à norma revogada.", statement:"Atualmente, o STF admite que, mesmo sem impugnação expressa das normas anteriores revogadas, a Corte pode, de ofício, ao delimitar a eficácia de sua decisão, excluir o efeito repristinatório indesejado quando constatar que a norma revogada padece do mesmo vício de inconstitucionalidade.", answer:true, just:"CORRETO. O STF flexibilizou o princípio do pedido, permitindo a exclusão de ofício do efeito repristinatório indesejado (declaração de inconstitucionalidade por arrastamento), mesmo sem impugnação expressa da lei revogada."},
+{id:29, tema:"Poder Legislativo / CPI", fonte:"STF Info 1210", caso:"Discutiu-se se a prorrogação do prazo de funcionamento de uma Comissão Parlamentar de Inquérito seria automática e configuraria direito subjetivo da minoria parlamentar que a requereu. O STF fixou que a prorrogação depende de deliberação formal da Casa Legislativa.", statement:"A criação e instalação de uma CPI constituem direito subjetivo da minoria parlamentar (ato vinculado), cabível a intervenção do STF; já a prorrogação de seu prazo de funcionamento é matéria interna corporis, dependendo de deliberação da respectiva Casa, em regra não cabendo intervenção judicial.", answer:true, just:"CORRETO. O STF distinguiu exatamente essas duas situações no MS 40.799/DF: a criação é direito subjetivo vinculado da minoria; já a prorrogação depende de deliberação formal da Casa Legislativa, sendo matéria interna corporis."},
+{id:30, tema:"Segurança Pública / Polícia Penal", fonte:"STF Info 1208", caso:"Foi ajuizada ADO alegando mora do Governador do Piauí em deflagrar processo legislativo para regulamentar a Polícia Penal estadual após a EC 104/2019. O STF julgou improcedente o pedido, afastando a tese de omissão inconstitucional.", statement:"A simples ausência de um diploma legal 'acabado' regulamentando a Polícia Penal estadual já basta, por si só, para configurar mora inconstitucional do Poder Executivo estadual, independentemente de outras medidas concretas adotadas.", answer:false, just:"ERRADO. O STF entendeu o contrário: a simples ausência de diploma legal acabado não basta para configurar mora, tendo sido verificado que o Estado já adotara medidas objetivas concretas que descaracterizavam a inércia injustificável."},
+{id:31, tema:"Nacionalidade", fonte:"STF Info 1208", caso:"Regina, brasileira, mudou-se para os EUA, onde adotou regularmente duas crianças norte-americanas e registrou as certidões de nascimento e adoção no consulado brasileiro. Ao retornar ao Brasil, pediu na Justiça Federal o reconhecimento das filhas como brasileiras natas, com base no art. 12, I, 'c', CF/88. As instâncias inferiores negaram sob o argumento de que a alínea exigiria vínculo biológico. O STF discordou e reconheceu a nacionalidade brasileira originária das filhas.", statement:"A igualdade entre filhos biológicos e adotivos prevista no art. 227, §6º, da CF/88 limita-se ao Direito de Família, não se estendendo ao direito à nacionalidade, que exige vínculo biológico (ius sanguinis).", answer:false, just:"ERRADO. O STF fixou que essa igualdade não se limita ao Direito de Família, estendendo-se a todos os direitos fundamentais, incluindo o direito à nacionalidade — por isso as filhas adotivas de Regina, registradas em consulado, foram reconhecidas como brasileiras natas."},
+{id:32, tema:"Direitos Fundamentais / Meio Ambiente", fonte:"STF Info 1207", caso:"Discutiu-se a constitucionalidade das Leis nº 13.364/2016 (reconhece a vaquejada como patrimônio cultural imaterial) e nº 10.220/2001 (equipara peões a atletas profissionais), à luz da proteção constitucional aos animais.", statement:"São constitucionais os dispositivos que reconhecem a vaquejada como patrimônio cultural imaterial e equiparam o peão a atleta profissional, desde que observados, no mínimo, os critérios de bem-estar animal estabelecidos na própria Lei nº 13.364/2016.", answer:true, just:"CORRETO. O STF declarou a constitucionalidade dessas leis na ADI 5.772/DF, condicionada à observância dos critérios mínimos de bem-estar animal (art. 3º-B, §2º, da Lei 13.364/2016), sob pena de responsabilização administrativa e penal dos envolvidos."},
+{id:33, tema:"Competências Legislativas / Educação", fonte:"STF Info 1206", caso:"Discutiu-se se municípios teriam competência para proibir, por lei, o uso de linguagem neutra nas escolas municipais, sob a justificativa de proteção da infância.", statement:"Os municípios têm competência para proibir o uso de linguagem neutra nas escolas, por se tratar de assunto de interesse local relacionado à organização do ensino municipal.", answer:false, just:"ERRADO. O STF decidiu que os municípios NÃO têm essa competência, pois se trata de matéria de diretrizes e bases da educação nacional, de competência privativa da União (art. 22, XXIV, CF/88), havendo também violação à liberdade de cátedra e ao pluralismo pedagógico."},
+{id:34, tema:"Liberdade de Expressão", fonte:"STF Info 1205", caso:"A ONG Projeto Esperança Animal publicou campanha convocando o público a pressionar patrocinadores da Festa do Peão de Boiadeiro de Barretos/SP a retirarem apoio ao evento, associando-o a maus-tratos (uso do sedém). A organizadora da festa pediu indenização e a proibição da campanha. O STF deu provimento ao recurso da ONG, julgando improcedentes os pedidos.", statement:"Campanhas de mobilização social promovidas por entidades da sociedade civil, com base em pautas de direitos fundamentais, voltadas a desestimular o financiamento ou apoio institucional a eventos ou organizações, estão protegidas pela liberdade de expressão.", answer:true, just:"CORRETO. Essa é a primeira tese fixada pelo STF no RE 662.055/SP (Tema 837): tais campanhas estão protegidas pelos arts. 5º, IV e IX, e 220, §§1º e 2º, da CF/88."},
+{id:35, tema:"Liberdade de Expressão", fonte:"STF Info 1205", caso:"A ONG Projeto Esperança Animal publicou campanha convocando o público a pressionar patrocinadores da Festa do Peão de Boiadeiro de Barretos/SP a retirarem apoio ao evento, associando-o a maus-tratos (uso do sedém). A organizadora da festa pediu indenização e a proibição da campanha. O STF deu provimento ao recurso da ONG, julgando improcedentes os pedidos.", statement:"A responsabilidade civil de entidade que promove campanha de mobilização social, com determinação de cessação e retirada de conteúdo das redes, somente será possível quando comprovada má-fé, caracterizada por dolo (conhecimento prévio da falsidade) ou por culpa grave (negligência evidente na apuração da veracidade).", answer:true, just:"CORRETO. Essa é a segunda tese fixada no Tema 837: a responsabilização exige comprovação de má-fé qualificada (dolo ou culpa grave), não bastando a mera divergência de opinião sobre o evento criticado."},
+{id:36, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1166", caso:"Discutiu-se se as Guardas Municipais poderiam exercer o policiamento ostensivo e comunitário no âmbito municipal, dado que o art. 144 da CF/88 lhes atribui, a princípio, apenas a proteção de bens, serviços e instalações municipais.", statement:"É constitucional o exercício de ações de segurança urbana pelas Guardas Municipais, inclusive policiamento ostensivo e comunitário, respeitadas as atribuições dos demais órgãos de segurança pública e excluída qualquer atividade de polícia judiciária.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF no RE 608.588/SP (Tema 656 de repercussão geral): admite-se o policiamento ostensivo e comunitário pelas guardas municipais, desde que respeitadas as atribuições dos demais entes e excluída a polícia judiciária, sob controle externo do MP."},
+{id:37, tema:"Saúde / Judicialização", fonte:"STF Info 1152", caso:"O STF fixou parâmetros para a concessão judicial de medicamentos registrados na Anvisa, mas não incluídos nas listas de dispensação do SUS (RENAME, RESME, REMUME).", statement:"A ausência de inclusão de medicamento nas listas de dispensação do SUS impede, como regra geral, o fornecimento do fármaco por decisão judicial, independentemente do custo, admitindo-se a concessão apenas excepcionalmente, mediante o preenchimento cumulativo de requisitos específicos.", answer:true, just:"CORRETO. Essa é a tese fixada no RE 566.471/RN (Tema 6): a regra geral é a impossibilidade de fornecimento judicial de medicamento não incorporado, ressalvada a exceção mediante requisitos cumulativos (negativa administrativa, ilegalidade da não incorporação, ausência de substituto no SUS, evidências científicas robustas, imprescindibilidade clínica e incapacidade financeira)."},
+{id:38, tema:"Saúde / Judicialização", fonte:"STF Info 1152", caso:"O STF fixou parâmetros para a concessão judicial de medicamentos registrados na Anvisa, mas não incluídos nas listas de dispensação do SUS (RENAME, RESME, REMUME).", statement:"Segundo o STF, o Poder Judiciário pode fundamentar sua decisão de concessão de medicamento não incorporado unicamente em prescrição, relatório ou laudo médico juntado aos autos pelo autor da ação, sem necessidade de consulta a órgãos técnicos.", answer:false, just:"ERRADO. O STF fixou que o Judiciário deve, sob pena de nulidade da decisão, aferir os requisitos a partir de prévia consulta ao NATJUS (Núcleo de Apoio Técnico do Poder Judiciário) ou a entes com expertise técnica, não podendo fundamentar a decisão unicamente em prescrição ou laudo médico juntado pelo autor."},
+{id:39, tema:"Direitos Fundamentais / Liberdade Religiosa", fonte:"STF Info 1152", statement:"Testemunhas de Jeová maiores e capazes têm o direito de recusar procedimento médico que envolva transfusão de sangue, com base na autonomia individual e na liberdade religiosa, fazendo jus, em contrapartida, aos procedimentos alternativos disponíveis no SUS.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF no RE 979.742/AM (Tema 952): a recusa a transfusão por motivo religioso é permitida a pacientes maiores e capazes, assegurado o acesso a tratamentos alternativos no SUS, inclusive fora do domicílio se necessário."},
+{id:40, tema:"Direitos Fundamentais / Liberdade Religiosa", fonte:"STF Info 1152", statement:"É possível a realização de procedimento médico disponibilizado pelo sistema público de saúde com a interdição de transfusão sanguínea, desde que haja viabilidade técnico-científica de sucesso, anuência da equipe médica e decisão inequívoca, livre, informada e esclarecida do paciente — inclusive por diretivas antecipadas de vontade.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF no RE 1.212.272/AL (Tema 1.069), complementar ao Tema 952, admitindo a realização do procedimento sem transfusão quando presentes esses requisitos, inclusive quando manifestados por diretivas antecipadas de vontade."},
+{id:41, tema:"Segurança Pública / Defensoria Pública", fonte:"STF Info 1139", statement:"É inconstitucional lei estadual que concede o direito ao porte de arma de fogo a membros da Defensoria Pública local, por violar a competência material exclusiva e a competência legislativa privativa da União sobre material bélico.", answer:true, just:"CORRETO. O STF julgou inconstitucional essa previsão na ADI 7.571/ES, por ofensa aos arts. 21, VI, e 22, XXI, da CF/88, que atribuem à União a competência sobre produção, comércio e regulação de material bélico."},
+{id:42, tema:"Direitos Sociais / Omissão Legislativa", fonte:"STF Info 1139", statement:"O Congresso Nacional está em omissão inconstitucional por não regulamentar o adicional de penosidade previsto no art. 7º, XXIII, da CF/88 para trabalhadores urbanos e rurais, tendo o STF fixado prazo de 18 meses para que o Legislativo supra essa mora.", answer:true, just:"CORRETO. O STF reconheceu a omissão na ADO 74/DF e fixou prazo de 18 meses para a regulamentação, ressaltando que se trata de parâmetro temporal razoável, e não de imposição rígida de prazo ao Legislativo."},
+{id:43, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1138", caso:"Discutiu-se bonificação de inclusão regional incidente sobre a nota final do Enem, no Sisu, beneficiando alunos que concluíram o ensino médio nas imediações da instituição, mesmo restrita ao curso de medicina, sob justificativa de dificuldade de fixação de médicos na localidade.", statement:"É inconstitucional, por violar o princípio da igualdade, o estabelecimento de bonificação de inclusão regional incidente sobre a nota final do Enem para ingresso em universidade federal, mesmo quando restrita ao curso de medicina e justificada pela dificuldade de arregimentação de médicos para a localidade.", answer:true, just:"CORRETO. O STF, na Rcl 65.976/MA, declarou inconstitucional essa bonificação, por violação ao princípio da isonomia, mesmo diante da justificativa de escassez de médicos na região."},
+{id:44, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1138", caso:"Discutiu-se os limites da responsabilidade civil de jornalistas ao divulgar notícias sobre figuras públicas, bem como a possibilidade de reunião de ações ajuizadas em diversas comarcas contra o mesmo jornalista pelos mesmos fatos.", statement:"A responsabilidade civil de jornalistas ou órgãos de imprensa, ao divulgar notícias sobre figuras públicas ou assuntos de interesse social, somente ocorre em casos de dolo ou culpa grave (evidente negligência profissional na apuração dos fatos).", answer:true, just:"CORRETO. O STF fixou essa tese na ADI 6.792/DF e ADI 7.055/DF: a responsabilidade civil de jornalistas exige dolo ou culpa grave, e não mera divergência ou imprecisão factual."},
+{id:45, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1138", caso:"Discutiu-se os limites da responsabilidade civil de jornalistas ao divulgar notícias sobre figuras públicas, bem como a possibilidade de reunião de ações ajuizadas em diversas comarcas contra o mesmo jornalista pelos mesmos fatos.", statement:"Caracterizado o assédio judicial contra jornalista ou órgão de imprensa — mediante ajuizamento de inúmeras ações sobre os mesmos fatos em comarcas diversas com o intuito de constranger ou onerar sua defesa —, o jornalista réu poderá requerer a reunião de todas as ações no foro de seu domicílio.", answer:true, just:"CORRETO. O STF reconheceu essa possibilidade como forma de coibir o assédio judicial (forum shopping abusivo) contra profissionais de imprensa."},
+{id:46, tema:"Investigação Criminal", fonte:"STF Info 1133", caso:"Discutiu-se a constitucionalidade dos arts. 13-A e 13-B do CPP (inseridos pela Lei 13.344/2016), que permitem a requisição de dados cadastrais e de localização em investigações de crimes como cárcere privado, tráfico de pessoas e sequestro relâmpago.", statement:"É constitucional norma que permite, mesmo sem autorização judicial, que delegados de polícia e membros do Ministério Público requisitem dados cadastrais de vítimas ou suspeitos em investigações de determinados crimes graves (como tráfico de pessoas e sequestro relâmpago), nos termos do art. 13-A do CPP.", answer:true, just:"CORRETO. O STF declarou constitucional o art. 13-A do CPP na ADI 5.642/DF, por se tratar de dados meramente cadastrais, sem proteção por reserva de jurisdição."},
+{id:47, tema:"Direitos Fundamentais / Liberdade Religiosa", fonte:"STF Info 1133", statement:"É constitucional a utilização de vestimentas ou acessórios relacionados a crença ou religião nas fotos de documentos oficiais, desde que não impeçam a adequada identificação individual, com rosto visível.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF no RE 859.376/PR (Tema 953): a liberdade de crença e religião (art. 5º, VI, CF/88) autoriza o uso de tais vestimentas, respeitada a proporcionalidade quanto à identificação individual."},
+{id:48, tema:"Nacionalidade / Cooperação Internacional", fonte:"STJ Info 805", caso:"O STJ autorizou a homologação de sentença estrangeira que condenou o jogador de futebol Robinho na Itália, determinando o cumprimento imediato da pena no Brasil, com base na Lei de Migração.", statement:"A transferência da execução de pena imposta no exterior a brasileiro nato viola o núcleo do direito fundamental que veda a extradição de brasileiro nato (art. 5º, LI, CF/88), pois equivale, na prática, à entrega do condenado a outro país.", answer:false, just:"ERRADO. O STJ decidiu que essa transferência NÃO viola o art. 5º, LI, da CF/88, pois não há entrega do brasileiro nato para cumprimento de pena no exterior — ao contrário, a pena passa a ser cumprida no Brasil, evitando a impunidade do condenado não sujeito à extradição."},
+{id:49, tema:"Nacionalidade / Cooperação Internacional", fonte:"STJ Info 805", caso:"O STJ autorizou a homologação de sentença estrangeira que condenou o jogador de futebol Robinho na Itália, determinando o cumprimento imediato da pena no Brasil, com base na Lei de Migração.", statement:"O art. 100 da Lei de Migração (Lei nº 13.445/2017), que autoriza a transferência da execução de pena imposta no exterior, não pode ser aplicado a fatos anteriores à sua vigência, por se tratar de norma penal mais gravosa.", answer:false, just:"ERRADO. O STJ entendeu que o art. 100 da Lei de Migração se aplica a fatos anteriores à sua vigência, por se tratar de norma de cooperação internacional em matéria penal, e não de norma penal incriminadora retroativa em prejuízo do réu."},
+{id:50, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1128", caso:"Duas mulheres em união estável homoafetiva decidiram ter um filho por inseminação artificial; uma delas seria responsável pela gestação. Discutiu-se se a mãe não gestante também teria direito à licença-maternidade.", statement:"Na hipótese de gravidez em união homoafetiva, a mãe não gestante (servidora pública ou trabalhadora do setor privado) faz jus à licença-maternidade ou, caso a companheira já a tenha utilizado, a prazo análogo ao da licença-paternidade.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF no RE 1.211.446/SP (Tema 1.072): a mãe não gestante em união homoafetiva tem direito à licença-maternidade, ou, alternativamente, a período equivalente à licença-paternidade."},
+{id:51, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1122", statement:"São formalmente inconstitucionais leis estaduais que concedam porte de arma a agentes de segurança socioeducativos, por violarem a competência privativa da União para legislar sobre direito penal e material bélico.", answer:true, just:"CORRETO. O STF julgou inconstitucional essa concessão na ADI 7.424/ES, com fundamento nos arts. 22, I e XXI, da CF/88."},
+{id:52, tema:"Direitos Sociais / Omissão Legislativa", fonte:"STF Info 1121", caso:"O STF reconheceu que o Congresso Nacional está em omissão inconstitucional por não ter editado lei fixando o prazo da licença-paternidade prevista no art. 7º, XIX, da CF/88.", statement:"Existindo omissão inconstitucional quanto à edição da lei regulamentadora da licença-paternidade, o STF fixou prazo de 18 meses para o Congresso Nacional sanar a omissão, estabelecendo que, não editada a lei no prazo, caberá ao próprio STF fixar o período da licença.", answer:true, just:"CORRETO. Essa é a tese fixada pelo STF na ADO 20/DF: prazo de 18 meses ao Congresso, sob pena de o próprio STF fixar o período da licença-paternidade — o que foi posteriormente superado pela edição da Lei nº 15.371/2026."},
+{id:53, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1120", caso:"Discutiu-se se veículo de comunicação social pode ser responsabilizado por divulgar entrevista na qual o entrevistado forneceu informações falsas e ofensivas à honra de terceiro. O entendimento originalmente fixado pelo STF foi posteriormente aperfeiçoado em embargos de declaração.", statement:"Na hipótese de publicação de entrevista em que o entrevistado imputa falsamente a prática de crime a terceiro, a empresa jornalística somente poderá ser responsabilizada civilmente se comprovada sua má-fé, caracterizada por dolo (conhecimento prévio da falsidade) ou por culpa grave (evidente negligência na apuração da veracidade e na busca do contraditório).", answer:true, just:"CORRETO. Essa é a tese fixada e depois aperfeiçoada pelo STF no RE 1.075.412/PE (Tema 995), exigindo dolo ou culpa grave para a responsabilização do veículo de imprensa."},
+{id:54, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1120", caso:"Discutiu-se se veículo de comunicação social pode ser responsabilizado por divulgar entrevista na qual o entrevistado forneceu informações falsas e ofensivas à honra de terceiro. O entendimento originalmente fixado pelo STF foi posteriormente aperfeiçoado em embargos de declaração.", statement:"Na hipótese de entrevistas realizadas e transmitidas ao vivo, o veículo de comunicação responde objetivamente por ato exclusivo do entrevistado que falsamente impute a outrem a prática de um crime, ainda que assegure o direito de resposta em iguais condições.", answer:false, just:"ERRADO. O STF fixou o oposto: em entrevistas ao vivo, fica excluída a responsabilidade do veículo por ato exclusivamente de terceiro, desde que assegurado o direito de resposta em iguais condições, espaço e destaque, sob pena de responsabilidade."},
+{id:55, tema:"Sistema Prisional / Estado de Coisas Inconstitucional", fonte:"STF Info 1111", caso:"Na ADPF 347/DF, discutiu-se a existência de um estado de coisas inconstitucional (ECI) no sistema prisional brasileiro, diante da violação massiva de direitos fundamentais dos presos (superlotação, condições degradantes).", statement:"Há um estado de coisas inconstitucional no sistema carcerário brasileiro, responsável pela violação massiva de direitos fundamentais dos presos, demandando atuação cooperativa de diversas autoridades e instituições para a construção de solução satisfatória.", answer:true, just:"CORRETO. O STF reconheceu o ECI do sistema prisional na ADPF 347/DF, determinando que União, Estados e DF, em conjunto com o CNJ, elaborem planos a serem homologados pelo STF."},
+{id:56, tema:"Sistema Prisional / Estado de Coisas Inconstitucional", fonte:"STF Info 1111", caso:"Na ADPF 347/DF, discutiu-se a existência de um estado de coisas inconstitucional (ECI) no sistema prisional brasileiro, diante da violação massiva de direitos fundamentais dos presos (superlotação, condições degradantes).", statement:"Reconhecido o estado de coisas inconstitucional do sistema prisional, o STF determinou que o CNJ realize estudo e regule a criação de número de varas de execução penal proporcional ao número de varas criminais e ao quantitativo de presos.", answer:true, just:"CORRETO. Essa foi uma das determinações concretas do STF na ADPF 347/DF para o enfrentamento do ECI carcerário."},
+{id:57, tema:"Sistema Prisional / Estado de Coisas Inconstitucional", fonte:"STF Info 1111", caso:"Na ADPF 347/DF, discutiu-se a existência de um estado de coisas inconstitucional (ECI) no sistema prisional brasileiro, diante da violação massiva de direitos fundamentais dos presos (superlotação, condições degradantes).", statement:"O reconhecimento do estado de coisas inconstitucional pelo STF implica a assunção, pelo próprio Tribunal, da gestão direta e individualizada de cada estabelecimento prisional do país, substituindo a atuação dos entes federativos.", answer:false, just:"ERRADO. O ECI não significa que o STF assuma a gestão direta dos presídios; a solução se dá por meio de planos elaborados pelos próprios entes federativos (União, Estados e DF) em conjunto com o CNJ, homologados e monitorados pelo STF — típico processo estrutural."},
+{id:58, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", caso:"No julgamento do RE 1.017.365/SC (Tema 1.031), o STF fixou extenso conjunto de teses sobre a demarcação de terras tradicionalmente ocupadas por indígenas, incluindo a questão do chamado 'marco temporal'.", statement:"A proteção constitucional aos direitos originários sobre as terras tradicionalmente ocupadas pelos indígenas independe da existência de um marco temporal em 5 de outubro de 1988 ou da configuração de renitente esbulho (conflito físico ou controvérsia judicial) persistente à data da promulgação da Constituição.", answer:true, just:"CORRETO. Essa é uma das teses centrais fixadas pelo STF no Tema 1.031: a tese do marco temporal foi rejeitada, não se exigindo ocupação ou conflito físico exatamente em 5/10/1988."},
+{id:59, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", caso:"No julgamento do RE 1.017.365/SC (Tema 1.031), o STF fixou extenso conjunto de teses sobre a demarcação de terras tradicionalmente ocupadas por indígenas, incluindo a questão do chamado 'marco temporal'.", statement:"Existindo ocupação tradicional indígena ou renitente esbulho contemporâneo à promulgação da Constituição, aplica-se aos particulares atingidos o regime indenizatório relativo às benfeitorias úteis e necessárias, previsto no §6º do art. 231 da CF/88.", answer:true, just:"CORRETO. Essa é uma das teses fixadas no Tema 1.031: nesses casos, o particular tem direito à indenização por benfeitorias úteis e necessárias, mas não à terra nua."},
+{id:60, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", caso:"No julgamento do RE 1.017.365/SC (Tema 1.031), o STF fixou extenso conjunto de teses sobre a demarcação de terras tradicionalmente ocupadas por indígenas, incluindo a questão do chamado 'marco temporal'.", statement:"Ausente ocupação tradicional indígena ou renitente esbulho na data da promulgação da Constituição, são válidos e eficazes os atos jurídicos perfeitos e a coisa julgada relativos a justo título ou posse de boa-fé, assistindo ao particular direito à justa e prévia indenização das benfeitorias necessárias e úteis pela União, e, quando inviável o reassentamento, indenização pelo valor da terra nua.", answer:true, just:"CORRETO. Essa é outra tese do Tema 1.031: nessa hipótese, além das benfeitorias, o particular tem direito à indenização pela terra nua quando inviável o reassentamento, com direito de regresso da União contra o ente federativo que titulou a área."},
+{id:61, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", caso:"No julgamento do RE 1.017.365/SC (Tema 1.031), o STF fixou extenso conjunto de teses sobre a demarcação de terras tradicionalmente ocupadas por indígenas, incluindo a questão do chamado 'marco temporal'.", statement:"As terras de ocupação tradicional indígena são de posse permanente da comunidade, cabendo aos indígenas o usufruto exclusivo das riquezas do solo, rios e lagos nelas existentes, sendo tais terras alienáveis e disponíveis, desde que autorizada a venda pela FUNAI.", answer:false, just:"ERRADO. O STF fixou que essas terras, por serem públicas, são inalienáveis e indisponíveis, e os direitos sobre elas são imprescritíveis — não há hipótese de venda autorizada pela FUNAI."},
+{id:62, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", caso:"No julgamento do RE 1.017.365/SC (Tema 1.031), o STF fixou extenso conjunto de teses sobre a demarcação de terras tradicionalmente ocupadas por indígenas, incluindo a questão do chamado 'marco temporal'.", statement:"Os povos indígenas possuem capacidade civil e postulatória, sendo partes legítimas nos processos em que discutidos seus interesses, sem prejuízo da legitimidade concorrente da FUNAI e da intervenção do Ministério Público como fiscal da lei.", answer:true, just:"CORRETO. Essa é uma das teses fixadas no Tema 1.031, reconhecendo expressamente a capacidade civil e postulatória própria dos povos indígenas, sem excluir a legitimidade concorrente da FUNAI e a fiscalização do MP."},
+{id:63, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", caso:"No julgamento do RE 1.017.365/SC (Tema 1.031), o STF fixou extenso conjunto de teses sobre a demarcação de terras tradicionalmente ocupadas por indígenas, incluindo a questão do chamado 'marco temporal'.", statement:"O laudo antropológico realizado nos termos do Decreto nº 1.775/1996 é um dos elementos fundamentais para a demonstração da tradicionalidade da ocupação indígena, de acordo com seus usos, costumes e tradições.", answer:true, just:"CORRETO. O STF reconheceu, no Tema 1.031, a relevância do laudo antropológico do Decreto 1.775/1996 como elemento fundamental de comprovação da tradicionalidade da ocupação."},
+{id:64, tema:"Segurança Pública / Corpo de Bombeiros", fonte:"STF Info 1107", statement:"É constitucional norma de Constituição estadual que atribui ao Corpo de Bombeiros Militar competência para coordenação e execução de perícias de incêndios e explosões em local de sinistro, sendo essa competência, contudo, exclusiva, afastando a atuação das polícias civis na apuração criminal.", answer:false, just:"ERRADO. O STF decidiu que essa competência é constitucional, mas NÃO pode ser exclusiva, sob pena de prejudicar a atuação das polícias civis na apuração criminal de fatos que envolvam incêndios e explosões (ADI 2.776/ES)."},
+{id:65, tema:"Segurança Pública / Corpo de Bombeiros", fonte:"STF Info 1107", statement:"O STF declarou integralmente inconstitucional a norma de Constituição estadual que atribui ao Corpo de Bombeiros Militar competência para realizar perícias de incêndios e explosões, por invasão da competência da Polícia Civil.", answer:false, just:"ERRADO. O STF não declarou a norma integralmente inconstitucional — reconheceu sua constitucionalidade, apenas ressalvando que essa competência do CBM não pode ser exclusiva, para não prejudicar a atuação da Polícia Civil."},
+{id:66, tema:"Poder Executivo / Dupla Vacância", fonte:"STF Info 1104", statement:"Os Estados possuem autonomia relativa na solução normativa do problema da dupla vacância da Chefia do Poder Executivo estadual, não estando vinculados ao modelo e procedimento federal (eleição indireta pelo Legislativo, art. 81, CF/88), mas devendo observar princípios constitucionais como o registro de candidatos por chapa única e a regra da maioria.", answer:true, just:"CORRETO. O STF fixou essa autonomia relativa na ADPF 969/AL, exigindo, porém, observância de determinados princípios constitucionais, como chapa única e condições de elegibilidade do art. 14 da CF/88."},
+{id:67, tema:"Poder Executivo / Dupla Vacância", fonte:"STF Info 1104", statement:"Segundo o STF, na eleição indireta estadual por dupla vacância, a filiação partidária do candidato pressupõe necessariamente a escolha em convenção partidária e o registro da candidatura pelo partido político, nos mesmos moldes da eleição direta.", answer:false, just:"ERRADO. O STF fixou que a filiação partidária não pressupõe a escolha em convenção partidária nem o registro da candidatura pelo partido político, dadas as peculiaridades do procedimento de eleição indireta."},
+{id:68, tema:"Direitos Fundamentais / Políticas Públicas", fonte:"STF Info 1101", statement:"A intervenção do Poder Judiciário em políticas públicas voltadas à realização de direitos fundamentais, em caso de ausência ou deficiência grave do serviço, viola o princípio da separação dos Poderes, sendo vedada em qualquer hipótese.", answer:false, just:"ERRADO. O STF fixou o entendimento oposto no RE 684.612/RJ (Tema 698): essa intervenção NÃO viola a separação dos Poderes quando há ausência ou deficiência grave do serviço público."},
+{id:69, tema:"Direitos Fundamentais / Políticas Públicas", fonte:"STF Info 1101", statement:"Segundo o STF, ao intervir em políticas públicas de saúde, a decisão judicial deve, como regra, apontar as finalidades a serem alcançadas e determinar à Administração que apresente um plano ou os meios adequados para o resultado, em vez de determinar medidas pontuais e específicas.", answer:true, just:"CORRETO. O STF fixou essa diretriz no Tema 698, privilegiando decisões estruturais (fixação de finalidades e exigência de plano da Administração) em vez de comandos pontuais e específicos."},
+{id:70, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1086", statement:"É inconstitucional, por violar a competência privativa da União para legislar sobre direito penal e material bélico, norma estadual que concede, de forma incondicionada, o porte de arma de fogo a agentes penitenciários.", answer:true, just:"CORRETO. O STF declarou essa inconstitucionalidade na ADI 5076/RO, com fundamento no art. 22, I e XXI, da CF/88."},
+{id:71, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1086", statement:"Segundo o STF, é constitucional que lei estadual conceda porte de arma de fogo a agentes penitenciários de forma incondicionada, desde que a categoria demonstre necessidade funcional para o exercício do cargo.", answer:false, just:"ERRADO. O STF não abriu essa exceção: a concessão incondicionada de porte de arma a agentes penitenciários por lei estadual é inconstitucional, independentemente de necessidade funcional alegada, por invadir competência privativa da União."},
+{id:72, tema:"Defensoria Pública", fonte:"STF Info 1045", statement:"A Defensoria Pública detém a prerrogativa de requisitar, de quaisquer autoridades públicas e de seus agentes, certidões, exames, perícias, vistorias, diligências, processos, documentos e demais providências necessárias à sua atuação, sendo essa prerrogativa constitucional.", answer:true, just:"CORRETO. O STF confirmou a constitucionalidade dessa prerrogativa de requisição em diversas ADIs (ADI 6852/DF, ADI 6862/PR, entre outras)."},
+{id:73, tema:"Defensoria Pública", fonte:"STF Info 1045", statement:"A prerrogativa de requisição da Defensoria Pública foi julgada inconstitucional pelo STF por violar a separação de poderes e criar excessiva ingerência sobre outros órgãos públicos.", answer:false, just:"ERRADO. O STF julgou exatamente o oposto: a prerrogativa de requisição da Defensoria é constitucional, não havendo violação à separação de poderes."},
+{id:74, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1045", statement:"É incompatível com a Constituição Federal a concessão de porte de arma a Procuradores do Estado por lei estadual.", answer:true, just:"CORRETO. O STF assim decidiu na ADI 6985/AL, por violação à competência privativa da União para legislar sobre material bélico."},
+{id:75, tema:"Competências Estaduais / Direito do Consumidor", fonte:"STF Info 1045", statement:"É válida lei estadual que obrigue empresas prestadoras de serviços de TV por assinatura e estabelecimentos comerciais de vendas no varejo e atacado — que já possuam SAC — a fornecerem atendimento telefônico gratuito a seus clientes.", answer:true, just:"CORRETO. O STF considerou válida essa lei estadual na ADI 4118/RJ, por se tratar de matéria de proteção ao consumidor, de competência concorrente."},
+{id:76, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1044", caso:"Discutiu-se a constitucionalidade de norma estadual que assegurava independência funcional a delegados de polícia e atribuía à Polícia Civil o caráter de função essencial ao exercício da jurisdição e à defesa da ordem jurídica, equiparando-a, em prerrogativas, ao Ministério Público e ao Judiciário.", statement:"É inconstitucional norma estadual que assegure independência funcional a delegados de polícia e atribua à Polícia Civil o caráter de função essencial ao exercício da jurisdição, pois o art. 144, §6º, da CF/88 estabelece expressamente a subordinação da Polícia Civil ao Governador do Estado.", answer:true, just:"CORRETO. O STF declarou essa inconstitucionalidade na ADI 5522/SP, por violação ao princípio da separação dos poderes e à subordinação da Polícia Civil ao Governador prevista no art. 144, §6º, da CF/88."},
+{id:77, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1044", caso:"Discutiu-se a constitucionalidade de norma estadual que assegurava independência funcional a delegados de polícia e atribuía à Polícia Civil o caráter de função essencial ao exercício da jurisdição e à defesa da ordem jurídica, equiparando-a, em prerrogativas, ao Ministério Público e ao Judiciário.", statement:"Segundo o STF, a Constituição Federal, ao tratar da Administração Pública, escolheu quais órgãos deveriam ter assegurada autonomia; norma estadual que atribua autonomia funcional, administrativa ou financeira a órgãos não previstos especificamente na Constituição Federal padece de vício de inconstitucionalidade material.", answer:true, just:"CORRETO. O STF reafirmou essa lógica na ADI 5522/SP: apenas os órgãos aos quais a própria CF/88 assegura autonomia (como MP e Defensoria) podem tê-la, não sendo cabível ao constituinte estadual estendê-la a outros órgãos, como a Polícia Civil."},
+{id:78, tema:"Educação / Fundeb", fonte:"STF Info 1044", statement:"É vedada a utilização, ainda que em caráter excepcional, de recursos vinculados ao Fundeb para ações de combate à pandemia da Covid-19, ainda que se reconheça a gravidade da pandemia e seus impactos na economia e nas finanças públicas.", answer:true, just:"CORRETO. O STF fixou essa vedação na ADI 6490/PI: recursos constitucionalmente vinculados à manutenção e desenvolvimento do ensino básico não podem ser desviados para outras finalidades, por mais grave que seja a situação emergencial."},
+{id:79, tema:"Segurança Pública / Processos Estruturais", fonte:"STJ Info 894", statement:"O julgado sobre o plano dialógico de atuação da PM em manifestações públicas (AgInt no AREsp 2.068.297-SP) foi decidido pela 1ª Turma do STJ, sob relatoria do Min. Paulo Sérgio Domingues, em 16/6/2026.", answer:true, just:"CORRETO. O julgamento foi mesmo da 1ª Turma do STJ, Rel. Min. Paulo Sérgio Domingues, julgado em 16/6/2026 (Info 894)."},
+{id:80, tema:"Saúde / Tratamento no Exterior", fonte:"STJ Info 894", statement:"O caso de Alice (transplante de intestino nos EUA) foi julgado pela 1ª Seção do STJ, em recurso repetitivo, sob relatoria do Min. Marco Aurélio Bellizze.", answer:false, just:"ERRADO. O julgamento (REsp 1.860.543-PR) foi da 2ª Turma do STJ, e não da 1ª Seção nem em rito de repetitivo, sob relatoria do Min. Marco Aurélio Bellizze, julgado em 16/6/2026 (Info 894)."},
+{id:81, tema:"Provimento Derivado / Cargos Públicos", fonte:"STF Info 1222", statement:"O caso do perito papiloscopista do Mato Grosso do Sul (ADI 7.691/MS) foi julgado pelo Plenário do STF, sob relatoria do Min. Cristiano Zanin, em 15/06/2026.", answer:true, just:"CORRETO. A ADI 7.691/MS foi julgada pelo Plenário do STF, Rel. Min. Cristiano Zanin, em 15/06/2026 (Info 1222)."},
+{id:82, tema:"Controle de Constitucionalidade / Legitimidade", fonte:"STF Info 1220", statement:"A ADI 7.821/CE, sobre a legitimidade universal da OAB para propor ADI perante o TJ, teve como relator o Min. Gilmar Mendes e foi julgada em 10/06/2026.", answer:true, just:"CORRETO. A ADI 7.821/CE foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 10/06/2026 (Info 1220)."},
+{id:83, tema:"Poder Judiciário / Regime Jurídico", fonte:"STF Info 1219", statement:"O caso da aposentadoria compulsória de magistrado após a EC 103/2019 foi julgado em ação originária (AO 2.870) pelo Plenário do STF, sob relatoria do Min. Flávio Dino.", answer:false, just:"ERRADO. O julgamento (AO 2.870 AgR-AgR e AgR-segundo/DF) foi da 1ª Turma do STF, e não do Plenário, sob relatoria do Min. Flávio Dino, em 26/05/2026 (Info 1219)."},
+{id:84, tema:"Direitos Fundamentais / Pessoas com Deficiência", fonte:"STF Info 1217", statement:"A ADI 7.401/PI, sobre a exigência de 'aptidão plena' em concursos do Piauí, foi julgada pelo Plenário do STF em 18/05/2026, sob relatoria do Min. Nunes Marques.", answer:true, just:"CORRETO. A ADI 7.401/PI foi julgada pelo Plenário do STF, Rel. Min. Nunes Marques, em 18/05/2026 (Info 1217)."},
+{id:85, tema:"Competências Legislativas / Educação", fonte:"STF Info 1216", statement:"A ADPF 1.159/SC (linguagem neutra) e a ADI 7.847/ES (veto parental a atividades sobre gênero) foram julgadas pelo mesmo relator, Min. Flávio Dino.", answer:false, just:"ERRADO. Há uma pegadinha aqui: o caso do veto parental capixaba é a ADI 7.847/ES (uma ADI, não ADPF), julgada pelo Plenário, Rel. Min. Cármen Lúcia, em 12/05/2026 (Info 1216) — já a ADPF 1.159/SC (linguagem neutra) é de outro informativo (1206) e tem outro relator, Min. Flávio Dino."},
+{id:86, tema:"Competências Legislativas / Portaria Virtual", fonte:"STF Info 1216", statement:"A ADI 7.836/DF, sobre a proibição de portaria virtual em condomínios do DF, foi julgada pelo Plenário do STF, Rel. Min. Nunes Marques, em 12/05/2026.", answer:true, just:"CORRETO. A ADI 7.836/DF foi julgada pelo Plenário do STF, Rel. Min. Nunes Marques, em 12/05/2026 (Info 1216)."},
+{id:87, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1215", statement:"Na ADO 13/MG, sobre a omissão do Estado de Minas Gerais quanto ao subsídio dos delegados, o relator original foi o Min. Marco Aurélio, mas o redator do acórdão foi o Min. Cristiano Zanin.", answer:true, just:"CORRETO. A ADO 13/MG foi julgada pelo Plenário do STF em 30/04/2026, Rel. Min. Marco Aurélio, redator do acórdão Min. Cristiano Zanin (Info 1215) — indicando que a posição do relator original restou vencida em algum ponto."},
+{id:88, tema:"Advocacia Pública", fonte:"STF Info 1215", statement:"O RE 609.517/RO (obrigatoriedade de inscrição de advogados públicos na OAB) foi julgado em repercussão geral (Tema 936), com o Min. Cristiano Zanin como relator original e o Min. Edson Fachin como redator do acórdão.", answer:true, just:"CORRETO. O RE 609.517/RO foi julgado pelo Plenário em 30/04/2026, sob repercussão geral (Tema 936), Rel. Min. Cristiano Zanin, redator do acórdão Min. Edson Fachin (Info 1215)."},
+{id:89, tema:"Direitos Fundamentais / Ações Afirmativas", fonte:"STF Info 1213", statement:"O julgamento sobre a vedação de cotas étnico-raciais em Santa Catarina envolveu seis ADIs distintas (ADI 7.925 a ADI 7.930/SC), todas sob relatoria do Min. Gilmar Mendes, julgadas em 22/04/2026.", answer:true, just:"CORRETO. Foram seis ADIs (7.925 a 7.930/SC), julgadas conjuntamente pelo Plenário, Rel. Min. Gilmar Mendes, em 22/04/2026 (Info 1213)."},
+{id:90, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1212", statement:"A ADPF 1.214/SP, sobre a vedação ao uso do nome 'Polícia Municipal' pela Guarda Civil Metropolitana de São Paulo, foi julgada pelo Plenário do STF, Rel. Min. Flávio Dino, em 14/04/2026.", answer:true, just:"CORRETO. A ADPF 1.214/SP foi julgada pelo Plenário do STF, Rel. Min. Flávio Dino, em 14/04/2026 (Info 1212)."},
+{id:91, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1211", statement:"A ADI 7.783/PE, que declarou inconstitucional a bolsa-auxílio do Delegado de Polícia de Pernambuco em patamar inferior ao mínimo da LONPC, foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 09/04/2026.", answer:true, just:"CORRETO. A ADI 7.783/PE foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 09/04/2026 (Info 1211)."},
+{id:92, tema:"Controle de Constitucionalidade / Efeito Repristinatório", fonte:"STF Info 1211", statement:"A tese sobre a possibilidade de o STF declarar, de ofício, a inconstitucionalidade por arrastamento para afastar o efeito repristinatório indesejado foi reafirmada exatamente no mesmo processo (ADI 7.783/PE) que tratou da bolsa-auxílio de delegados em Pernambuco.", answer:true, just:"CORRETO. Ambas as teses (bolsa-auxílio abaixo do piso da LONPC e inconstitucionalidade por arrastamento sem pedido expresso) foram tratadas na mesma ADI 7.783/PE, Rel. Min. Dias Toffoli, julgada em 09/04/2026 (Info 1211)."},
+{id:93, tema:"Poder Legislativo / CPI", fonte:"STF Info 1210", statement:"O MS 40.799/DF, sobre a prorrogação do prazo de funcionamento de CPI, teve como relator original o Min. André Mendonça, mas o redator do acórdão foi o Min. Flávio Dino.", answer:true, just:"CORRETO. O MS 40.799/DF foi julgado pelo Plenário em 26/03/2026, Rel. Min. André Mendonça, redator do acórdão Min. Flávio Dino (Info 1210)."},
+{id:94, tema:"Segurança Pública / Polícia Penal", fonte:"STF Info 1208", statement:"A ADO 90/PI e a ADO 91/PA, sobre a alegada omissão na instituição da Polícia Penal estadual, foram julgadas conjuntamente pelo Plenário do STF, Rel. Min. Nunes Marques, em 16/03/2026.", answer:true, just:"CORRETO. As ADOs 90/PI e 91/PA foram julgadas conjuntamente pelo Plenário, Rel. Min. Nunes Marques, em 16/03/2026 (Info 1208)."},
+{id:95, tema:"Nacionalidade", fonte:"STF Info 1208", statement:"O RE 1.163.774/MG, sobre a nacionalidade originária de filhos adotivos nascidos no exterior, foi julgado sob o rito da repercussão geral, correspondendo ao Tema 1253, sob relatoria da Min. Cármen Lúcia.", answer:true, just:"CORRETO. O RE 1.163.774/MG foi julgado pelo Plenário em repercussão geral (Tema 1253), Rel. Min. Cármen Lúcia, em 12/03/2026 (Info 1208)."},
+{id:96, tema:"Direitos Fundamentais / Meio Ambiente", fonte:"STF Info 1207", statement:"A ADI 5.772/DF, sobre a constitucionalidade da vaquejada e da equiparação de peões a atletas profissionais, foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 05/03/2026.", answer:true, just:"CORRETO. A ADI 5.772/DF foi julgada pelo Plenário do STF, Rel. Min. Dias Toffoli, em 05/03/2026 (Info 1207)."},
+{id:97, tema:"Competências Legislativas / Educação", fonte:"STF Info 1206", statement:"A ADPF 1.159/SC, que declarou inconstitucional lei municipal catarinense sobre linguagem neutra nas escolas, foi julgada pelo Plenário do STF, Rel. Min. Flávio Dino, em 27/02/2026.", answer:true, just:"CORRETO. A ADPF 1.159/SC foi julgada pelo Plenário do STF, Rel. Min. Flávio Dino, em 27/02/2026 (Info 1206)."},
+{id:98, tema:"Liberdade de Expressão", fonte:"STF Info 1205", statement:"O RE 662.055/SP, sobre a campanha de ONG contra patrocinadores de rodeio, foi julgado em repercussão geral (Tema 837), com o Min. Roberto Barroso como relator original e o Min. Alexandre de Moraes como redator do acórdão.", answer:true, just:"CORRETO. O RE 662.055/SP foi julgado pelo Plenário em 11/02/2026, sob repercussão geral (Tema 837), Rel. Min. Roberto Barroso, redator do acórdão Min. Alexandre de Moraes (Info 1205)."},
+{id:99, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1166", statement:"O RE 608.588/SP (Tema 656), que admitiu o policiamento ostensivo pelas guardas municipais, foi julgado pelo Plenário do STF em 20/02/2025, sob relatoria do Min. Luiz Fux.", answer:true, just:"CORRETO. O RE 608.588/SP foi julgado pelo Plenário do STF em repercussão geral (Tema 656), Rel. Min. Luiz Fux, em 20/02/2025 (Info 1166)."},
+{id:100, tema:"Saúde / Judicialização", fonte:"STF Info 1152", statement:"O RE 566.471/RN (Tema 6), sobre medicamentos não incorporados ao SUS, teve o Min. Marco Aurélio como relator original, mas o Min. Luís Roberto Barroso foi o redator do acórdão, julgado em 26/09/2024.", answer:true, just:"CORRETO. O RE 566.471/RN foi julgado pelo Plenário em repercussão geral (Tema 6), Rel. Min. Marco Aurélio, redator do acórdão Min. Luís Roberto Barroso, em 26/09/2024 (Info 1152)."},
+{id:101, tema:"Direitos Fundamentais / Liberdade Religiosa", fonte:"STF Info 1152", statement:"Os dois julgados sobre Testemunhas de Jeová e recusa de transfusão de sangue (Temas 952 e 1069) foram julgados no mesmo dia (25/09/2024) pelo Plenário do STF, mas por relatores diferentes: Min. Luís Roberto Barroso (Tema 952) e Min. Gilmar Mendes (Tema 1069).", answer:true, just:"CORRETO. O RE 979.742/AM (Tema 952) foi relatado pelo Min. Luís Roberto Barroso e o RE 1.212.272/AL (Tema 1069) pelo Min. Gilmar Mendes, ambos julgados pelo Plenário em 25/09/2024 (Info 1152)."},
+{id:102, tema:"Segurança Pública / Defensoria Pública", fonte:"STF Info 1139", statement:"A ADI 7.571/ES, sobre porte de arma a Defensores Públicos, foi julgada pelo Plenário do STF, Rel. Min. Cristiano Zanin, em 05/06/2024.", answer:true, just:"CORRETO. A ADI 7.571/ES foi julgada pelo Plenário do STF, Rel. Min. Cristiano Zanin, em 05/06/2024 (Info 1139)."},
+{id:103, tema:"Direitos Sociais / Omissão Legislativa", fonte:"STF Info 1139", statement:"A ADO 74/DF, sobre a omissão do Congresso Nacional quanto ao adicional de penosidade, foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, no mesmo dia em que se julgou a ADI sobre porte de arma para Defensores Públicos.", answer:true, just:"CORRETO. Ambos os julgados (ADO 74/DF e ADI 7.571/ES) foram decididos pelo Plenário do STF em 05/06/2024 (Info 1139), embora sob relatores diferentes (Min. Gilmar Mendes e Min. Cristiano Zanin, respectivamente)."},
+{id:104, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1138", statement:"A Rcl 65.976/MA, sobre a bonificação regional do Enem para medicina, foi julgada pela 1ª Turma do STF, Rel. Min. Cármen Lúcia, em 21/05/2024.", answer:true, just:"CORRETO. A Rcl 65.976/MA foi julgada pela 1ª Turma do STF, Rel. Min. Cármen Lúcia, em 21/05/2024 (Info 1138)."},
+{id:105, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1138", statement:"As ADI 6.792/DF e ADI 7.055/DF, sobre responsabilidade civil de jornalistas e assédio judicial, tiveram a Min. Rosa Weber como relatora original e o Min. Luís Roberto Barroso como redator do acórdão.", answer:true, just:"CORRETO. As ADIs 6.792/DF e 7.055/DF foram julgadas pelo Plenário em 22/05/2024, Rel. Min. Rosa Weber, redator do acórdão Min. Luís Roberto Barroso (Info 1138)."},
+{id:106, tema:"Investigação Criminal", fonte:"STF Info 1133", statement:"A ADI 5.642/DF, sobre a constitucionalidade dos arts. 13-A e 13-B do CPP, foi julgada pelo Plenário do STF, Rel. Min. Edson Fachin, em 19/04/2024.", answer:true, just:"CORRETO. A ADI 5.642/DF foi julgada pelo Plenário do STF, Rel. Min. Edson Fachin, em 19/04/2024 (Info 1133)."},
+{id:107, tema:"Direitos Fundamentais / Liberdade Religiosa", fonte:"STF Info 1133", statement:"O RE 859.376/PR, sobre o uso de vestimentas religiosas em fotos de documentos oficiais, foi julgado em repercussão geral (Tema 953), sob relatoria do Min. Luís Roberto Barroso, em 17/04/2024.", answer:true, just:"CORRETO. O RE 859.376/PR foi julgado pelo Plenário em repercussão geral (Tema 953), Rel. Min. Luís Roberto Barroso, em 17/04/2024 (Info 1133)."},
+{id:108, tema:"Nacionalidade / Cooperação Internacional", fonte:"STJ Info 805", statement:"A homologação de sentença estrangeira envolvendo o jogador Robinho (HDE 7.986-EX) foi julgada pela Corte Especial do STJ, Rel. Min. Francisco Falcão, em 20/3/2024.", answer:true, just:"CORRETO. A HDE 7.986-EX foi julgada pela Corte Especial do STJ, Rel. Min. Francisco Falcão, em 20/3/2024 (Info 805)."},
+{id:109, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1128", statement:"O RE 1.211.446/SP, sobre licença-maternidade da mãe não gestante em união homoafetiva, foi julgado em repercussão geral (Tema 1.072), sob relatoria do Min. Luiz Fux, em 13/03/2024.", answer:true, just:"CORRETO. O RE 1.211.446/SP foi julgado pelo Plenário em repercussão geral (Tema 1.072), Rel. Min. Luiz Fux, em 13/03/2024 (Info 1128)."},
+{id:110, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1122", statement:"A ADI 7.424/ES, sobre porte de arma a agentes socioeducativos, foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 06/02/2024.", answer:true, just:"CORRETO. A ADI 7.424/ES foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 06/02/2024 (Info 1122)."},
+{id:111, tema:"Direitos Sociais / Omissão Legislativa", fonte:"STF Info 1121", statement:"A ADO 20/DF, sobre a omissão na regulamentação da licença-paternidade, teve o Min. Marco Aurélio como relator original, mas o redator do acórdão foi o Min. Edson Fachin, julgada em 14/12/2023.", answer:true, just:"CORRETO. A ADO 20/DF foi julgada pelo Plenário em 14/12/2023, Rel. Min. Marco Aurélio, redator do acórdão Min. Edson Fachin (Info 1121)."},
+{id:112, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1120", statement:"O RE 1.075.412/PE (Tema 995) foi julgado originalmente em 29/11/2023 pelo Plenário, e a tese foi posteriormente aperfeiçoada em embargos de declaração julgados em 20/03/2025, sob relatoria do Min. Roberto Barroso nos embargos.", answer:true, just:"CORRETO. O julgamento original do RE 1.075.412/PE ocorreu em 29/11/2023 (Rel. Min. Marco Aurélio, redator do acórdão Min. Edson Fachin), e os embargos de declaração foram julgados em 20/03/2025, Rel. Min. Roberto Barroso (Info 1120 e Info 1170)."},
+{id:113, tema:"Sistema Prisional / Estado de Coisas Inconstitucional", fonte:"STF Info 1111", statement:"A ADPF 347/DF, que reconheceu o estado de coisas inconstitucional do sistema prisional, teve o Min. Marco Aurélio como relator original e o Min. Luís Roberto Barroso como redator do acórdão, julgada em 4/10/2023.", answer:true, just:"CORRETO. A ADPF 347/DF foi julgada pelo Plenário em 4/10/2023, Rel. Min. Marco Aurélio, redator do acórdão Min. Luís Roberto Barroso (Info 1111)."},
+{id:114, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", statement:"O RE 1.017.365/SC, que fixou as teses sobre demarcação de terras indígenas (Tema 1.031), foi julgado pelo Plenário do STF, Rel. Min. Edson Fachin, em 27/9/2023.", answer:true, just:"CORRETO. O RE 1.017.365/SC foi julgado pelo Plenário em repercussão geral (Tema 1.031), Rel. Min. Edson Fachin, em 27/9/2023 (Info 1110)."},
+{id:115, tema:"Segurança Pública / Corpo de Bombeiros", fonte:"STF Info 1107", statement:"A ADI 2.776/ES, sobre a competência não exclusiva do Corpo de Bombeiros Militar para perícias de incêndio, foi julgada pelo Plenário do STF, Rel. Min. Nunes Marques, em 12/9/2023.", answer:true, just:"CORRETO. A ADI 2.776/ES foi julgada pelo Plenário do STF, Rel. Min. Nunes Marques, em 12/9/2023 (Info 1107)."},
+{id:116, tema:"Poder Executivo / Dupla Vacância", fonte:"STF Info 1104", statement:"A ADPF 969/AL, sobre as regras de eleição indireta em caso de dupla vacância estadual, foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 15/8/2023.", answer:true, just:"CORRETO. A ADPF 969/AL foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 15/8/2023 (Info 1104)."},
+{id:117, tema:"Direitos Fundamentais / Políticas Públicas", fonte:"STF Info 1101", statement:"O RE 684.612/RJ (Tema 698), sobre parâmetros para decisões judiciais em políticas públicas de saúde, teve o Min. Ricardo Lewandowski como relator original e o Min. Roberto Barroso como redator do acórdão, julgado em 01/7/2023.", answer:true, just:"CORRETO. O RE 684.612/RJ foi julgado pelo Plenário em repercussão geral (Tema 698), Rel. Min. Ricardo Lewandowski, redator do acórdão Min. Roberto Barroso, em 01/7/2023 (Info 1101)."},
+{id:118, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1086", statement:"A ADI 5076/RO, sobre o porte de arma incondicionado a agentes penitenciários, foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 13/03/2023.", answer:true, just:"CORRETO. A ADI 5076/RO foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 13/03/2023 (Info 1086)."},
+{id:119, tema:"Defensoria Pública", fonte:"STF Info 1045", statement:"O julgamento sobre a prerrogativa de requisição da Defensoria Pública reuniu diversas ADIs (6852, 6862, 6865, 6867, 6870, 6871, 6872, 6873 e 6875), todas relatadas por um único Ministro, o Min. Edson Fachin.", answer:false, just:"ERRADO. As ADI 6852/DF e ADI 6862/PR foram relatadas pelo Min. Edson Fachin, mas as demais (ADI 6865/PB, ADI 6867/ES, ADI 6870/DF, ADI 6871/CE, ADI 6872/AP, ADI 6873/AM e ADI 6875/RN) tiveram como relator o Min. Alexandre de Moraes — todas julgadas pelo Plenário em 18/2/2022 (Info 1045)."},
+{id:120, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1045", statement:"A ADI 6985/AL, sobre a vedação de porte de arma a Procuradores do Estado, foi julgada pelo Plenário do STF, Rel. Min. Alexandre de Moraes, em 25/2/2022.", answer:true, just:"CORRETO. A ADI 6985/AL foi julgada pelo Plenário do STF, Rel. Min. Alexandre de Moraes, em 25/2/2022 (Info 1045)."},
+{id:121, tema:"Competências Estaduais / Direito do Consumidor", fonte:"STF Info 1045", statement:"A ADI 4118/RJ, sobre a obrigatoriedade de atendimento telefônico gratuito por empresas de TV por assinatura, foi julgada pelo Plenário do STF, Rel. Min. Rosa Weber, no mesmo dia em que se julgou a ADI sobre porte de arma para Procuradores do Estado.", answer:true, just:"CORRETO. Ambos os julgados (ADI 4118/RJ e ADI 6985/AL) foram decididos pelo Plenário do STF em 25/2/2022 (Info 1045), sob relatoria de Ministros diferentes (Min. Rosa Weber e Min. Alexandre de Moraes, respectivamente)."},
+{id:122, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1044", statement:"A ADI 5522/SP, sobre a inconstitucionalidade da independência funcional atribuída a delegados de polícia por norma estadual, foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 18/2/2022.", answer:true, just:"CORRETO. A ADI 5522/SP foi julgada pelo Plenário do STF, Rel. Min. Gilmar Mendes, em 18/2/2022 (Info 1044)."},
+{id:123, tema:"Educação / Fundeb", fonte:"STF Info 1044", statement:"A ADI 6490/PI, sobre a vedação ao uso de verbas do Fundeb para combate à pandemia de Covid-19, foi julgada pelo Plenário do STF, Rel. Min. Cármen Lúcia, no mesmo dia em que se julgou a ADI sobre a independência funcional de delegados de polícia em São Paulo.", answer:true, just:"CORRETO. Ambos os julgados (ADI 6490/PI e ADI 5522/SP) foram decididos pelo Plenário do STF em 18/2/2022 (Info 1044), sob relatoria de Ministros diferentes (Min. Cármen Lúcia e Min. Gilmar Mendes, respectivamente)."},
+{id:124, tema:"Saúde / Tratamento no Exterior", fonte:"STJ Info 894", statement:"O STJ fixou quatro requisitos cumulativos para o custeio excepcional de tratamento no exterior: inexistência de alternativa terapêutica eficaz no país, comprovação científica robusta, imprescindibilidade clínica e incapacidade financeira.", answer:true, just:"CORRETO. No REsp 1.860.543-PR, o STJ fixou exatamente esses quatro requisitos cumulativos como condição para o custeio excepcional de tratamento no exterior."},
+{id:125, tema:"Provimento Derivado / Cargos Públicos", fonte:"STF Info 1222", statement:"No caso do datiloscopista/papiloscopista do MS, a exigência de escolaridade evoluiu do 1º grau (datiloscopista) para o 2º grau em 1989 (papiloscopista policial) e depois para bacharelado em qualquer área em 2005 (perito papiloscopista).", answer:true, just:"CORRETO. Essa foi exatamente a evolução histórica narrada no julgado: 1º grau (datiloscopista) → 2º grau em 1989 (papiloscopista) → bacharelado em 2005 (perito papiloscopista), sem exigência de novo concurso a cada mudança."},
+{id:126, tema:"Poder Judiciário / Regime Jurídico", fonte:"STF Info 1219", statement:"A competência do STF para julgar a ação de perda de cargo de magistrado está prevista no art. 102, I, 'r', da CF/88.", answer:true, just:"CORRETO. O STF fundamentou sua competência originária exatamente nesse dispositivo (art. 102, I, 'r', CF/88), com base também no princípio do paralelismo das formas."},
+{id:127, tema:"Direitos Fundamentais / Pessoas com Deficiência", fonte:"STF Info 1217", statement:"A norma estadual do Piauí declarada inconstitucional estava prevista no art. 61, caput e §1º, da Lei estadual nº 6.653/2015, e no art. 25, §6º, do Decreto estadual nº 15.259/2013.", answer:true, just:"CORRETO. Esses foram exatamente os dispositivos declarados inconstitucionais pelo STF na ADI 7.401/PI, por exigirem 'aptidão plena' de PCDs em concursos públicos e concursos militares."},
+{id:128, tema:"Competências Legislativas / Educação", fonte:"STF Info 1216", statement:"A lei capixaba sobre veto parental a atividades pedagógicas de gênero era a Lei nº 12.479/2025, do Estado do Espírito Santo.", answer:true, just:"CORRETO. Trata-se exatamente da Lei nº 12.479/2025 do Espírito Santo, declarada inconstitucional pelo STF na ADI 7.847/ES."},
+{id:129, tema:"Competências Legislativas / Portaria Virtual", fonte:"STF Info 1216", statement:"A Lei nº 7.686/2025 do Distrito Federal proibia a portaria virtual em condomínios com mais de 30 unidades habitacionais.", answer:false, just:"ERRADO. O limite fixado pela lei distrital era de 45 unidades habitacionais, e não 30 — condomínios com até 45 unidades poderiam adotar portaria virtual apenas sob condições adicionais."},
+{id:130, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1215", statement:"O STF fixou prazo de 24 meses para que o Estado de Minas Gerais supra a omissão quanto à instituição do subsídio em parcela única para os delegados de polícia.", answer:true, just:"CORRETO. Na ADO 13/MG, o STF fixou exatamente o prazo de 24 meses para a superação da mora legislativa estadual."},
+{id:131, tema:"Direitos Fundamentais / Ações Afirmativas", fonte:"STF Info 1213", statement:"A lei catarinense que vedava cotas étnico-raciais é a Lei 19.722/2026, que ressalvava expressamente as cotas para Pessoas com Deficiência (PCD) e as baseadas em critério exclusivamente econômico.", answer:true, just:"CORRETO. A Lei 19.722/2026 de Santa Catarina vedava as ações afirmativas em geral, exceto para PCD, critério econômico e estudantes de escolas públicas — na prática, vedando apenas as cotas étnico-raciais."},
+{id:132, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1212", statement:"A denominação adicional 'Polícia Municipal de São Paulo' foi incluída na Lei Orgânica do Município por meio da Emenda nº 44/2025.", answer:true, just:"CORRETO. Foi a Emenda nº 44/2025 à Lei Orgânica do Município de São Paulo que acrescentou ao art. 88 a expressão 'também denominada Polícia Municipal de São Paulo', declarada inconstitucional na ADPF 1.214/SP."},
+{id:133, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1211", statement:"A bolsa-auxílio fixada pela Lei estadual nº 18.430/2023 de Pernambuco (R$ 2.900,00) correspondia a cerca de 23,77% da remuneração inicial do cargo de Delegado de Polícia Civil na época, muito abaixo do piso de 50% exigido pela LONPC.", answer:true, just:"CORRETO. Esses são exatamente os números do julgado: R$ 2.900,00 equivalia a apenas 23,77% da remuneração inicial, quando a LONPC (Lei 14.735/2023, art. 22) exige piso mínimo de 50%."},
+{id:134, tema:"Poder Legislativo / CPI", fonte:"STF Info 1210", statement:"A exigência constitucional de 'prazo certo' para a duração de CPI está prevista no art. 58, §3º, da CF/88.", answer:true, just:"CORRETO. O art. 58, §3º, da CF/88 exige prazo certo para a CPI, o que fundamentou a tese do STF de que a prorrogação não é automática nem direito subjetivo da minoria parlamentar."},
+{id:135, tema:"Segurança Pública / Polícia Penal", fonte:"STF Info 1208", statement:"A alegada mora do Governador do Piauí na regulamentação da Polícia Penal estadual referia-se à implementação da Emenda Constitucional nº 104/2019.", answer:true, just:"CORRETO. A EC 104/2019 é o marco normativo que criou a Polícia Penal, e foi em relação a ela que se discutiu a suposta omissão do Estado do Piauí, afastada pelo STF na ADO 90/PI."},
+{id:136, tema:"Nacionalidade", fonte:"STF Info 1208", statement:"A tese do STF sobre nacionalidade originária de filhos adotivos nascidos no exterior combina o art. 12, I, 'c', com o art. 227, §6º, ambos da CF/88.", answer:true, just:"CORRETO. O STF combinou exatamente esses dois dispositivos para reconhecer que filhos adotivos nascidos no exterior, registrados em consulado, têm direito à nacionalidade brasileira originária."},
+{id:137, tema:"Direitos Fundamentais / Meio Ambiente", fonte:"STF Info 1207", statement:"A constitucionalidade da vaquejada e da equiparação de peões a atletas profissionais foi condicionada à observância dos critérios de bem-estar animal do art. 3º-B, §2º, da Lei 13.364/2016, com redação dada pela Lei 13.873/2019.", answer:true, just:"CORRETO. O STF condicionou expressamente a constitucionalidade a esses critérios mínimos de bem-estar animal, sem prejuízo de outros cuidados necessários conforme o caso concreto."},
+{id:138, tema:"Competências Legislativas / Educação", fonte:"STF Info 1206", statement:"A vedação ao uso de linguagem neutra nas escolas por lei municipal viola a competência privativa da União prevista no art. 22, XXIV, da CF/88 (diretrizes e bases da educação nacional).", answer:true, just:"CORRETO. O STF fundamentou a inconstitucionalidade formal exatamente no art. 22, XXIV, CF/88, que atribui à União a competência privativa sobre diretrizes e bases da educação nacional."},
+{id:139, tema:"Liberdade de Expressão", fonte:"STF Info 1205", statement:"O caso da campanha contra patrocinadores de rodeio, julgado no RE 662.055/SP, envolveu a Festa do Peão de Boiadeiro do município de Barretos/SP e teve origem em publicação feita no ano de 2007.", answer:true, just:"CORRETO. A campanha 'Quem patrocina e apoia rodeios também tortura o bicho' foi publicada pela ONG PEA em 2007, visando a Festa do Peão de Boiadeiro de Barretos/SP."},
+{id:140, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1166", statement:"O controle externo da atividade das Guardas Municipais que exercem policiamento ostensivo compete ao Ministério Público, nos termos do art. 129, VII, da CF/88.", answer:true, just:"CORRETO. O STF fixou, no Tema 656, que as Guardas Municipais, no exercício de ações de segurança urbana, submetem-se ao controle externo do Ministério Público (art. 129, VII, CF/88)."},
+{id:141, tema:"Saúde / Judicialização", fonte:"STF Info 1152", statement:"O órgão técnico que deve ser previamente consultado pelo Judiciário, sempre que disponível, antes de conceder judicialmente medicamento não incorporado ao SUS é o NATJUS (Núcleo de Apoio Técnico do Poder Judiciário).", answer:true, just:"CORRETO. O STF exigiu, no Tema 6, a prévia consulta ao NATJUS (ou a entes/pessoas com expertise técnica) antes da concessão judicial de medicamento não incorporado, sob pena de nulidade da decisão."},
+{id:142, tema:"Direitos Fundamentais / Liberdade Religiosa", fonte:"STF Info 1152", statement:"O Tema 952 (recusa de transfusão por Testemunhas de Jeová) e o Tema 1.069 (interdição da transfusão com anuência da equipe médica) foram julgados em datas diferentes, com meses de intervalo entre um e outro.", answer:false, just:"ERRADO. Ambos os temas (952 e 1.069) foram julgados no mesmo dia, 25/09/2024, pelo Plenário do STF (Info 1152), tratando de aspectos complementares da mesma discussão sobre liberdade religiosa e recusa a tratamento médico."},
+{id:143, tema:"Segurança Pública / Defensoria Pública", fonte:"STF Info 1139", statement:"O porte de arma a Defensores Públicos foi julgado inconstitucional por violar tanto a competência material exclusiva da União (art. 21, VI) quanto a competência legislativa privativa da União (art. 22, XXI), ambos da CF/88.", answer:true, just:"CORRETO. O STF fundamentou a inconstitucionalidade na ADI 7.571/ES exatamente nesses dois dispositivos, relativos à autorização/fiscalização de material bélico e à competência legislativa sobre o tema."},
+{id:144, tema:"Direitos Sociais / Omissão Legislativa", fonte:"STF Info 1139", statement:"O adicional de penosidade, previsto no art. 7º, XXIII, da CF/88, já havia sido regulamentado para os trabalhadores urbanos e rurais antes do julgamento da ADO 74/DF, faltando apenas sua extensão aos servidores públicos federais.", answer:false, just:"ERRADO. É o inverso: o adicional de penosidade já existia para os servidores públicos federais (Lei 8.112/90), mas nunca foi regulamentado para os trabalhadores urbanos e rurais em geral — essa foi a omissão reconhecida pelo STF na ADO 74/DF, com prazo de 18 meses fixado."},
+{id:145, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1138", statement:"A Rcl 65.976/MA admitiu a relativização da exigência de esgotamento das instâncias ordinárias, com base no art. 988, §5º, II, do CPC/2015, diante do perigo de perecimento do direito pelo decurso do tempo.", answer:true, just:"CORRETO. O STF admitiu essa relativização excepcional na Rcl 65.976/MA, para corrigir a má aplicação de tese de repercussão geral (bonificação regional do Enem) e garantir direitos diante do risco de perecimento pelo decurso do tempo."},
+{id:146, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1138", statement:"O assédio judicial contra jornalistas, reconhecido pelo STF nas ADI 6.792/DF e 7.055/DF, caracteriza-se pelo ajuizamento de múltiplas ações sobre os mesmos fatos em comarcas diversas, com o intuito de dificultar a defesa do profissional ou órgão de imprensa.", answer:true, just:"CORRETO. Essa é exatamente a definição de assédio judicial fixada pelo STF nesse julgado, que autoriza a reunião de todas as ações no foro do domicílio do jornalista réu."},
+{id:147, tema:"Investigação Criminal", fonte:"STF Info 1133", statement:"Os arts. 13-A e 13-B do CPP, julgados constitucionais na ADI 5.642/DF, foram inseridos pela Lei nº 13.344/2016, que trata do tráfico de pessoas.", answer:true, just:"CORRETO. A Lei nº 13.344/2016 inseriu os arts. 13-A e 13-B no CPP, voltados à investigação de crimes como cárcere privado, tráfico de pessoas e sequestro relâmpago, declarados constitucionais pelo STF."},
+{id:148, tema:"Nacionalidade / Cooperação Internacional", fonte:"STJ Info 805", statement:"A transferência da execução de pena imposta no exterior, autorizada pelo art. 100 da Lei nº 13.445/2017 (Lei de Migração), aplica-se tanto a brasileiros natos ou naturalizados quanto a estrangeiros com residência habitual ou vínculo pessoal no Brasil.", answer:true, just:"CORRETO. O STJ destacou exatamente essa abrangência do art. 100 da Lei de Migração no caso da homologação da sentença estrangeira contra Robinho."},
+{id:149, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1122", statement:"A ADI 7.424/ES, sobre porte de arma a agentes socioeducativos, fundamentou a inconstitucionalidade na competência privativa da União para legislar sobre direito penal e material bélico, prevista no art. 22, I e XXI, da CF/88.", answer:true, just:"CORRETO. Esse foi exatamente o fundamento usado pelo STF para declarar inconstitucional a lei capixaba na ADI 7.424/ES."},
+{id:150, tema:"Direitos Sociais / Omissão Legislativa", fonte:"STF Info 1121", statement:"O STF fixou, na ADO 20/DF, que a licença-paternidade está prevista no art. 7º, XIX, da CF/88, e que, não editada a lei regulamentadora no prazo de 18 meses, caberia ao próprio Tribunal fixar o período da licença.", answer:true, just:"CORRETO. Essa foi exatamente a tese fixada pelo STF na ADO 20/DF, posteriormente superada pela edição da Lei nº 15.371/2026, que regulamentou a licença-paternidade com ampliação gradual a partir de 1º de janeiro de 2027."},
+{id:151, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", statement:"O regime indenizatório de benfeitorias úteis e necessárias para os particulares afetados por terras de ocupação tradicional indígena está previsto no art. 231, §6º, da CF/88.", answer:true, just:"CORRETO. O STF fundamentou a indenização por benfeitorias exatamente no art. 231, §6º, da CF/88, no Tema 1.031 (RE 1.017.365/SC)."},
+{id:152, tema:"Poder Executivo / Dupla Vacância", fonte:"STF Info 1104", statement:"Na ADPF 969/AL, o STF exigiu, entre outros requisitos, que o registro e a votação de candidatos a Governador e Vice-Governador, em eleição indireta por dupla vacância, ocorressem por meio de chapa única, nos moldes do art. 14 da CF/88.", answer:true, just:"CORRETO. O STF exigiu exatamente esse requisito (chapa única) como um dos princípios constitucionais a serem observados pelos Estados na disciplina normativa da eleição indireta por dupla vacância."},
+{id:153, tema:"Direitos Fundamentais / Políticas Públicas", fonte:"STF Info 1101", statement:"No RE 684.612/RJ (Tema 698), o STF citou como exemplo de solução para déficit de profissionais de saúde a contratação de organizações sociais (OS) e organizações da sociedade civil de interesse público (OSCIP).", answer:true, just:"CORRETO. O STF mencionou expressamente essas alternativas (concurso público, remanejamento de recursos humanos, contratação de OS e OSCIP) como formas de suprir o déficit de profissionais de saúde no Tema 698."},
+{id:154, tema:"Defensoria Pública", fonte:"STF Info 1045", statement:"A prerrogativa de requisição da Defensoria Pública, julgada constitucional pelo STF, abrange certidões, exames, perícias, vistorias, diligências, processos, documentos e demais providências necessárias à sua atuação, dirigida a quaisquer autoridades públicas e seus agentes.", answer:true, just:"CORRETO. Essa é exatamente a extensão da prerrogativa de requisição da Defensoria Pública, reconhecida como constitucional pelo STF nas diversas ADIs julgadas em 18/2/2022 (Info 1045)."},
+{id:155, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1044", statement:"O dispositivo constitucional que determina a subordinação da Polícia Civil ao Governador do Estado é o art. 144, §6º, da CF/88.", answer:true, just:"CORRETO. O STF fundamentou a inconstitucionalidade da independência funcional de delegados exatamente nesse dispositivo (art. 144, §6º, CF/88), na ADI 5522/SP."},
+{id:156, tema:"Segurança Pública / Processos Estruturais", fonte:"STJ Info 894", statement:"Um problema estrutural, na definição usada pelo STJ, caracteriza-se como situação pontual e isolada, que pode ser resolvida por uma única decisão judicial de cumprimento imediato, sem necessidade de monitoramento contínuo.", answer:false, just:"ERRADO. O STJ definiu problema estrutural como situação complexa e persistente decorrente de falhas sistêmicas em instituições ou políticas públicas, que demanda intervenções graduais e monitoradas pelo Judiciário — o oposto de uma solução pontual e isolada."},
+{id:157, tema:"Controle de Constitucionalidade / Legitimidade", fonte:"STF Info 1220", statement:"Segundo o STF, a legitimidade universal da OAB para propor ADI perante o TJ, quando prevista na Constituição estadual, decorre da natureza institucional da Ordem dos Advogados do Brasil e da amplitude de sua legitimação no controle concentrado.", answer:true, just:"CORRETO. O STF fundamentou exatamente nesses termos a inconstitucionalidade da restrição imposta pelo TJCE à legitimidade da OAB (ADI 7.821/CE)."},
+{id:158, tema:"Direitos Fundamentais / Ações Afirmativas", fonte:"STF Info 1213", statement:"O STF citou, como precedentes sobre a constitucionalidade das ações afirmativas étnico-raciais, a ADPF 186/DF, o RE 597.285/RS e a ADC 41/DF.", answer:true, just:"CORRETO. Esses três precedentes foram expressamente citados pelo STF na ADI 7.925/SC e conexas, para reafirmar a constitucionalidade das cotas étnico-raciais."},
+{id:159, tema:"Direitos Fundamentais / Ações Afirmativas", fonte:"STF Info 1213", statement:"A Convenção Interamericana contra o Racismo foi internalizada no ordenamento brasileiro pelo Decreto nº 10.932/2022, com status de emenda constitucional, nos termos do art. 5º, §3º, da CF/88.", answer:true, just:"CORRETO. O STF utilizou exatamente esse decreto e esse fundamento constitucional (art. 5º, §3º, CF/88) como parâmetro de controle de constitucionalidade na ADI 7.925/SC e conexas."},
+{id:160, tema:"Poder Judiciário / Regime Jurídico", fonte:"STF Info 1219", statement:"Antes da EC 103/2019, a EC 45/2004 havia inserido no texto constitucional referência expressa à aposentadoria compulsória como sanção disciplinar a magistrados.", answer:true, just:"CORRETO. O STF destacou que a referência à aposentadoria compulsória como sanção foi inserida pela EC 45/2004, e deixou de existir no texto constitucional a partir da EC 103/2019."},
+{id:161, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1166", statement:"O Tema 656 de repercussão geral, sobre o policiamento ostensivo pelas guardas municipais, exclui expressamente qualquer atividade de polícia judiciária do rol de atribuições dessas guardas.", answer:true, just:"CORRETO. O STF fixou expressamente, no Tema 656, a exclusão de qualquer atividade de polícia judiciária das atribuições das Guardas Municipais, mesmo no exercício do policiamento ostensivo e comunitário."},
+{id:162, tema:"Saúde / Judicialização", fonte:"STF Info 1152", statement:"Uma das exigências do Tema 6 é que o autor da ação demonstre a ilegalidade do ato de não incorporação do medicamento pela Conitec, ou a ausência de pedido de incorporação, ou a mora na sua apreciação.", answer:true, just:"CORRETO. Essa é uma das seis exigências cumulativas do item 2 da tese fixada no Tema 6 (RE 566.471/RN), com ônus probatório do autor da ação."},
+{id:163, tema:"Direitos Fundamentais / Meio Ambiente", fonte:"STF Info 1207", statement:"A base constitucional para a constitucionalidade da vaquejada e da equiparação de peões a atletas profissionais é o art. 225, §7º, da CF/88.", answer:true, just:"CORRETO. O STF fundamentou a constitucionalidade da vaquejada exatamente no art. 225, §7º, CF/88, desde que respeitados os critérios de bem-estar animal."},
+{id:164, tema:"Liberdade de Expressão", fonte:"STF Info 1205", statement:"As teses fixadas no RE 662.055/SP (Tema 837) mencionam expressamente a caracterização de má-fé por dolo (conhecimento prévio da falsidade) ou por culpa grave (negligência evidente na apuração da veracidade).", answer:true, just:"CORRETO. Essa é exatamente a formulação da segunda tese fixada no Tema 837 pelo STF, exigindo dolo ou culpa grave para a responsabilização civil da entidade que promove a campanha."},
+{id:165, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1211", statement:"A LONPC (Lei Orgânica Nacional das Polícias Civis) corresponde à Lei Federal nº 14.735/2023.", answer:true, just:"CORRETO. A LONPC é exatamente a Lei Federal nº 14.735/2023, cujo art. 22 estabelece o piso mínimo de 50% para a bolsa-auxílio de formação de Delegados de Polícia, quando concedida pelos Estados."},
+{id:166, tema:"Controle de Constitucionalidade / Efeito Repristinatório", fonte:"STF Info 1211", statement:"O efeito repristinatório tácito, mencionado no julgado sobre a ADI 7.783/PE, ocorre porque a lei declarada inconstitucional é considerada nula desde o nascimento, fazendo a lei anteriormente revogada voltar a produzir efeitos.", answer:true, just:"CORRETO. Essa é exatamente a explicação dada pelo STF para o efeito repristinatório tácito: como a lei inconstitucional nunca produziu efeitos válidos, a lei revogada por ela volta a viger."},
+{id:167, tema:"Segurança Pública / Polícia Penal", fonte:"STF Info 1208", statement:"Segundo o STF, a implantação de um órgão novo na estrutura administrativa estadual, como a Polícia Penal, demanda estudos de ordem financeira e administrativa cuja complexidade excede o ordinário, o que justifica um ciclo mais alongado de conformação legislativa.", answer:true, just:"CORRETO. O STF reconheceu exatamente essa complexidade institucional e fiscal como fator legítimo para afastar a mora inconstitucional do Estado do Piauí na ADO 90/PI."},
+{id:168, tema:"Direitos Sociais / Licença-Maternidade", fonte:"STF Info 1128", statement:"O Tema 1.072 do STF, sobre licença-maternidade em união homoafetiva, estabelece que a mãe não gestante terá direito ao prazo integral da licença-maternidade em qualquer hipótese, mesmo que a companheira gestante já a tenha utilizado por completo.", answer:false, just:"ERRADO. A tese do STF prevê que, caso a companheira gestante já tenha utilizado o benefício, a mãe não gestante fará jus a prazo análogo ao da licença-paternidade, e não ao prazo integral da licença-maternidade."},
+{id:169, tema:"Terras Indígenas / Marco Temporal", fonte:"STF Info 1110", statement:"O prazo para pedido de revisão do procedimento demarcatório de terra indígena, por grave e insanável erro na condução do procedimento, é de cinco anos contados da demarcação anterior.", answer:true, just:"CORRETO. O STF fixou esse prazo de cinco anos no Tema 1.031, ressalvadas as ações judiciais em curso e os pedidos de revisão já instaurados até a data de conclusão do julgamento."},
+{id:170, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1212", statement:"O fundamento constitucional utilizado pelo STF para vedar o uso da expressão 'Polícia Municipal' pelas Guardas Municipais é o art. 144, §8º, da CF/88, regulamentado pelas Leis 13.022/2014 e 13.675/2018.", answer:true, just:"CORRETO. O STF fundamentou a ADPF 1.214/SP exatamente nesse dispositivo e nessas leis regulamentadoras (Estatuto Geral das Guardas Municipais e Lei do SUSP)."},
+{id:171, tema:"Poder Legislativo / CPI", fonte:"STF Info 1210", statement:"Segundo o STF, eventuais controvérsias sobre a prorrogação de CPI inserem-se, em regra, no âmbito interna corporis da Casa Legislativa, cabendo intervenção judicial apenas em caso de ofensa direta ao texto constitucional.", answer:true, just:"CORRETO. O STF fixou exatamente essa limitação no MS 40.799/DF: a prorrogação da CPI é matéria interna corporis, sujeita a controle judicial apenas em casos excepcionais de ofensa direta à Constituição."},
+{id:172, tema:"Nacionalidade", fonte:"STF Info 1208", statement:"No caso de Regina (adoção de duas crianças norte-americanas), as instâncias inferiores haviam negado o reconhecimento da nacionalidade brasileira das filhas sob o argumento de que a alínea 'c' do art. 12, I, exigiria vínculo biológico (ius sanguinis).", answer:true, just:"CORRETO. Essa foi exatamente a fundamentação das decisões de primeira e segunda instância, posteriormente reformada pelo STF no RE 1.163.774/MG."},
+{id:173, tema:"Advocacia Pública", fonte:"STF Info 1215", statement:"O Tema 936 de repercussão geral do STF trata da constitucionalidade da exigência de inscrição na OAB para advogados públicos, prevista na Lei nº 8.906/94 (Estatuto da Advocacia).", answer:true, just:"CORRETO. O Tema 936 (RE 609.517/RO) tratou exatamente dessa questão, concluindo pela constitucionalidade da exigência prevista no Estatuto da Advocacia e da OAB."},
+{id:174, tema:"Direitos Fundamentais / Educação", fonte:"STF Info 1213", statement:"A Lei 19.722/2026 de Santa Catarina foi aprovada em pouco menos de dois meses, sem audiência pública nem oitiva das instituições de ensino superior afetadas, segundo destacou o STF na decisão que a declarou inconstitucional.", answer:true, just:"CORRETO. O STF destacou expressamente essa celeridade do processo legislativo catarinense, sem audiência pública ou aprofundamento técnico, como fator relevante para a inconstitucionalidade."},
+{id:175, tema:"Liberdade de Expressão / Jornalismo", fonte:"STF Info 1120", statement:"Nos embargos de declaração do RE 1.075.412/PE (Tema 995), o STF esclareceu que, em entrevistas ao vivo, a exclusão da responsabilidade do veículo por ato exclusivo do entrevistado depende de o veículo assegurar o direito de resposta em iguais condições, espaço e destaque.", answer:true, just:"CORRETO. Essa foi exatamente a nova redação da tese fixada nos embargos de declaração (item 2), julgados em 20/03/2025 (Info 1170)."},
+{id:176, tema:"Sistema Prisional / Estado de Coisas Inconstitucional", fonte:"STF Info 1111", statement:"Na ADPF 347/DF, o STF determinou que a criação de varas de execução penal deve ser proporcional ao número de varas cíveis, e não ao número de varas criminais e ao quantitativo de presos.", answer:false, just:"ERRADO. O STF determinou que o CNJ regule a criação de varas de execução penal em proporção ao número de varas criminais e ao quantitativo de presos — e não ao número de varas cíveis."},
+{id:177, tema:"Segurança Pública / Corpo de Bombeiros", fonte:"STF Info 1107", statement:"Na ADI 2.776/ES, o STF ressalvou que a competência não exclusiva do Corpo de Bombeiros Militar para perícias de incêndio e explosões visa não prejudicar a atuação das polícias civis na apuração criminal desses fatos.", answer:true, just:"CORRETO. Essa foi exatamente a ressalva feita pelo STF ao validar a competência do CBM: ela não pode ser exclusiva, sob pena de prejudicar a apuração criminal pelas polícias civis."},
+{id:178, tema:"Segurança Pública / Porte de Arma", fonte:"STF Info 1086", statement:"A inconstitucionalidade da concessão incondicionada de porte de arma a agentes penitenciários por lei estadual foi declarada na ADI 5076/RO, com fundamento nos arts. 22, I e XXI, da CF/88.", answer:true, just:"CORRETO. Esse foi exatamente o fundamento utilizado pelo STF (competência privativa da União para legislar sobre direito penal e material bélico) na ADI 5076/RO."},
+{id:179, tema:"Segurança Pública / Delegados de Polícia", fonte:"STF Info 1044", statement:"Segundo o STF, na ADI 5522/SP, é possível ao constituinte estadual atribuir autonomia funcional a órgãos não previstos especificamente na Constituição Federal, desde que haja previsão expressa na Constituição estadual originária.", answer:false, just:"ERRADO. O STF fixou que atribuir autonomia funcional, administrativa ou financeira a órgãos não previstos especificamente na CF/88 padece de vício de inconstitucionalidade material, independentemente de estar prevista na Constituição estadual originária — a única autonomia válida é a que decorre da própria CF/88."},
+{id:180, tema:"Educação / Fundeb", fonte:"STF Info 1044", statement:"O STF, na ADI 6490/PI, vedou o uso de verbas do Fundeb para o combate à pandemia de Covid-19, mesmo reconhecendo a gravidade da pandemia e seus impactos na economia e nas finanças públicas, pois a verba é constitucionalmente vinculada à manutenção e ao desenvolvimento do ensino básico.", answer:true, just:"CORRETO. Essa foi exatamente a fundamentação do STF na ADI 6490/PI para vedar o desvio de recursos do Fundeb, ainda que em caráter excepcional durante a pandemia."},
+{id:181, tema:"Direitos Fundamentais / Pessoas com Deficiência", fonte:"STF Info 1217", statement:"O art. 34, §3º, da Lei nº 13.146/2015 (Estatuto da Pessoa com Deficiência) veda expressamente a exigência de aptidão plena em processos seletivos.", answer:true, just:"CORRETO. O STF citou exatamente esse dispositivo do Estatuto da Pessoa com Deficiência como fundamento para declarar inconstitucionais as normas do Piauí que exigiam aptidão plena."},
+{id:182, tema:"Direitos Fundamentais / Liberdade Religiosa", fonte:"STF Info 1152", statement:"A recusa a tratamento de saúde por motivos religiosos, segundo o STF, é condicionada à decisão inequívoca, livre, informada e esclarecida do paciente, podendo ser veiculada inclusive por meio de diretivas antecipadas de vontade.", answer:true, just:"CORRETO. Essa é exatamente a condição fixada pelo STF no Tema 952 (RE 979.742/AM) para validar a recusa de tratamento por motivos religiosos."},
+{id:183, tema:"Segurança Pública / Guardas Municipais", fonte:"STF Info 1166", statement:"O art. 144, §8º, da CF/88 determina que as leis municipais sobre Guardas Municipais devem observar as normas gerais fixadas pelo Congresso Nacional.", answer:true, just:"CORRETO. O STF citou exatamente esse dispositivo no Tema 656, ao validar o policiamento ostensivo pelas Guardas Municipais, condicionado à observância das normas gerais federais."},
+];
+
+const TOTAL = QUESTIONS.length;
+
+/* =========================================================
+   ESTADO / STORAGE
+   ========================================================= */
+let state = {
+  answers: {},      // {id: {status:'correct'|'wrong', guess:true|false|null}}
+  easyIds: [],       // ids marcados como fáceis (excluídos permanentemente)
+  currentIndex: 0,
+  category: "TODAS",
+  search: ""
+};
+let filteredQuestions = [];
+let answeredCurrent = false;
+let currentSelected = null; // 'V' ou 'F'
+let pendingSelection = null; // seleção feita mas ainda não confirmada
+
+const LS_PREFIX = 'quizdc_parte1_';
+
+// Wrapper com fallback duplo: tenta window.storage (preview da Claude) e
+// SEMPRE espelha em localStorage (funciona também se o arquivo for aberto
+// direto no navegador, fora do preview). Garante que o progresso sobrevive
+// a fechar/reabrir o navegador em qualquer um dos dois cenários.
+async function storageGet(key){
+  try{
+    if(window.storage && typeof window.storage.get === 'function'){
+      const r = await window.storage.get(key, false);
+      if(r && typeof r.value !== 'undefined' && r.value !== null) return r.value;
+    }
+  }catch(e){}
+  try{
+    const v = localStorage.getItem(LS_PREFIX + key);
+    if(v !== null) return v;
+  }catch(e){}
+  return null;
+}
+async function storageSet(key, value){
+  try{
+    if(window.storage && typeof window.storage.set === 'function'){
+      await window.storage.set(key, value, false);
+    }
+  }catch(e){}
+  try{
+    localStorage.setItem(LS_PREFIX + key, value);
+  }catch(e){}
+}
+
+async function loadState(){
+  try{
+    const v = await storageGet('quiz-answers');
+    if(v) state.answers = JSON.parse(v);
+  }catch(e){}
+  try{
+    const v = await storageGet('quiz-easy');
+    if(v) state.easyIds = JSON.parse(v);
+  }catch(e){}
+  try{
+    const v = await storageGet('quiz-meta');
+    if(v){
+      const m = JSON.parse(v);
+      state.currentIndex = m.currentIndex || 0;
+      state.category = m.category || "TODAS";
+      state.search = m.search || "";
+    }
+  }catch(e){}
+}
+
+async function saveAnswers(){
+  try{ await storageSet('quiz-answers', JSON.stringify(state.answers)); }catch(e){}
+}
+async function saveEasy(){
+  try{ await storageSet('quiz-easy', JSON.stringify(state.easyIds)); }catch(e){}
+}
+async function saveMeta(){
+  try{ await storageSet('quiz-meta', JSON.stringify({currentIndex: state.currentIndex, category: state.category, search: state.search})); }catch(e){}
+}
+
+/* =========================================================
+   INICIALIZAÇÃO
+   ========================================================= */
+function getCategories(){
+  const set = new Set(QUESTIONS.map(q=>q.tema));
+  return ["TODAS", ...Array.from(set).sort()];
+}
+
+function buildFiltered(){
+  const cat = state.category;
+  const search = state.search.trim().toLowerCase();
+  filteredQuestions = QUESTIONS.filter(q=>{
+    if(state.easyIds.includes(q.id)) return false;
+    if(cat !== "TODAS" && q.tema !== cat) return false;
+    if(search && !(q.statement.toLowerCase().includes(search) || q.tema.toLowerCase().includes(search) || q.fonte.toLowerCase().includes(search))) return false;
+    return true;
+  });
+  if(state.currentIndex >= filteredQuestions.length) state.currentIndex = 0;
+  if(state.currentIndex < 0) state.currentIndex = 0;
+}
+
+function renderCategorySelect(){
+  const sel = document.getElementById('categorySelect');
+  sel.innerHTML = "";
+  getCategories().forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c === "TODAS" ? "📚 Todos os temas" : c;
+    if(c === state.category) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderStats(){
+  const answered = Object.keys(state.answers).length;
+  const correct = Object.values(state.answers).filter(a=>a.status==='correct').length;
+  const wrong = Object.values(state.answers).filter(a=>a.status==='wrong').length;
+  const pct = answered ? Math.round((correct/answered)*100) : 0;
+  const easy = state.easyIds.length;
+  document.getElementById('statsbar').innerHTML = `
+    <div class="stat"><div class="num" style="color:var(--blue)">${TOTAL}</div><div class="lbl">Total questões</div></div>
+    <div class="stat"><div class="num" style="color:var(--green)">${correct}</div><div class="lbl">Acertos</div></div>
+    <div class="stat"><div class="num" style="color:var(--red)">${wrong}</div><div class="lbl">Erros</div></div>
+    <div class="stat"><div class="num" style="color:var(--yellow)">${pct}%</div><div class="lbl">Aproveitamento</div></div>
+    <div class="stat"><div class="num" style="color:var(--purple)">${easy}</div><div class="lbl">Marcadas fáceis</div></div>
+  `;
+}
+
+function renderQuestion(){
+  buildFiltered();
+  renderStats();
+  const card = document.getElementById('quizCard');
+  const counter = document.getElementById('qcounter');
+
+  if(filteredQuestions.length === 0){
+    counter.textContent = "";
+    card.innerHTML = `<div class="empty-msg">Nenhuma questão encontrada com esse filtro (ou todas já foram marcadas como fáceis 🎉).</div>`;
+    return;
+  }
+
+  const q = filteredQuestions[state.currentIndex];
+  counter.textContent = `Questão ${state.currentIndex+1} de ${filteredQuestions.length} (filtro atual)`;
+
+  const prevAnswer = state.answers[q.id];
+  answeredCurrent = !!prevAnswer;
+  currentSelected = prevAnswer ? prevAnswer.selected : null;
+  pendingSelection = null; // zera a seleção não confirmada a cada renderização
+
+  let html = `
+    <div class="tags">
+      <span class="tag">${q.tema}</span>
+      <span class="tag source">${q.fonte}</span>
+    </div>
+    ${q.caso ? `<div class="caso-box"><b>📋 Caso concreto:</b> ${q.caso}</div>` : ''}
+    <div class="statement">${q.statement}</div>
+    <div class="vf-buttons">
+      <button id="btnV" class="btn-green" ${answeredCurrent?'disabled':''} style="${answeredCurrent && currentSelected==='V' ? 'outline:3px solid #fff;' : ''}">✅ VERDADEIRO</button>
+      <button id="btnF" class="btn-red" ${answeredCurrent?'disabled':''} style="${answeredCurrent && currentSelected==='F' ? 'outline:3px solid #fff;' : ''}">❌ FALSO</button>
+    </div>
+    <div id="confirmRow" style="${answeredCurrent?'display:none;':''} margin-bottom:14px;">
+      <button id="confirmAnswerBtn" class="btn-blue" style="width:100%;" disabled>✔️ Confirmar resposta</button>
+    </div>
+    <div id="resultArea"></div>
+    <div class="nav-row">
+      <div class="nav-left">
+        <button class="btn-gray" id="prevBtn">⬅ Anterior</button>
+        <button class="btn-gray" id="nextBtn">Próxima ➡</button>
+      </div>
+      <div class="nav-right">
+        <button class="btn-purple" id="easyBtn">⭐ Marcar como fácil</button>
+      </div>
+    </div>
+    <div class="hint">Escolha VERDADEIRO ou FALSO e clique em "Confirmar resposta". Use as setas ⬅️ ➡️ do teclado para navegar entre as questões.</div>
+  `;
+  card.innerHTML = html;
+
+  const btnV = document.getElementById('btnV');
+  const btnF = document.getElementById('btnF');
+  const confirmBtn = document.getElementById('confirmAnswerBtn');
+
+  function selectChoice(choice){
+    if(answeredCurrent) return;
+    pendingSelection = choice;
+    btnV.style.outline = choice==='V' ? '3px solid #fff' : 'none';
+    btnF.style.outline = choice==='F' ? '3px solid #fff' : 'none';
+    confirmBtn.disabled = false;
+  }
+
+  btnV.onclick = ()=>selectChoice('V');
+  btnF.onclick = ()=>selectChoice('F');
+  confirmBtn.onclick = ()=>{
+    if(!pendingSelection) return;
+    answerQuestion(q, pendingSelection);
+  };
+  document.getElementById('prevBtn').onclick = ()=>{ state.currentIndex--; if(state.currentIndex<0) state.currentIndex = filteredQuestions.length-1; saveMeta(); renderQuestion(); };
+  document.getElementById('nextBtn').onclick = ()=>{ state.currentIndex++; if(state.currentIndex>=filteredQuestions.length) state.currentIndex = 0; saveMeta(); renderQuestion(); };
+  document.getElementById('easyBtn').onclick = ()=>markEasy(q.id);
+
+  if(answeredCurrent){
+    renderResultArea(q, prevAnswer);
+  }
+}
+
+function answerQuestion(q, selected){
+  const isCorrect = (selected === 'V' && q.answer === true) || (selected === 'F' && q.answer === false);
+  state.answers[q.id] = {
+    status: isCorrect ? 'correct' : 'wrong',
+    selected: selected,
+    guess: null // será perguntado se acertou
+  };
+  pendingSelection = null;
+  saveAnswers();
+  renderQuestion();
+  if(isCorrect){
+    // pergunta se foi chute ou sabia -> renderResultArea já mostra os botões
+  }
+}
+
+function setGuess(qid, wasGuess){
+  if(state.answers[qid]){
+    state.answers[qid].guess = wasGuess;
+    saveAnswers();
+    renderQuestion();
+  }
+}
+
+function renderResultArea(q, ans){
+  const area = document.getElementById('resultArea');
+  const correctLabel = q.answer ? "VERDADEIRO" : "FALSO";
+  let bannerHtml = "";
+  if(ans.status === 'correct'){
+    bannerHtml = `<div class="result-banner correct">✅ Você acertou! O gabarito é <b>${correctLabel}</b>.</div>`;
+  } else {
+    bannerHtml = `<div class="result-banner wrong">❌ Você errou. O gabarito correto é <b class="correct-ans">${correctLabel}</b> (você marcou ${ans.selected === 'V' ? 'Verdadeiro' : 'Falso'}).</div>`;
+  }
+
+  let guessRow = "";
+  if(ans.status === 'correct' && ans.guess === null){
+    guessRow = `
+      <div class="guess-row">
+        <button class="btn-blue" id="knewBtn">🧠 Eu sabia a resposta</button>
+        <button class="btn-yellow" id="guessBtn">🎲 Acertei no chute</button>
+      </div>
+    `;
+  } else if(ans.status === 'correct' && ans.guess !== null){
+    guessRow = `<div class="hint">${ans.guess ? '🎲 Marcado como acerto no chute.' : '🧠 Marcado como acerto por conhecimento.'}</div>`;
+  }
+
+  area.innerHTML = bannerHtml + `<div class="justification">${ans.status==='correct' ? '✔️' : '📖'} <b>Justificativa:</b> ${q.just}</div>` + guessRow;
+
+  if(document.getElementById('knewBtn')) document.getElementById('knewBtn').onclick = ()=>setGuess(q.id, false);
+  if(document.getElementById('guessBtn')) document.getElementById('guessBtn').onclick = ()=>setGuess(q.id, true);
+}
+
+async function markEasy(qid){
+  if(!state.easyIds.includes(qid)){
+    state.easyIds.push(qid);
+    await saveEasy();
+    state.currentIndex = 0;
+    await saveMeta();
+    renderQuestion();
+  }
+}
+
+/* =========================================================
+   BANCO DE FÁCEIS
+   ========================================================= */
+function openBank(){
+  const list = document.getElementById('bankList');
+  if(state.easyIds.length === 0){
+    list.innerHTML = `<div class="empty-msg">Nenhuma questão marcada como fácil ainda.</div>`;
+  } else {
+    list.innerHTML = state.easyIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id===id);
+      if(!q) return "";
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,110)}${q.statement.length>110?'...':''}</div><button class="btn-red" onclick="removeEasy(${id})">Remover</button></div>`;
+    }).join("");
+  }
+  document.getElementById('bankModal').classList.add('show');
+}
+function removeEasy(id){
+  state.easyIds = state.easyIds.filter(x=>x!==id);
+  saveEasy();
+  openBank();
+  renderQuestion();
+}
+
+/* =========================================================
+   ESTATÍSTICAS DE ERROS/CHUTES
+   ========================================================= */
+function openStatsModal(){
+  const wrongList = document.getElementById('wrongList');
+  const guessList = document.getElementById('guessList');
+  const wrongIds = Object.keys(state.answers).filter(id=>state.answers[id].status==='wrong');
+  const guessIds = Object.keys(state.answers).filter(id=>state.answers[id].status==='correct' && state.answers[id].guess===true);
+
+  wrongList.innerHTML = wrongIds.length === 0 ? `<div class="empty-msg">Nenhum erro registrado ainda. 🎉</div>` :
+    wrongIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id==id);
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,120)}${q.statement.length>120?'...':''}</div><button class="btn-blue" onclick="jumpTo(${id})">Ir</button></div>`;
+    }).join("");
+
+  guessList.innerHTML = guessIds.length === 0 ? `<div class="empty-msg">Nenhum acerto no chute registrado ainda.</div>` :
+    guessIds.map(id=>{
+      const q = QUESTIONS.find(x=>x.id==id);
+      return `<div class="list-item"><div class="txt"><b>[${q.fonte}]</b> ${q.statement.substring(0,120)}${q.statement.length>120?'...':''}</div><button class="btn-blue" onclick="jumpTo(${id})">Ir</button></div>`;
+    }).join("");
+
+  document.getElementById('statsModal').classList.add('show');
+}
+function jumpTo(id){
+  closeModal('statsModal');
+  state.category = "TODAS";
+  state.search = "";
+  document.getElementById('categorySelect').value = "TODAS";
+  document.getElementById('searchInput').value = "";
+  buildFiltered();
+  const idx = filteredQuestions.findIndex(q=>q.id==id);
+  state.currentIndex = idx >= 0 ? idx : 0;
+  saveMeta();
+  renderQuestion();
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+
+/* =========================================================
+   IMPORTAR / EXPORTAR PROGRESSO (sem download de arquivo)
+   ========================================================= */
+let dataModalMode = "export";
+function openExport(){
+  dataModalMode = "export";
+  document.getElementById('dataModalTitle').textContent = "Exportar progresso";
+  document.getElementById('dataHint').textContent = "Copie o texto abaixo e guarde em local seguro. Depois use 'Importar progresso' para restaurar.";
+  document.getElementById('dataTextarea').value = JSON.stringify({answers: state.answers, easyIds: state.easyIds});
+  document.getElementById('dataConfirmBtn').textContent = "Fechar";
+  document.getElementById('dataModal').classList.add('show');
+}
+function openImport(){
+  dataModalMode = "import";
+  document.getElementById('dataModalTitle').textContent = "Importar progresso";
+  document.getElementById('dataHint').textContent = "Cole aqui o texto exportado anteriormente e clique em Confirmar.";
+  document.getElementById('dataTextarea').value = "";
+  document.getElementById('dataConfirmBtn').textContent = "Confirmar Importação";
+  document.getElementById('dataModal').classList.add('show');
+}
+async function confirmDataModal(){
+  if(dataModalMode === "export"){
+    closeModal('dataModal');
+    return;
+  }
+  try{
+    const parsed = JSON.parse(document.getElementById('dataTextarea').value);
+    if(parsed.answers) state.answers = parsed.answers;
+    if(parsed.easyIds) state.easyIds = parsed.easyIds;
+    await saveAnswers();
+    await saveEasy();
+    closeModal('dataModal');
+    renderQuestion();
+    alert("Progresso importado com sucesso!");
+  }catch(e){
+    alert("Texto inválido. Verifique se copiou corretamente o progresso exportado.");
+  }
+}
+
+/* =========================================================
+   RECOMEÇAR / ZERAR TUDO
+   ========================================================= */
+async function restartQuiz(){
+  if(!confirm("Recomeçar o quiz? Suas respostas serão apagadas, mas as questões marcadas como fáceis continuam excluídas.")) return;
+
+  // Recarrega a lista de fáceis diretamente do armazenamento ANTES de mexer em
+  // qualquer coisa, garantindo que usamos a versão mais atual (evita perder
+  // marcações feitas recentemente por uma eventual condição de corrida no save).
+  try{
+    const v = await storageGet('quiz-easy');
+    if(v) state.easyIds = JSON.parse(v);
+  }catch(e){}
+
+  state.answers = {};
+  state.currentIndex = 0;
+  await saveAnswers();
+  await saveMeta();
+  await saveEasy(); // regrava explicitamente a lista de fáceis (inalterada), garantindo que não seja perdida
+  renderQuestion();
+}
+async function resetAll(){
+  if(!confirm("Zerar TUDO? Isso vai apagar respostas E a lista de questões fáceis, voltando ao estado inicial completo.")) return;
+  state.answers = {};
+  state.easyIds = [];
+  state.currentIndex = 0;
+  await saveAnswers();
+  await saveEasy();
+  await saveMeta();
+  renderQuestion();
+}
+
+/* =========================================================
+   EVENTOS GERAIS
+   ========================================================= */
+function setupEvents(){
+  document.getElementById('categorySelect').onchange = (e)=>{
+    state.category = e.target.value;
+    state.currentIndex = 0;
+    saveMeta();
+    renderQuestion();
+  };
+  let searchTimeout;
+  document.getElementById('searchInput').oninput = (e)=>{
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(()=>{
+      state.search = e.target.value;
+      state.currentIndex = 0;
+      saveMeta();
+      renderQuestion();
+    }, 250);
+  };
+  document.getElementById('goToBtn').onclick = ()=>{
+    const val = parseInt(document.getElementById('goToInput').value, 10);
+    if(!isNaN(val) && val >= 1 && val <= filteredQuestions.length){
+      state.currentIndex = val - 1;
+      saveMeta();
+      renderQuestion();
+    } else {
+      alert("Número de questão inválido para o filtro atual (1 a " + filteredQuestions.length + ").");
+    }
+  };
+  document.getElementById('bankBtn').onclick = openBank;
+  document.getElementById('statsModalBtn').onclick = openStatsModal;
+  document.getElementById('exportBtn').onclick = openExport;
+  document.getElementById('importBtn').onclick = openImport;
+  document.getElementById('dataConfirmBtn').onclick = confirmDataModal;
+  document.getElementById('restartBtn').onclick = restartQuiz;
+  document.getElementById('resetAllBtn').onclick = resetAll;
+
+  document.addEventListener('keydown', (e)=>{
+    const modalOpen = document.querySelector('.modal-bg.show');
+    if(modalOpen) return;
+    if(e.key === 'ArrowRight'){
+      state.currentIndex++; if(state.currentIndex>=filteredQuestions.length) state.currentIndex = 0;
+      saveMeta(); renderQuestion();
+    } else if(e.key === 'ArrowLeft'){
+      state.currentIndex--; if(state.currentIndex<0) state.currentIndex = filteredQuestions.length-1;
+      saveMeta(); renderQuestion();
+    }
+  });
+
+  document.querySelectorAll('.modal-bg').forEach(m=>{
+    m.addEventListener('click', (e)=>{ if(e.target === m) m.classList.remove('show'); });
+  });
+}
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+async function boot(){
+  await loadState();
+  renderCategorySelect();
+  document.getElementById('searchInput').value = state.search;
+  setupEvents();
+  renderQuestion();
+}
+boot();
+</script>
+</body>
+</html>
