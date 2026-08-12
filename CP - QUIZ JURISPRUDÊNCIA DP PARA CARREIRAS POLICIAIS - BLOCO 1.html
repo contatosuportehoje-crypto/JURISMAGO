@@ -10,6 +10,15 @@
     --green:#22c55e; --red:#ef4444; --blue:#3b82f6; --yellow:#eab308; --purple:#a855f7;
     --border:#334155;
   }
+  body.light-theme{
+    --bg:#f4f6fb; --card:#ffffff; --card2:#eef1f7; --text:#1e2530; --muted:#64748b;
+    --border:#d7dce6;
+  }
+  body.light-theme h1{color:#0f172a;}
+  body.light-theme .tag.source{background:#e0e7ff; color:#3730a3; border-color:#a5b4fc;}
+  body.light-theme .caso-box{background:#fffbeb; border-color:#fbe7a1; color:#78350f;}
+  body.light-theme .result-banner.correct{background:#dcfce7;}
+  body.light-theme .result-banner.wrong{background:#fee2e2;}
   *{box-sizing:border-box;}
   body{
     margin:0; font-family: 'Segoe UI', Arial, sans-serif; background:var(--bg); color:var(--text);
@@ -118,6 +127,7 @@
     <input type="text" id="searchInput" placeholder="🔎 Buscar por palavra-chave...">
     <input type="number" id="goToInput" placeholder="Nº questão" style="width:110px;">
     <button class="btn-blue" id="goToBtn">Ir</button>
+    <button class="btn-gray" id="unsolvedBtn">🕘 Não resolvidas</button>
     <button class="btn-gray" id="bankBtn">📦 Banco de Fáceis</button>
     <button class="btn-gray" id="statsModalBtn">📊 Ver erros/chutes</button>
     <button class="btn-gray" id="exportBtn">Exportar progresso</button>
@@ -126,6 +136,7 @@
   <div class="controls">
     <button class="btn-yellow" id="restartBtn">🔄 Recomeçar (mantém fáceis)</button>
     <button class="btn-red" id="resetAllBtn">🗑️ Zerar tudo</button>
+    <button class="btn-gray" id="themeToggleBtn">🌙 Tema escuro</button>
   </div>
 
   <div class="qcounter" id="qcounter"></div>
@@ -300,9 +311,11 @@ let state = {
   easyIds: [],       // ids marcados como fáceis (excluídos permanentemente)
   currentIndex: 0,
   category: "TODAS",
-  search: ""
+  search: "",
+  filter: "all"      // all | unsolved
 };
 let filteredQuestions = [];
+let unsolvedSnapshot = null; // fotografia do filtro "não resolvidas"
 let answeredCurrent = false;
 let currentSelected = null; // 'V' ou 'F'
 let pendingSelection = null; // seleção feita mas ainda não confirmada
@@ -355,6 +368,12 @@ async function loadState(){
       state.search = m.search || "";
     }
   }catch(e){}
+  try{
+    const v = await storageGet('quiz-theme');
+    if(v === 'light'){
+      document.body.classList.add('light-theme');
+    }
+  }catch(e){}
 }
 
 async function saveAnswers(){
@@ -378,12 +397,29 @@ function getCategories(){
 function buildFiltered(){
   const cat = state.category;
   const search = state.search.trim().toLowerCase();
-  filteredQuestions = QUESTIONS.filter(q=>{
-    if(state.easyIds.includes(q.id)) return false;
-    if(cat !== "TODAS" && q.tema !== cat) return false;
-    if(search && !(q.statement.toLowerCase().includes(search) || q.tema.toLowerCase().includes(search) || q.fonte.toLowerCase().includes(search))) return false;
-    return true;
-  });
+
+  let ids = QUESTIONS.filter(q=>!state.easyIds.includes(q.id)).map(q=>q.id);
+  if(cat !== "TODAS"){
+    ids = ids.filter(id => QUESTIONS.find(q=>q.id===id).tema === cat);
+  }
+
+  if(state.filter === "unsolved"){
+    if(!unsolvedSnapshot){
+      unsolvedSnapshot = ids.filter(id => !state.answers[id]);
+    }
+    ids = unsolvedSnapshot.filter(id => ids.includes(id));
+  } else {
+    unsolvedSnapshot = null;
+  }
+
+  if(search){
+    ids = ids.filter(id=>{
+      const q = QUESTIONS.find(x=>x.id===id);
+      return q.statement.toLowerCase().includes(search) || q.tema.toLowerCase().includes(search) || q.fonte.toLowerCase().includes(search);
+    });
+  }
+
+  filteredQuestions = ids.map(id => QUESTIONS.find(q=>q.id===id));
   if(state.currentIndex >= filteredQuestions.length) state.currentIndex = 0;
   if(state.currentIndex < 0) state.currentIndex = 0;
 }
@@ -545,6 +581,7 @@ async function markEasy(qid){
     state.easyIds.push(qid);
     await saveEasy();
     state.currentIndex = 0;
+    unsolvedSnapshot = null;
     await saveMeta();
     renderQuestion();
   }
@@ -569,6 +606,7 @@ function openBank(){
 function removeEasy(id){
   state.easyIds = state.easyIds.filter(x=>x!==id);
   saveEasy();
+  unsolvedSnapshot = null;
   openBank();
   renderQuestion();
 }
@@ -600,8 +638,11 @@ function jumpTo(id){
   closeModal('statsModal');
   state.category = "TODAS";
   state.search = "";
+  state.filter = "all";
+  unsolvedSnapshot = null;
   document.getElementById('categorySelect').value = "TODAS";
   document.getElementById('searchInput').value = "";
+  updateFilterBtnActive();
   buildFiltered();
   const idx = filteredQuestions.findIndex(q=>q.id==id);
   state.currentIndex = idx >= 0 ? idx : 0;
@@ -645,6 +686,7 @@ async function confirmDataModal(){
     await saveAnswers();
     await saveEasy();
     closeModal('dataModal');
+    unsolvedSnapshot = null;
     renderQuestion();
     alert("Progresso importado com sucesso!");
   }catch(e){
@@ -668,6 +710,9 @@ async function restartQuiz(){
 
   state.answers = {};
   state.currentIndex = 0;
+  state.filter = "all";
+  unsolvedSnapshot = null;
+  updateFilterBtnActive();
   await saveAnswers();
   await saveMeta();
   await saveEasy(); // regrava explicitamente a lista de fáceis (inalterada), garantindo que não seja perdida
@@ -678,10 +723,42 @@ async function resetAll(){
   state.answers = {};
   state.easyIds = [];
   state.currentIndex = 0;
+  state.filter = "all";
+  unsolvedSnapshot = null;
+  updateFilterBtnActive();
   await saveAnswers();
   await saveEasy();
   await saveMeta();
   renderQuestion();
+}
+
+/* =========================================================
+   FILTRO "NÃO RESOLVIDAS" E TEMA CLARO/ESCURO
+   ========================================================= */
+function updateFilterBtnActive(){
+  const btn = document.getElementById('unsolvedBtn');
+  if(!btn) return;
+  if(state.filter === "unsolved"){
+    btn.classList.remove('btn-gray');
+    btn.classList.add('btn-blue');
+  } else {
+    btn.classList.remove('btn-blue');
+    btn.classList.add('btn-gray');
+  }
+}
+
+function updateThemeBtnLabel(){
+  const btn = document.getElementById('themeToggleBtn');
+  if(!btn) return;
+  const isLight = document.body.classList.contains('light-theme');
+  btn.textContent = isLight ? '🌙 Tema escuro' : '☀️ Tema claro';
+}
+
+async function toggleTheme(){
+  document.body.classList.toggle('light-theme');
+  const isLight = document.body.classList.contains('light-theme');
+  await storageSet('quiz-theme', isLight ? 'light' : 'dark');
+  updateThemeBtnLabel();
 }
 
 /* =========================================================
@@ -691,6 +768,7 @@ function setupEvents(){
   document.getElementById('categorySelect').onchange = (e)=>{
     state.category = e.target.value;
     state.currentIndex = 0;
+    unsolvedSnapshot = null;
     saveMeta();
     renderQuestion();
   };
@@ -714,6 +792,14 @@ function setupEvents(){
       alert("Número de questão inválido para o filtro atual (1 a " + filteredQuestions.length + ").");
     }
   };
+  document.getElementById('unsolvedBtn').onclick = ()=>{
+    state.filter = (state.filter === "unsolved") ? "all" : "unsolved";
+    state.currentIndex = 0;
+    unsolvedSnapshot = null;
+    updateFilterBtnActive();
+    saveMeta();
+    renderQuestion();
+  };
   document.getElementById('bankBtn').onclick = openBank;
   document.getElementById('statsModalBtn').onclick = openStatsModal;
   document.getElementById('exportBtn').onclick = openExport;
@@ -721,6 +807,7 @@ function setupEvents(){
   document.getElementById('dataConfirmBtn').onclick = confirmDataModal;
   document.getElementById('restartBtn').onclick = restartQuiz;
   document.getElementById('resetAllBtn').onclick = resetAll;
+  document.getElementById('themeToggleBtn').onclick = toggleTheme;
 
   document.addEventListener('keydown', (e)=>{
     const modalOpen = document.querySelector('.modal-bg.show');
@@ -747,6 +834,8 @@ async function boot(){
   renderCategorySelect();
   document.getElementById('searchInput').value = state.search;
   setupEvents();
+  updateFilterBtnActive();
+  updateThemeBtnLabel();
   renderQuestion();
 }
 boot();
